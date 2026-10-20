@@ -27,7 +27,10 @@ FEED = "https://www.goodreads.com/review/list_rss/{user}?shelf={shelf}&page={pag
 PROFILE = f"https://www.goodreads.com/user/show/{GOODREADS_USER}"
 PAGE_SIZE = 100
 USER_AGENT = "Mozilla/5.0 (compatible; vikasinpencil-sync; +https://vikasinpencil.com)"
-OUT = Path(__file__).resolve().parent.parent / "content" / "books.js"
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "content" / "books.js"
+COVERS = ROOT / "assets" / "covers"
+OPEN_LIBRARY = "https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
 
 HEADER = """/* =============================================================
    BOOKS: generated from Goodreads. Don't edit this file by hand.
@@ -119,6 +122,8 @@ def parse_item(item, shelf):
         "avg": avg,
         "tags": [t for t in tags if t and t not in SHELVES],
         "review": clean_review(text(item, "user_review")),
+        "_image": text(item, "book_large_image_url") or text(item, "book_image_url"),
+        "_isbn": re.sub(r"[^0-9Xx]", "", text(item, "isbn")),
     }
 
 
@@ -134,6 +139,42 @@ def fetch_shelf(shelf):
             return books
         time.sleep(1)
     return books
+
+
+def is_image(data):
+    return len(data) > 2000 and (data[:3] == b"\xff\xd8\xff" or data[:8] == b"\x89PNG\r\n\x1a\n")
+
+
+def cover_urls(book):
+    """Goodreads first (asking for a 400px-tall copy), then Open Library by ISBN."""
+    urls = []
+    image = book["_image"]
+    if image and "nophoto" not in image:
+        sized = re.sub(r"\._S[XY]\d+_(?=\.\w+$)", "", image)
+        urls.append(re.sub(r"(\.\w+)$", r"._SY400_\1", sized))
+        urls.append(image)
+    if book["_isbn"]:
+        urls.append(OPEN_LIBRARY.format(isbn=book["_isbn"]))
+    return urls
+
+
+def save_cover(book):
+    """Keeps a copy of each cover in assets/covers/ so the site never depends on Goodreads' image links.
+    A cover is downloaded once; delete the file to fetch it again."""
+    path = COVERS / f"{book['id']}.jpg"
+    if path.exists():
+        return path
+    for url in cover_urls(book):
+        try:
+            data = fetch(url, tries=2)
+        except RuntimeError:
+            continue
+        if is_image(data):
+            COVERS.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            time.sleep(0.3)
+            return path
+    return None
 
 
 def sort_key(book):
@@ -168,6 +209,10 @@ def main():
                 seen.add(book["id"])
                 books.append(book)
     books.sort(key=sort_key)
+    for book in books:
+        path = save_cover(book)
+        book["cover"] = f"assets/covers/{path.name}" if path else ""
+        del book["_image"], book["_isbn"]
 
     previous = load_previous()
     old_read = sum(1 for b in (previous or {}).get("books", []) if b.get("shelf") == "read")

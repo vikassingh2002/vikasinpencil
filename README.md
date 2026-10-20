@@ -65,6 +65,9 @@ The References page is your Goodreads library: every book you've read with your 
 - **Spine colours** follow your Goodreads shelves (fantasy, paranormal, indian and so on). Books you haven't shelved there show as pale "Unshelved" spines; shelve them on Goodreads and they take their colour the next morning.
 - **To change how a book shows here** without touching Goodreads, add a note to `content/references.js`: `hide`, `why`, `line`, or a tidier `title`. The top of that file explains each one.
 - **Proofread reviews:** 36 reviews have a lightly proofread copy in `content/references.js` (spelling, capitals and grammar; your words). Each copy is used only while your review on Goodreads still matches its `was` text exactly, so if you edit a review on Goodreads, your new version shows instead.
+- **Covers** are saved in `assets/covers/` (one per book, named by its Goodreads id) the first time the sync sees a book, from Goodreads or else Open Library. To replace a cover, put your own image there with the same name. Books with no cover anywhere get a drawn one.
+- **"Start here"** (the five books at the top of References) is the `startHere` list in `content/references.js`. Change the ids to change the books.
+- **Link previews:** `assets/img/share-library.png` is the image WhatsApp and LinkedIn show for the References link. WhatsApp keeps old previews for a while, so a changed image can take a day or so to appear in chats.
 - **Link to a single book:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id).
 - GitHub pauses scheduled jobs in a repository after 60 days with no commits. If the shelves stop updating, open the **Actions** tab and re-enable "Sync Goodreads".
 

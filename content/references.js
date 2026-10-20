@@ -26,6 +26,16 @@ NB.references = {
   // The first lines on the References page.
   intro: "Everything I've finished since 2018, with the stars I gave it and what I wrote at the time. Synced from Goodreads every morning.",
 
+  // "Start here": the books a visitor sees first, by Goodreads id, in this order.
+  startHereTitle: "Five books that shaped me",
+  startHere: [
+    "21",        // A Short History of Nearly Everything
+    "572918",    // Mastering Modern World History
+    "40121378",  // Atomic Habits
+    "29780253",  // Born a Crime
+    "11084145"   // Steve Jobs
+  ],
+
   notes: {
     // Tidier titles than the Goodreads editions
     "164581115": { // The Rise and Fall of the Third Reich

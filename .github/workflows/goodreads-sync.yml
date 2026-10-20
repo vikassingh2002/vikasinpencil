@@ -29,13 +29,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- content/books.js; then
+          git add content/books.js assets/covers
+          if git diff --cached --quiet; then
             echo "Goodreads hasn't changed since the last sync."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/books.js
           git commit -m "Sync library from Goodreads"
           git push
           gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" > /dev/null || echo "Pages will rebuild from the push."

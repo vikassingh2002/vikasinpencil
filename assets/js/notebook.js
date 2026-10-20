@@ -135,7 +135,8 @@
       review: review,
       why: n.why || '',
       line: n.line || '',
-      link: 'https://www.goodreads.com/book/show/' + encodeURIComponent(b.id)
+      link: 'https://www.goodreads.com/book/show/' + encodeURIComponent(b.id),
+      cover: b.cover || ''
     };
     book.genre = genreOf(book.tags);
     book.find = fold([book.title, book.subtitle, book.series, book.author, book.tags.join(' ')].join(' '));
@@ -151,6 +152,14 @@
     var html = '';
     for (var i = 1; i <= 5; i++) html += '<svg viewBox="0 0 24 24" aria-hidden="true"' + (i <= n ? ' class="on"' : '') + '><path d="' + STAR + '"/></svg>';
     return '<span class="stars' + (extraClass ? ' ' + extraClass : '') + '" role="img" aria-label="' + (n ? n + ' of 5 stars' : 'not rated') + '">' + html + '</span>';
+  }
+  // A book's cover: the copy saved by the sync, or a pencil-and-paper one in its shelf colour.
+  function coverHtml(b, extraClass, alt) {
+    var cls = 'cover' + (extraClass ? ' ' + extraClass : '');
+    if (b.cover) {
+      return '<img class="' + cls + '" src="' + esc(b.cover) + '" alt="' + esc(alt || '') + '" loading="lazy" decoding="async" width="200" height="300">';
+    }
+    return '<span class="' + cls + ' cover--drawn genre--' + b.genre.key + '"' + (alt ? ' role="img" aria-label="' + esc(alt) + '"' : ' aria-hidden="true"') + '><span>' + esc(b.title) + '</span></span>';
   }
   function reviewHtml(text) {
     return String(text).split(/\n{2,}/).map(function (para) {
@@ -371,7 +380,7 @@
     document.addEventListener('touchstart', function (e) {
       if (e.touches.length !== 1) { tracking = false; return; }
       var t = e.target;
-      if (t.closest && t.closest('input, textarea, select, button, summary, .tabs, .table-wrap, .lib-chips, .pocket-stage, .book-card')) { tracking = false; return; }
+      if (t.closest && t.closest('input, textarea, select, button, summary, .tabs, .table-wrap, .lib-chips, .cover-row, .pocket-stage, .book-card')) { tracking = false; return; }
       tracking = true;
       sx = e.touches[0].clientX;
       sy = e.touches[0].clientY;
@@ -1249,13 +1258,18 @@
     if (b.avg) facts.push(['Goodreads average', b.avg.toFixed(2)]);
     c.paper.innerHTML =
       '<button type="button" class="book-card__close" aria-label="Put the card back"><span aria-hidden="true">×</span></button>' +
-      '<p class="label">' + esc(SHELF_NAMES[b.shelf] || 'Book') + (c.list.length > 1 ? '<span class="book-card__count"> · ' + (c.index + 1) + ' of ' + c.list.length + '</span>' : '') + '</p>' +
-      '<h2 class="hand-l book-card__title" id="book-card-title">' + esc(b.title) + '</h2>' +
-      (b.subtitle ? '<p class="book-card__sub">' + esc(b.subtitle) + '</p>' : '') +
-      '<p class="book-card__by">' + esc(b.author) + (b.series ? ' · ' + esc(b.series) : '') + '</p>' +
-      (finished || b.rating
-        ? '<div class="book-card__rating">' + starsHtml(b.rating, 'stars--big') + '<span class="book-card__words">' + esc(b.rating ? RATING_WORDS[b.rating] : 'no stars given') + '</span></div>'
-        : '') +
+      '<div class="book-card__head">' +
+        '<div class="book-card__cover">' + coverHtml(b, 'cover--card', 'Cover of ' + b.title) + '</div>' +
+        '<div class="book-card__headtext">' +
+          '<p class="label">' + esc(SHELF_NAMES[b.shelf] || 'Book') + (c.list.length > 1 ? '<span class="book-card__count"> · ' + (c.index + 1) + ' of ' + c.list.length + '</span>' : '') + '</p>' +
+          '<h2 class="hand-l book-card__title" id="book-card-title">' + esc(b.title) + '</h2>' +
+          (b.subtitle ? '<p class="book-card__sub">' + esc(b.subtitle) + '</p>' : '') +
+          '<p class="book-card__by">' + esc(b.author) + (b.series ? ' · ' + esc(b.series) : '') + '</p>' +
+          (finished || b.rating
+            ? '<div class="book-card__rating">' + starsHtml(b.rating, 'stars--big') + '<span class="book-card__words">' + esc(b.rating ? RATING_WORDS[b.rating] : 'no stars given') + '</span></div>'
+            : '') +
+        '</div>' +
+      '</div>' +
       (facts.length ? '<div class="book-card__facts">' + facts.map(function (f) { return fieldHtml(f[0], f[1]); }).join('') + '</div>' : '') +
       (b.line ? '<p class="margin-note gap-m">' + rich(b.line) + '</p>' : '') +
       (b.why ? '<p class="label gap-m">Why it\'s on the list</p><p class="hand-s gap-s">' + rich(b.why) + '</p>' : '') +
@@ -1384,9 +1398,22 @@
     var pages = shelf.reduce(function (s, b) { return s + b.pages; }, 0);
     var reviewed = shelf.filter(function (b) { return b.review; }).length;
     var since = shelf.map(function (b) { return b.read.slice(0, 4); }).filter(Boolean).sort()[0] || '';
-    var state = { genre: '', five: false, reviewed: false, q: '', sort: 'year', view: store.get('libView', 'shelf') === 'list' ? 'list' : 'shelf' };
+    // Phones open on the list (quicker to scan than 14 planks) unless the visitor chose otherwise.
+    var phone = !!(window.matchMedia && window.matchMedia('(max-width: 720px)').matches);
+    var savedView = store.get('libView', '');
+    var state = { genre: '', five: false, reviewed: false, q: '', sort: 'year', view: savedView === 'list' || savedView === 'shelf' ? savedView : (phone ? 'list' : 'shelf') };
     var shown = shelf;
     var SHOW = 12;
+    var picks = list(refs.startHere).map(function (id) { return library.filter(function (b) { return b.id === String(id); })[0]; }).filter(Boolean);
+    var recent = shelf.slice().sort(function (a, b) { return b.read.localeCompare(a.read); }).slice(0, 4);
+    function coverRow(books, cls) {
+      return '<ul class="cover-row ' + cls + '">' + books.map(function (b, i) {
+        return '<li style="--r:' + [-2, 1.5, -1, 2, -1.5][i % 5] + 'deg"><button type="button" class="cover-row__book" data-book="' + esc(b.id) + '">' +
+          coverHtml(b, 'cover--row') +
+          '<span class="cover-row__title">' + esc(b.title) + '</span>' +
+          '<span class="cover-row__by">' + esc(b.author) + '</span></button></li>';
+      }).join('') + '</ul>';
+    }
 
     var counts = {};
     shelf.forEach(function (b) { counts[b.genre.key] = (counts[b.genre.key] || 0) + 1; });
@@ -1398,7 +1425,7 @@
 
     var readingHtml = reading.map(function (b) {
       return '<button type="button" class="reading-card" data-book="' + esc(b.id) + '">' +
-        '<span class="reading-card__book genre--' + b.genre.key + '" aria-hidden="true"></span>' +
+        coverHtml(b, 'cover--reading') +
         '<span class="reading-card__body">' +
           '<span class="reading-card__title">' + esc(b.title) + '</span>' +
           '<span class="reading-card__author">' + esc(b.author) + (b.pages ? ' · ' + num(b.pages) + ' pages' : '') + '</span>' +
@@ -1410,6 +1437,9 @@
       strip([['Title', 'References'], ['Read', num(shelf.length)], ['Since', since], ['Page', '30']]) +
       '<h1 class="hand-xl">References</h1>' +
       (refs.intro ? '<p class="lede">' + rich(refs.intro) + '</p>' : '') +
+      (picks.length
+        ? '<p class="label gap-l">Start here</p><h2 class="hand-m lib-start__title">' + esc(refs.startHereTitle || 'Books that shaped me') + '</h2>' + coverRow(picks, 'lib-start')
+        : '') +
       (readingHtml ? '<p class="label gap-l">Reading now</p><div class="reading">' + readingHtml + '</div>' : '') +
       (shelf.length
         ? '<p class="label gap-l">The numbers</p>' +
@@ -1419,8 +1449,16 @@
           '</div>' +
           '<p class="label gap-l">The shelves</p>' +
           '<div class="lib-tools">' +
-            '<label class="visually-hidden" for="lib-search">Find a title or author</label>' +
-            '<input class="input lib-search" id="lib-search" type="search" placeholder="Find a title or author" autocomplete="off" spellcheck="false">' +
+            '<div class="lib-searchrow">' +
+              '<label class="visually-hidden" for="lib-search">Find a title or author</label>' +
+              '<input class="input lib-search" id="lib-search" type="search" placeholder="Find a title or author" autocomplete="off" spellcheck="false">' +
+              '<button type="button" class="lib-chip lib-filter-toggle" id="lib-filter-toggle" aria-controls="lib-filters" aria-expanded="' + !phone + '">Filters<b id="lib-active" hidden></b></button>' +
+              '<span class="lib-view" role="group" aria-label="Show as">' +
+                '<button type="button" class="lib-chip" data-view="shelf" aria-pressed="' + (state.view === 'shelf') + '">Shelves</button>' +
+                '<button type="button" class="lib-chip" data-view="list" aria-pressed="' + (state.view === 'list') + '">List</button>' +
+              '</span>' +
+            '</div>' +
+            '<div class="lib-filters" id="lib-filters"' + (phone ? ' hidden' : '') + '>' +
             '<div class="lib-chips" role="group" aria-label="Shelf">' +
               '<button type="button" class="lib-chip" data-genre="" aria-pressed="true">All <span>' + shelf.length + '</span></button>' +
               chips.map(function (g) {
@@ -1433,10 +1471,7 @@
               '<label class="lib-sort"><span class="field-label">Order</span><select id="lib-sort" class="lib-select">' +
                 '<option value="year">By year read</option><option value="rating">By my stars</option><option value="title">A to Z</option><option value="pages">By length</option>' +
               '</select></label>' +
-              '<span class="lib-view" role="group" aria-label="Show as">' +
-                '<button type="button" class="lib-chip" data-view="shelf" aria-pressed="' + (state.view === 'shelf') + '">Shelves</button>' +
-                '<button type="button" class="lib-chip" data-view="list" aria-pressed="' + (state.view === 'list') + '">List</button>' +
-              '</span>' +
+            '</div>' +
             '</div>' +
           '</div>' +
           '<p class="lib-count" id="lib-count" aria-live="polite"></p>' +
@@ -1461,13 +1496,17 @@
         ? '<ul class="anti anti--compact" id="anti">' + waiting.map(function (b, i) {
             return '<li' + (i >= SHOW ? ' hidden data-extra' : '') + '><span class="anti__box" style="--r:' + [-3, 2, -1, 3][i % 4] + 'deg" aria-hidden="true"></span>' +
               '<button type="button" class="anti__open" data-book="' + esc(b.id) + '">' +
-                '<span class="anti__title">' + esc(b.title) + '</span>' +
-                '<span class="anti__author">' + esc(b.author) + (b.pages ? ' · ' + num(b.pages) + ' pages' : '') + '</span>' +
-                (b.why ? '<span class="anti__why">' + rich(b.why) + '</span>' : '') +
+                coverHtml(b, 'cover--thumb') +
+                '<span class="anti__text">' +
+                  '<span class="anti__title">' + esc(b.title) + '</span>' +
+                  '<span class="anti__author">' + esc(b.author) + (b.pages ? ' · ' + num(b.pages) + ' pages' : '') + '</span>' +
+                  (b.why ? '<span class="anti__why">' + rich(b.why) + '</span>' : '') +
+                '</span>' +
               '</button></li>';
           }).join('') + '</ul>'
         : '') +
       (waiting.length > SHOW ? '<button type="button" class="btn btn--line gap-s" id="anti-more" aria-expanded="false" aria-controls="anti">Show all ' + waiting.length + '</button>' : '') +
+      (recent.length ? '<p class="label gap-l">Recently finished</p>' + coverRow(recent, 'lib-recent') : '') +
       '<div class="box box--dashed gap-l"><p class="label">Lend me a book</p>' +
         composerHtml({
           id: 'lend',
@@ -1558,7 +1597,7 @@
         return '<h3 class="lib-group">' + esc(groupName(g.key)) + ' <small>' + plural(g.books.length, 'book', 'books') + '</small></h3>' +
           '<ul class="lib-list">' + g.books.map(function (b) {
             return '<li><button type="button" class="lib-item" data-book="' + esc(b.id) + '">' +
-              '<span class="lib-item__swatch genre--' + b.genre.key + '" aria-hidden="true"></span>' +
+              '<span class="lib-item__thumb genre--' + b.genre.key + '">' + coverHtml(b, 'cover--thumb') + '</span>' +
               '<span class="lib-item__main"><span class="lib-item__title">' + esc(b.title) + '</span>' +
                 '<span class="lib-item__by">' + esc(b.author) + (b.review ? ' · reviewed' : '') + '</span></span>' +
               '<span class="lib-item__meta">' + starsHtml(b.rating) + (b.read ? '<span class="lib-item__when">' + esc(fmt(b.read, 'month')) + '</span>' : '') + '</span>' +
@@ -1578,6 +1617,10 @@
         ? '<p class="hand-m gap-s">Nothing on the shelf matches that.</p><button type="button" class="btn btn--text" id="lib-clear">Clear the filters</button>'
         : state.view === 'list' ? listHtml(grouped(shown)) : shelfHtml(grouped(shown));
       if (card && card.el.open) markBook(card.list[card.index].id);
+      var active = (state.genre ? 1 : 0) + (state.five ? 1 : 0) + (state.reviewed ? 1 : 0) + (state.sort !== 'year' ? 1 : 0);
+      var badge = $('#lib-active');
+      badge.hidden = !active;
+      badge.textContent = active ? String(active) : '';
     }
     function pressOnly(selector, on) {
       $$(selector, left).forEach(function (el) { el.setAttribute('aria-pressed', String(el === on)); });
@@ -1621,6 +1664,12 @@
           paint();
         });
       });
+      $('#lib-filter-toggle').addEventListener('click', function (e) {
+        var btn = e.currentTarget;
+        var open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(open));
+        $('#lib-filters').hidden = !open;
+      });
       $('#pull').addEventListener('click', function () {
         var pool = shown.length ? shown : shelf;
         var pick = pool[Math.floor(Math.random() * pool.length)];
@@ -1635,7 +1684,7 @@
       if (t.closest('#lib-clear')) { clearFilters(); return; }
       var hit = t.closest('[data-book]');
       if (!hit) return;
-      var from = hit.closest('#lib-books') ? shown : hit.closest('.reading') ? reading : abandoned;
+      var from = hit.closest('#lib-books') ? shown : hit.closest('.lib-start') ? picks : hit.closest('.reading') ? reading : abandoned;
       openBook(hit.getAttribute('data-book'), from);
     });
     right.addEventListener('click', function (e) {
@@ -1650,7 +1699,7 @@
         return;
       }
       var hit = t.closest('[data-book]');
-      if (hit) openBook(hit.getAttribute('data-book'), waiting);
+      if (hit) openBook(hit.getAttribute('data-book'), hit.closest('.lib-recent') ? recent : waiting);
     });
 
     // A link straight to one book: references.html#book-21
