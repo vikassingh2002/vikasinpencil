@@ -1,5 +1,7 @@
 # Local tooling, not part of the site
 .claude/
+.venv/
+__pycache__/
 .DS_Store
 Thumbs.db
 desktop.ini

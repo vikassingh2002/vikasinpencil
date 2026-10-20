@@ -21,6 +21,11 @@
 <body>
 <div class="nb nb--cover" data-page="cover">
   <main id="main" class="cover">
+    <header class="cover__head">
+      <p class="cover__kicker">Lab notebook No. 1 · <span data-bind="name">Vikas Singh</span></p>
+      <h1 class="cover__title"><span class="cover__line">Vikas</span> <span class="cover__line"><span class="cover__in">in</span> Pencil</span><svg class="sketch cover__scribble" data-draw viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="ink" pathLength="1" d="M5 13c44-6 92-9 142-7s100 5 148-1"/></svg></h1>
+    </header>
+
     <div class="cover__stage">
       <div class="book js-turn" id="book">
         <div class="book__block" aria-hidden="true"></div>
@@ -42,7 +47,7 @@
           <div class="book__label">
             <div class="book__label-head"><span>Lab notebook</span><span class="book__no">No. 1</span></div>
             <div class="book__fields">
-              <div class="book__field"><span class="book__key">Name</span><h1 class="book__val" data-bind="name">Vikas Singh</h1></div>
+              <div class="book__field"><span class="book__key">Name</span><p class="book__val" data-bind="name">Vikas Singh</p></div>
               <div class="book__field"><span class="book__key">Subject</span><p class="book__val" data-bind="subject">things I haven't figured out yet</p></div>
               <div class="book__field"><span class="book__key">Pages left</span><p class="book__val" data-bind="pagesLeft">most of them</p></div>
             </div>
@@ -73,6 +78,8 @@
 <script src="content/hypotheses.js"></script>
 <script src="content/experiments.js"></script>
 <script src="content/books.js"></script>
+<script src="content/shelves.js"></script>
+<script src="content/media.js"></script>
 <script src="content/references.js"></script>
 <script src="content/errata.js"></script>
 <script src="content/pocket.js"></script>

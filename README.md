@@ -14,6 +14,7 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `robots.txt` | Tells search engines to stay out while it's a draft | Once, at launch |
 | `CNAME` and `.nojekyll` | Tell GitHub Pages your domain, and to publish the files exactly as they are | Never. Don't delete them |
 | `tools/goodreads_sync.py` | Copies your Goodreads shelves into `content/books.js` | Never. It runs itself every morning |
+| `tools/links_sync.py` | Looks up the links in your References log (films, videos, articles, podcasts) | Never. It runs straight after |
 | `.github/workflows/goodreads-sync.yml` | The daily job that runs that copy on GitHub | Never |
 
 ## Editing what the site says
@@ -26,8 +27,10 @@ Each notebook section has one file in `content/`:
 | `today.js` | The Today page (rewrite it on the 20th of each month) |
 | `hypotheses.js` | Hypotheses |
 | `experiments.js` | Experiments |
-| `references.js` | Your notes on books: proofread reviews, hidden books, why a book is on your list |
+| `references.js` | The References page: your notes on books, "Start here", and the log of courses, films, articles, videos and podcasts |
+| `shelves.js` | Which genre shelf each book sits on |
 | `books.js` | Your Goodreads shelves, copied every morning. **Don't edit it**: each sync overwrites it |
+| `media.js` | Titles and pictures the sync found for the links in your log. **Don't edit it** either |
 | `errata.js` | Corrections |
 | `pocket.js` | Sealed letters and open bets |
 
@@ -55,20 +58,39 @@ The three fingerprints there now are placeholders: they're the fingerprint of an
 
 The repository is public and keeps every past version of every file, so a letter's text must never be committed before its opening day, not even for a minute. The same goes for anything else you wouldn't put on the site itself.
 
-### Your reading comes from Goodreads
+### References: books, courses, films, articles, videos and podcasts
 
-The References page is your Goodreads library: every book you've read with your stars and review, what you're reading now, what you didn't finish, and your want-to-read shelf as the antilibrary. Nothing to edit here. Read, rate and review on Goodreads as usual, and the site catches up by the next morning.
+The References page is everything that's shaped how you think. The two pages hold "Start here", what's on the desk now, the numbers and the antilibrary; the whole collection sits on a fold-out sheet underneath, with the books on a bookcase and everything else as cards or a list.
+
+**Books come from Goodreads.** Read, rate and review there as usual, and the site catches up by the next morning.
 
 - **How it works:** every day at 06:00 India time, GitHub runs `tools/goodreads_sync.py`. It reads your public Goodreads shelves and rewrites `content/books.js`. If nothing changed, nothing happens. If Goodreads is down or sends back a suspiciously short list, the site keeps what it already has.
 - **To sync right now:** on GitHub, open **Actions → Sync Goodreads → Run workflow**.
 - **Keep your Goodreads profile public**, or the sync can't see your shelves.
-- **Spine colours** follow your Goodreads shelves (fantasy, paranormal, indian and so on). Books you haven't shelved there show as pale "Unshelved" spines; shelve them on Goodreads and they take their colour the next morning.
+- **Genres are decided here, not on Goodreads.** `content/shelves.js` puts every book on one shelf by what it's actually about (fantasy, horror, history, money and so on) and can file it under a few more genres for the filters. A book you add on Goodreads waits in a pale "To shelve" section until its Goodreads id is added to `shelves.js`. The morning job lists any such books in its summary (Actions → the latest run).
+- **Spine colours** come from each book's cover, worked out once when the cover is first saved. A spine's height follows the page count; a gold star means five stars, and a red ribbon means you wrote a review.
 - **To change how a book shows here** without touching Goodreads, add a note to `content/references.js`: `hide`, `why`, `line`, or a tidier `title`. The top of that file explains each one.
 - **Proofread reviews:** 36 reviews have a lightly proofread copy in `content/references.js` (spelling, capitals and grammar; your words). Each copy is used only while your review on Goodreads still matches its `was` text exactly, so if you edit a review on Goodreads, your new version shows instead.
 - **Covers** are saved in `assets/covers/` (one per book, named by its Goodreads id) the first time the sync sees a book, from Goodreads or else Open Library. To replace a cover, put your own image there with the same name. Books with no cover anywhere get a drawn one.
-- **"Start here"** (the five books at the top of References) is the `startHere` list in `content/references.js`. Change the ids to change the books.
+- **"Start here"** (the five at the top of References) is the `startHere` list in `content/references.js`. Change the ids to change them.
+
+**Everything else goes in the log** at the bottom of `content/references.js`, one line each. Paste the link, and the next morning `tools/links_sync.py` fills in the title, who made it, the year and a picture (saved in `content/media.js` and `assets/refs/`):
+
+```js
+{ type: "film", link: "https://www.imdb.com/title/tt0816692/", date: "2024-11", rating: 5, note: "What I thought of it." },
+{ type: "video", link: "https://www.youtube.com/watch?v=aircAruvnKk", topics: ["tech"] },
+{ type: "podcast", link: "https://open.spotify.com/episode/...", status: "doing" },
+{ type: "course", title: "Bloomberg Market Concepts", by: "Bloomberg", date: "2025" },
+```
+
+- **Films** work best as an IMDb or Wikipedia link: the poster, director, year and running time come from Wikidata and Wikipedia.
+- **YouTube and Spotify** links fill themselves in. For any other page (an article, a course), the sync reads the page's own title and preview picture. If it guesses wrong, write `title` and `by` yourself: what you write always wins.
+- **`status`** is `done` (the default), `doing` (it shows on the desk), `queued` (it goes to the antilibrary) or `dropped`. **`date`** can be a year, a month or a day. **`topics`** are genre keys from `shelves.js`.
+- **No link?** Write `title` and `by`, and it gets a drawn cover: a certificate for a course, a poster for a film, a clipping for an article.
+- **To sync a new link right now,** run the same workflow: **Actions → Sync Goodreads → Run workflow**.
+
 - **Link previews:** `assets/img/share-library.png` is the image WhatsApp and LinkedIn show for the References link. WhatsApp keeps old previews for a while, so a changed image can take a day or so to appear in chats.
-- **Link to a single book:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id).
+- **Link to a single thing:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id). Anything in the log has a link too: open its card and copy the address.
 - GitHub pauses scheduled jobs in a repository after 60 days with no commits. If the shelves stop updating, open the **Actions** tab and re-enable "Sync Goodreads".
 
 ## What visitors can do, and where it's saved
@@ -76,7 +98,7 @@ The References page is your Goodreads library: every book you've read with your 
 | Interaction | Where it goes |
 |---|---|
 | Bets on hypotheses, witness signatures, hidden notes found, sections visited | Saved only in that visitor's own browser |
-| Margin notes, "Lend me a book", "Tell me when it opens" | Prepared as an email from the visitor's own email app, to your address |
+| Margin notes, "Recommend me something", "Tell me when it opens" | Prepared as an email from the visitor's own email app, to your address |
 
 Version 2 can add a small free database so you see bets and signatures from everyone.
 
@@ -136,7 +158,7 @@ The site is plain files, so moving means uploading this folder to the new host a
 ## The monthly routine (about 15 minutes)
 
 - On the 20th: rewrite `today.js`, and set `date` and `nextUpdate` (including the "Reading" line).
-- Books need nothing: Goodreads syncs itself every morning.
+- Books need nothing: Goodreads syncs itself every morning. Add any course, film, article, video or podcast worth keeping to the log in `references.js`.
 - Move any confidence that changed (add a `history` line).
 - Resolve any bets that are due (`outcome: true` or `false`).
 - Anything you got wrong goes in `errata.js`.

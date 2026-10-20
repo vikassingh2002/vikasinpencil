@@ -1,4 +1,6 @@
-# Copies your Goodreads shelves into content/books.js every morning.
+# Copies your Goodreads shelves into content/books.js every morning, and
+# looks up any new links in the log of content/references.js (films,
+# articles, videos, podcasts) for their titles and pictures.
 # Nothing to do day to day: read, rate and review on Goodreads as usual.
 # To sync right now: GitHub -> Actions -> "Sync Goodreads" -> Run workflow.
 name: Sync Goodreads
@@ -22,16 +24,24 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Get Pillow, to colour each spine like its cover
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet --disable-pip-version-check pillow || echo "No Pillow today: the spine colours carry over."
+
       - name: Fetch the shelves from Goodreads
-        run: python3 tools/goodreads_sync.py
+        run: .venv/bin/python tools/goodreads_sync.py
+
+      - name: Look up the links in the log
+        run: .venv/bin/python tools/links_sync.py
 
       - name: Publish if anything changed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add content/books.js assets/covers
+          git add --all -- content assets
           if git diff --cached --quiet; then
-            echo "Goodreads hasn't changed since the last sync."
+            echo "Nothing has changed since the last sync."
             exit 0
           fi
           git config user.name "github-actions[bot]"

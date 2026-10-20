@@ -12,6 +12,7 @@ with a suspiciously small one (if Goodreads is down, nothing changes).
 """
 import html
 import json
+import os
 import re
 import sys
 import time
@@ -21,6 +22,11 @@ from datetime import date
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
+try:  # Optional: only used to colour each spine like its cover. Without it, colours carry over.
+    from PIL import Image
+except ImportError:
+    Image = None
+
 GOODREADS_USER = "115146123"
 SHELVES = ["currently-reading", "read", "did-not-finish", "to-read"]
 FEED = "https://www.goodreads.com/review/list_rss/{user}?shelf={shelf}&page={page}"
@@ -29,6 +35,7 @@ PAGE_SIZE = 100
 USER_AGENT = "Mozilla/5.0 (compatible; vikasinpencil-sync; +https://vikasinpencil.com)"
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "content" / "books.js"
+SHELVES_FILE = ROOT / "content" / "shelves.js"
 COVERS = ROOT / "assets" / "covers"
 OPEN_LIBRARY = "https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
 
@@ -177,6 +184,57 @@ def save_cover(book):
     return None
 
 
+def luminance(rgb):
+    def channel(c):
+        c /= 255
+        return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
+    r, g, b = (channel(c) for c in rgb)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a, b):
+    la, lb = sorted((luminance(a), luminance(b)), reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def spine_colours(path):
+    """The cover's main colour, plus the colour on it that stands out most, for drawing the spine."""
+    with Image.open(path) as im:
+        im = im.convert("RGB")
+        im.thumbnail((48, 72))
+        w, h = im.size
+        im = im.crop((int(w * 0.06), int(h * 0.06), int(w * 0.94), int(h * 0.94)))  # skip scanned borders
+        median_cut = getattr(getattr(Image, "Quantize", Image), "MEDIANCUT", 0)
+        quant = im.quantize(colors=6, method=median_cut)
+        palette = quant.getpalette()
+        ranked = sorted(quant.getcolors(), reverse=True)
+        colours = [tuple(palette[i * 3:i * 3 + 3]) for _, i in ranked]
+    main = colours[0]
+    accent = max(colours[1:] or [main], key=lambda c: contrast(c, main))
+    as_hex = lambda c: "#%02x%02x%02x" % c
+    return as_hex(main), as_hex(accent)
+
+
+def shelved_ids():
+    if not SHELVES_FILE.exists():
+        return set()
+    text = SHELVES_FILE.read_text(encoding="utf-8")
+    return set(re.findall(r'"(\d+)":\s*\[', text[text.find("books:"):]))
+
+
+def report_unshelved(books):
+    shelved = shelved_ids()
+    waiting = [b for b in books if b["id"] not in shelved]
+    if not waiting:
+        return
+    lines = [f"- {b['title']} by {b['author']} (Goodreads id {b['id']})" for b in waiting]
+    print("Still to be shelved (add them to content/shelves.js):\n" + "\n".join(lines))
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as f:
+            f.write("### Books still to be shelved\nAdd these ids to `content/shelves.js`:\n" + "\n".join(lines) + "\n")
+
+
 def sort_key(book):
     # Newest first: read date for finished books, date added for the rest.
     when = book["read"] if book["shelf"] == "read" else book["added"]
@@ -209,12 +267,23 @@ def main():
                 seen.add(book["id"])
                 books.append(book)
     books.sort(key=sort_key)
+    previous = load_previous()
+    old_colours = {b["id"]: (b.get("spine", ""), b.get("accent", "")) for b in (previous or {}).get("books", [])}
     for book in books:
+        had_cover = (COVERS / f"{book['id']}.jpg").exists()
         path = save_cover(book)
         book["cover"] = f"assets/covers/{path.name}" if path else ""
         del book["_image"], book["_isbn"]
+        # Worked out once per cover, so the colours don't wobble between Pillow versions.
+        spine, accent = old_colours.get(book["id"], ("", ""))
+        if path and Image is not None and (not spine or not had_cover):
+            try:
+                spine, accent = spine_colours(path)
+            except Exception as err:  # a broken image shouldn't stop the sync
+                print(f"Couldn't read the colours of {path.name}: {err}")
+        book["spine"], book["accent"] = spine, accent
+    report_unshelved(books)
 
-    previous = load_previous()
     old_read = sum(1 for b in (previous or {}).get("books", []) if b.get("shelf") == "read")
     new_read = sum(1 for b in books if b["shelf"] == "read")
     if not books or new_read < old_read * 0.5:

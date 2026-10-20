@@ -1,13 +1,39 @@
 /* =============================================================
-   REFERENCES: your reading, as this site shows it.
+   REFERENCES: everything that shaped how you think, as this site
+   shows it. Two sources:
 
-   The books come from Goodreads. content/books.js is refreshed
-   every morning with your shelves, ratings and reviews, so keep
-   reading, rating and reviewing on Goodreads as usual.
+   1. BOOKS come from Goodreads. content/books.js is refreshed every
+      morning with your shelves, stars and reviews, so keep reading,
+      rating and reviewing on Goodreads as usual. Which shelf (genre)
+      a book sits on is decided in content/shelves.js.
 
-   This file changes how a book appears HERE, without touching
-   Goodreads. Each note is keyed by the book's Goodreads id: the
-   number in its Goodreads link (goodreads.com/book/show/21 is "21").
+   2. EVERYTHING ELSE (films, articles, courses, videos, podcasts)
+      goes in the "log" list below, one entry per thing. Paste the
+      link and write your note; the next morning the sync fills in
+      the title, maker and picture (content/media.js). Fields:
+
+        type     "film", "article", "course", "video" or "podcast"
+        link     where it lives: an IMDb or Wikipedia page for a film,
+                 the YouTube link for a video, the article's address...
+        status   "done" (the default), "doing", "queued" (want to) or
+                 "dropped" (gave up)
+        date     when you finished it: "2026-10-20", or just "2026"
+        rating   1 to 5 stars (leave it out for none)
+        note     what you made of it. *italic* works
+        topics   genre keys from content/shelves.js, e.g. ["tech", "money"]
+        why, line     as for books below: why it's on your list, or a
+                 one-line takeaway
+        title, by     only if you want different wording than the sync
+                 finds, or there's no link (by = director, author,
+                 channel, show or provider)
+
+      Example:
+        { type: "film", link: "https://www.imdb.com/title/tt0816692/",
+          date: "2026-09-12", rating: 5, topics: ["science"],
+          note: "The docking scene. That's the whole review." },
+
+   The "notes" further down change how a BOOK appears here, keyed by
+   its Goodreads id (goodreads.com/book/show/21 is "21"):
 
      why       for a want-to-read book: why it's on your list
      line      a one-line takeaway, shown on the book's card
@@ -17,14 +43,21 @@
                while the review on Goodreads still says exactly what "was"
                says, so if you edit a review on Goodreads, your new words
                show here the next morning.
-
-   Example:  "5129": { why: "The other half of the argument 1984 started." },
    ============================================================= */
 window.NB = window.NB || {};
 
 NB.references = {
   // The first lines on the References page.
-  intro: "Everything I've finished since 2018, with the stars I gave it and what I wrote at the time. Synced from Goodreads every morning.",
+  intro: "Everything that's shaped how I think: the books I've read since 2018, and the courses, films, articles, videos and podcasts worth keeping. With the stars I gave each one and what I wrote at the time.",
+
+  // Films, articles, courses, videos and podcasts. Newest first is tidiest, but any order works.
+  log: [
+    { type: "course", title: "Bloomberg Market Concepts", by: "Bloomberg", date: "2025", topics: ["money"] },
+    { type: "course", title: "Introduction to Risk Management", by: "Corporate Finance Institute", date: "2024", topics: ["money"] },
+    { type: "course", title: "Accounting Fundamentals", by: "Corporate Finance Institute", date: "2024", topics: ["money"] },
+    { type: "course", title: "Power BI Virtual Case Experience", by: "PwC", date: "2023", topics: ["tech"] },
+    { type: "course", title: "Excel Skills Virtual Experience Program", by: "J.P. Morgan Chase & Co.", date: "2023", topics: ["tech", "money"] }
+  ],
 
   // "Start here": the books a visitor sees first, by Goodreads id, in this order.
   startHereTitle: "Five books that shaped me",
@@ -38,6 +71,9 @@ NB.references = {
 
   notes: {
     // Tidier titles than the Goodreads editions
+    "13599993": { // Divergence: a foreign-edition title for Divergent
+      title: "Divergent"
+    },
     "164581115": { // The Rise and Fall of the Third Reich
       subtitle: "A History of Nazi Germany"
     },
@@ -199,7 +235,9 @@ NB.references = {
       review: "Best book for those searching for a story with a life lesson. I was interested in history and wars, so I read it. It gives you great insight into what happened in the world war, from a personal point of view. If you are lost or feeling uncertain about anything, just read this book and it will definitely give you hope. Disclaimer for those who waste food: you will feel very guilty after reading this.",
       was: "Best book for those searching for a fiction with a life lesson. I was interested in history and wars so I read it. It gives you a great insight of want happened in world war from a personal view. If you are lost or feeling uncertain about anything just read this book and it will definitely give you hope. Disclaimer for those who waste food: you will feel very guilty after reading this"
     },
-    "10580": { // A Winter's Tale
+    "10580": { // A Winter's Tale: Penguin Readers' retelling of King's novella
+      title: "The Breathing Method",
+      author: "Stephen King",
       review: "The first Stephen King book I read. It was awesome, and even the environment I read it in suited this book well. There is a public library in my town where I go to study. I felt bored, so I decided to read something. Then I began reading this book and went into that feeling you get while reading this type of book. Then the lights went off. They came back after half an hour, but it had done its job. I would suggest reading it in one go, in a good setting.",
       was: "First book that I read of Stephen king. It was awesome even the environment in which I read it was well suited for this book. There is a public library in my town where I go for studies. I felt bored so I decided to read something.Then I begin reading this book. I when into that feeling that you get while reading this type of books. Then light went off. It came back after half an hour but it did it's job. I would suggest to read it in one go in a good setting."
     },
