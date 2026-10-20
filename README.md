@@ -13,6 +13,8 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `assets/js/notebook.js` | How the notebook behaves | Only for new features |
 | `robots.txt` | Tells search engines to stay out while it's a draft | Once, at launch |
 | `CNAME` and `.nojekyll` | Tell GitHub Pages your domain, and to publish the files exactly as they are | Never. Don't delete them |
+| `tools/goodreads_sync.py` | Copies your Goodreads shelves into `content/books.js` | Never. It runs itself every morning |
+| `.github/workflows/goodreads-sync.yml` | The daily job that runs that copy on GitHub | Never |
 
 ## Editing what the site says
 
@@ -24,7 +26,8 @@ Each notebook section has one file in `content/`:
 | `today.js` | The Today page (rewrite it on the 20th of each month) |
 | `hypotheses.js` | Hypotheses |
 | `experiments.js` | Experiments |
-| `references.js` | Reading now, finished books, the antilibrary |
+| `references.js` | Your notes on books: proofread reviews, hidden books, why a book is on your list |
+| `books.js` | Your Goodreads shelves, copied every morning. **Don't edit it**: each sync overwrites it |
 | `errata.js` | Corrections |
 | `pocket.js` | Sealed letters and open bets |
 
@@ -52,6 +55,19 @@ The three fingerprints there now are placeholders: they're the fingerprint of an
 
 The repository is public and keeps every past version of every file, so a letter's text must never be committed before its opening day, not even for a minute. The same goes for anything else you wouldn't put on the site itself.
 
+### Your reading comes from Goodreads
+
+The References page is your Goodreads library: every book you've read with your stars and review, what you're reading now, what you didn't finish, and your want-to-read shelf as the antilibrary. Nothing to edit here. Read, rate and review on Goodreads as usual, and the site catches up by the next morning.
+
+- **How it works:** every day at 06:00 India time, GitHub runs `tools/goodreads_sync.py`. It reads your public Goodreads shelves and rewrites `content/books.js`. If nothing changed, nothing happens. If Goodreads is down or sends back a suspiciously short list, the site keeps what it already has.
+- **To sync right now:** on GitHub, open **Actions → Sync Goodreads → Run workflow**.
+- **Keep your Goodreads profile public**, or the sync can't see your shelves.
+- **Spine colours** follow your Goodreads shelves (fantasy, paranormal, indian and so on). Books you haven't shelved there show as pale "Unshelved" spines; shelve them on Goodreads and they take their colour the next morning.
+- **To change how a book shows here** without touching Goodreads, add a note to `content/references.js`: `hide`, `why`, `line`, or a tidier `title`. The top of that file explains each one.
+- **Proofread reviews:** 36 reviews have a lightly proofread copy in `content/references.js` (spelling, capitals and grammar; your words). Each copy is used only while your review on Goodreads still matches its `was` text exactly, so if you edit a review on Goodreads, your new version shows instead.
+- **Link to a single book:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id).
+- GitHub pauses scheduled jobs in a repository after 60 days with no commits. If the shelves stop updating, open the **Actions** tab and re-enable "Sync Goodreads".
+
 ## What visitors can do, and where it's saved
 
 | Interaction | Where it goes |
@@ -64,13 +80,12 @@ Version 2 can add a small free database so you see bets and signatures from ever
 ## Before you share the link (launch checklist)
 
 1. Replace every `[bracket]` in the `content/` files.
-2. Put your CV in `assets/` as `cv.pdf` and set `cvFile: "assets/cv.pdf"` in `content/site.js`.
-3. Add your LinkedIn link in `content/site.js`.
-4. Check that email to `hello@vikasinpencil.com` reaches your inbox (forwarding is set up in ImprovMX; see "Where it lives" below).
-5. Check your employer's policy before describing any client work, even redacted.
-6. Write and seal at least one real letter.
-7. In `content/site.js`, set `draft: false`.
-8. In `robots.txt`, replace `Disallow: /` with `Allow: /`.
+2. Put your CV in `assets/` as `cv.pdf` and set `cvFile: "assets/cv.pdf"` in `content/site.js`. Check its footer first: everything in it becomes public, including any phone number, date of birth or personal email.
+3. Check that email to `hello@vikasinpencil.com` reaches your inbox (forwarding is set up in ImprovMX; see "Where it lives" below).
+4. Check your employer's policy before describing any client work, even redacted.
+5. Write and seal at least one real letter.
+6. In `content/site.js`, set `draft: false`.
+7. In `robots.txt`, replace `Disallow: /` with `Allow: /`.
 
 ## Where it lives
 
@@ -117,7 +132,8 @@ The site is plain files, so moving means uploading this folder to the new host a
 
 ## The monthly routine (about 15 minutes)
 
-- On the 20th: rewrite `today.js`, and set `date` and `nextUpdate`.
+- On the 20th: rewrite `today.js`, and set `date` and `nextUpdate` (including the "Reading" line).
+- Books need nothing: Goodreads syncs itself every morning.
 - Move any confidence that changed (add a `history` line).
 - Resolve any bets that are due (`outcome: true` or `false`).
 - Anything you got wrong goes in `errata.js`.

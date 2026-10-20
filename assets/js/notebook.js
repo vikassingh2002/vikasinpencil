@@ -86,6 +86,78 @@
   var letters = list(NB.letters);
   var bets = list(NB.bets);
 
+  /* The library: Goodreads shelves (content/books.js) with your notes
+     from content/references.js laid on top. Spine colour follows the
+     first group a book's Goodreads shelves fall into. */
+  var gr = NB.goodreads || {};
+  var GENRES = [
+    { key: 'indian', label: 'Indian & mythology', tags: ['indian', 'india', 'indian-mythology'] },
+    { key: 'dark', label: 'Paranormal & horror', tags: ['paranormal', 'horror'] },
+    { key: 'dystopian', label: 'Dystopian & sci-fi', tags: ['dystopian', 'science-fiction'] },
+    { key: 'fantasy', label: 'Fantasy', tags: ['fantasy', 'high-epic'] },
+    { key: 'thriller', label: 'Thriller', tags: ['thriller', 'suspense', 'psychological'] },
+    { key: 'nonfiction', label: 'Non-fiction', tags: ['non-fiction', 'history', 'biography', 'memoir', 'self-help', 'science', 'biology', 'economic', 'finance', 'business', 'management', 'geopolitics', 'political-science', 'philosophical', 'communication', 'military-stuff', 'war', 'china', 'geography', 'spirituality'] },
+    { key: 'fiction', label: 'Fiction', tags: ['fiction', 'classic', 'romance', 'historical-fiction', 'comedy', 'young-adult', 'poetry'] },
+    { key: 'other', label: 'Unshelved', tags: [] }
+  ];
+  function genreOf(tags) {
+    for (var i = 0; i < GENRES.length - 1; i++) {
+      for (var j = 0; j < tags.length; j++) if (GENRES[i].tags.indexOf(tags[j]) !== -1) return GENRES[i];
+    }
+    return GENRES[GENRES.length - 1];
+  }
+  function fold(s) {
+    s = String(s == null ? '' : s).toLowerCase();
+    try { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); } catch (e) { /* older browser: fine without */ }
+    return s;
+  }
+  function squashWs(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
+  var library = list(gr.books).map(function (b) {
+    var n = (refs.notes && refs.notes[b.id]) || {};
+    if (n.hide) return null;
+    var review = b.review || '';
+    // A proofread copy only stands in while Goodreads still has the words it was made from.
+    if (n.review && (!n.was || squashWs(n.was) === squashWs(review))) review = n.review;
+    var book = {
+      id: String(b.id),
+      shelf: b.shelf,
+      title: n.title || b.title || '',
+      subtitle: n.subtitle != null ? n.subtitle : (b.subtitle || ''),
+      series: b.series || '',
+      author: n.author || b.author || '',
+      rating: Number(b.rating) || 0,
+      read: b.read || '',
+      added: b.added || '',
+      published: b.published || '',
+      pages: Number(b.pages) || 0,
+      avg: Number(b.avg) || 0,
+      tags: list(b.tags),
+      review: review,
+      why: n.why || '',
+      line: n.line || '',
+      link: 'https://www.goodreads.com/book/show/' + encodeURIComponent(b.id)
+    };
+    book.genre = genreOf(book.tags);
+    book.find = fold([book.title, book.subtitle, book.series, book.author, book.tags.join(' ')].join(' '));
+    book.sortTitle = fold(book.title).replace(/^(the|a|an)\s+/, '');
+    return book;
+  }).filter(Boolean);
+  function onShelf(shelf) { return library.filter(function (b) { return b.shelf === shelf; }); }
+  function num(n) { return Number(n).toLocaleString('en-GB'); }
+
+  var STAR = 'M12 2.8l2.75 5.9 6.45.8-4.75 4.45 1.2 6.4L12 17.2l-5.65 3.15 1.2-6.4L2.8 9.5l6.45-.8z';
+  var RATING_WORDS = ['', 'did not like it', 'it was ok', 'liked it', 'really liked it', 'it was amazing'];
+  function starsHtml(n, extraClass) {
+    var html = '';
+    for (var i = 1; i <= 5; i++) html += '<svg viewBox="0 0 24 24" aria-hidden="true"' + (i <= n ? ' class="on"' : '') + '><path d="' + STAR + '"/></svg>';
+    return '<span class="stars' + (extraClass ? ' ' + extraClass : '') + '" role="img" aria-label="' + (n ? n + ' of 5 stars' : 'not rated') + '">' + html + '</span>';
+  }
+  function reviewHtml(text) {
+    return String(text).split(/\n{2,}/).map(function (para) {
+      return '<p>' + rich(para).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+  }
+
   var ICON = {
     back: '<svg class="icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M13 8H3M7 4L3 8l4 4"/></svg>',
     next: '<svg class="icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>',
@@ -173,6 +245,7 @@
     });
     errata.forEach(function (e) { dates.push(e.date); });
     letters.forEach(function (l) { dates.push(l.sealed); });
+    library.forEach(function (b) { if (b.shelf === 'read') dates.push(b.read); });
     var now = Date.now();
     var best = null;
     dates.forEach(function (iso) {
@@ -298,7 +371,7 @@
     document.addEventListener('touchstart', function (e) {
       if (e.touches.length !== 1) { tracking = false; return; }
       var t = e.target;
-      if (t.closest && t.closest('input, textarea, select, button, summary, .tabs, .table-wrap, .shelf, .pocket-stage')) { tracking = false; return; }
+      if (t.closest && t.closest('input, textarea, select, button, summary, .tabs, .table-wrap, .lib-chips, .pocket-stage, .book-card')) { tracking = false; return; }
       tracking = true;
       sx = e.touches[0].clientX;
       sy = e.touches[0].clientY;
@@ -319,6 +392,14 @@
   function initKeys() {
     document.addEventListener('keydown', function (e) {
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      // With a book card open, the arrows flip cards instead of pages.
+      if (document.documentElement.classList.contains('has-card')) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          e.preventDefault();
+          stepBook(e.key === 'ArrowRight' ? 1 : -1, false);
+        }
+        return;
+      }
       var t = e.target;
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
       if (e.key === 'ArrowRight') step('next');
@@ -671,7 +752,7 @@
       { href: 'today.html', title: 'Today', desc: 'What I\'m working on this month' + (today.date ? ', updated ' + fmt(today.date, 'short') : ''), pn: 'p. 01' },
       { href: 'hypotheses.html', title: 'Hypotheses', desc: plural(openH, 'open', 'open') + ', ' + plural(retired, 'retired', 'retired'), pn: 'p. 04' },
       { href: 'experiments.html', title: 'Experiments', desc: plural(running, 'running', 'running') + ', ' + plural(concluded, 'concluded', 'concluded'), pn: 'p. 12' },
-      { href: 'references.html', title: 'References', desc: 'Reading now, finished, and the antilibrary', pn: 'p. 30' },
+      { href: 'references.html', title: 'References', desc: onShelf('read').length ? plural(onShelf('read').length, 'book', 'books') + ' read, ' + onShelf('to-read').length + ' in the antilibrary' : 'Reading now, finished, and the antilibrary', pn: 'p. 30' },
       { href: '#errata', title: 'Errata', desc: 'Where I was wrong: ' + plural(errata.length, 'correction', 'corrections'), pn: 'p. 41' },
       { href: 'pocket.html', title: 'Back pocket', desc: plural(sealed, 'sealed letter', 'sealed letters') + ' and ' + plural(bets.length, 'open bet', 'open bets'), pn: 'back cover' }
     ];
@@ -1124,59 +1205,269 @@
   }
 
   /* ============================================================
-     PAGE: References
+     PAGE: References (the library, copied from Goodreads)
      ============================================================ */
+
+  // The index card a book is written up on. One <dialog>, reused.
+  var card = null;
+  var SHELF_NAMES = { read: 'From the shelf', 'currently-reading': 'On the desk now', 'to-read': 'In the antilibrary', 'did-not-finish': 'Didn\'t finish' };
+
+  function bookCard() {
+    if (card) return card;
+    var el = document.createElement('dialog');
+    el.className = 'book-card';
+    el.setAttribute('aria-labelledby', 'book-card-title');
+    el.innerHTML = '<div class="book-card__paper"></div>';
+    document.body.appendChild(el);
+    card = { el: el, paper: el.firstChild, list: [], index: 0 };
+    el.addEventListener('click', function (e) {
+      if (e.target === el) { closeBook(); return; } // the desk around the card
+      var t = e.target.closest ? e.target : null;
+      if (!t) return;
+      if (t.closest('.book-card__close')) { closeBook(); return; }
+      var turn = t.closest('[data-step]');
+      if (turn) stepBook(Number(turn.getAttribute('data-step')), true);
+    });
+    el.addEventListener('close', bookClosed);
+    return card;
+  }
+
+  function markBook(id) {
+    $$('[data-book][aria-current]').forEach(function (el) { el.removeAttribute('aria-current'); });
+    if (id) $$('[data-book="' + id + '"]').forEach(function (el) { el.setAttribute('aria-current', 'true'); });
+  }
+
+  function paintBook() {
+    var c = card;
+    var b = c.list[c.index];
+    if (!b) return;
+    var finished = b.shelf === 'read';
+    var facts = [];
+    if (b.read) facts.push(['Read', fmt(b.read)]);
+    if (b.pages) facts.push(['Pages', num(b.pages)]);
+    if (b.published) facts.push(['First published', b.published]);
+    if (b.avg) facts.push(['Goodreads average', b.avg.toFixed(2)]);
+    c.paper.innerHTML =
+      '<button type="button" class="book-card__close" aria-label="Put the card back"><span aria-hidden="true">×</span></button>' +
+      '<p class="label">' + esc(SHELF_NAMES[b.shelf] || 'Book') + (c.list.length > 1 ? '<span class="book-card__count"> · ' + (c.index + 1) + ' of ' + c.list.length + '</span>' : '') + '</p>' +
+      '<h2 class="hand-l book-card__title" id="book-card-title">' + esc(b.title) + '</h2>' +
+      (b.subtitle ? '<p class="book-card__sub">' + esc(b.subtitle) + '</p>' : '') +
+      '<p class="book-card__by">' + esc(b.author) + (b.series ? ' · ' + esc(b.series) : '') + '</p>' +
+      (finished || b.rating
+        ? '<div class="book-card__rating">' + starsHtml(b.rating, 'stars--big') + '<span class="book-card__words">' + esc(b.rating ? RATING_WORDS[b.rating] : 'no stars given') + '</span></div>'
+        : '') +
+      (facts.length ? '<div class="book-card__facts">' + facts.map(function (f) { return fieldHtml(f[0], f[1]); }).join('') + '</div>' : '') +
+      (b.line ? '<p class="margin-note gap-m">' + rich(b.line) + '</p>' : '') +
+      (b.why ? '<p class="label gap-m">Why it\'s on the list</p><p class="hand-s gap-s">' + rich(b.why) + '</p>' : '') +
+      (b.review
+        ? '<p class="label gap-m">What I wrote</p><div class="prose book-card__review">' + reviewHtml(b.review) + '</div>'
+        : finished ? '<p class="hand-s muted gap-m">No review written. The stars will have to do.</p>' : '') +
+      (b.tags.length ? '<p class="book-card__tags">' + b.tags.map(function (t) { return '<span>' + esc(t.replace(/-/g, ' ')) + '</span>'; }).join('') + '</p>' : '') +
+      '<div class="actions book-card__nav">' +
+        (c.list.length > 1
+          ? '<button type="button" class="btn btn--line" data-step="-1">' + ICON.back + '<span>Previous</span></button>' +
+            '<button type="button" class="btn btn--line" data-step="1"><span>Next</span>' + ICON.next + '</button>'
+          : '') +
+        '<a class="btn btn--text" href="' + esc(b.link) + '" target="_blank" rel="noopener">On Goodreads</a>' +
+      '</div>';
+    c.paper.scrollTop = 0;
+    setHash('book-' + b.id);
+    markBook(b.id);
+  }
+
+  function openBook(id, books) {
+    id = String(id);
+    var pool = list(books);
+    var at = -1;
+    for (var i = 0; i < pool.length; i++) if (pool[i].id === id) { at = i; break; }
+    if (at === -1) {
+      pool = library.filter(function (b) { return b.id === id; });
+      if (!pool.length) return;
+      at = 0;
+    }
+    var c = bookCard();
+    c.list = pool;
+    c.index = at;
+    paintBook();
+    if (!c.el.open) {
+      if (typeof c.el.showModal === 'function') c.el.showModal();
+      else c.el.setAttribute('open', '');
+      document.documentElement.classList.add('has-card');
+      var shut = $('.book-card__close', c.el);
+      if (shut) shut.focus();
+    }
+  }
+
+  function stepBook(delta, fromButton) {
+    var c = card;
+    if (!c || c.list.length < 2) return;
+    c.index = (c.index + delta + c.list.length) % c.list.length;
+    paintBook();
+    var again = fromButton ? $('[data-step="' + delta + '"]', c.el) : $('.book-card__close', c.el);
+    if (again) again.focus();
+  }
+
+  function closeBook() {
+    if (!card) return;
+    if (card.el.open && typeof card.el.close === 'function') card.el.close();
+    else { card.el.removeAttribute('open'); bookClosed(); }
+  }
+
+  function bookClosed() {
+    if (card && card.el.open) return; // reopened before the close event arrived
+    document.documentElement.classList.remove('has-card');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* not allowed here */ }
+    var b = card && card.list[card.index];
+    markBook('');
+    var back = b && $('[data-book="' + b.id + '"]');
+    if (back) back.focus();
+  }
+
+  /* Fig. 3: books finished per year, inked in like the other sketches */
+  function yearChart(books) {
+    var counts = {};
+    books.forEach(function (b) { var y = Number(b.read.slice(0, 4)); if (y) counts[y] = (counts[y] || 0) + 1; });
+    var ys = Object.keys(counts).map(Number);
+    if (!ys.length) return '';
+    var first = Math.min.apply(null, ys);
+    var last = Math.max(Math.max.apply(null, ys), new Date().getFullYear());
+    var all = [];
+    for (var y = first; y <= last; y++) all.push({ y: y, n: counts[y] || 0 });
+    var max = Math.max.apply(null, all.map(function (a) { return a.n; }));
+    var best = all.filter(function (a) { return a.n === max; })[0];
+    var W = 360, TOP = 30, BASE = 120;
+    var slot = W / all.length, bw = Math.min(28, slot * 0.58), short = slot < 44;
+    var shapes = '', words = '';
+    all.forEach(function (a, i) {
+      var x = slot * i + (slot - bw) / 2;
+      var cx = (x + bw / 2).toFixed(1);
+      var top = BASE - Math.round((BASE - TOP) * a.n / (max || 1));
+      var d = 'M' + x.toFixed(1) + ' ' + BASE + 'V' + top + 'H' + (x + bw).toFixed(1) + 'V' + BASE;
+      var isBest = a === best;
+      if (a.n) {
+        shapes += '<path class="bar-fill' + (isBest ? ' bar-fill--best' : '') + '" d="' + d + 'Z"/>' +
+          '<path class="ink' + (isBest ? ' ink--red' : '') + '" pathLength="1" style="--d:' + (i * 0.07).toFixed(2) + 's" d="' + d + '"/>';
+      }
+      words += '<text class="val' + (isBest ? ' red' : a.n ? '' : ' none') + '" x="' + cx + '" y="' + (top - 10) + '">' + a.n + '</text>' +
+        '<text class="axis" x="' + cx + '" y="' + (BASE + 20) + '">' + (short ? '’' + String(a.y).slice(2) : a.y) + '</text>';
+    });
+    var aria = 'Books finished per year: ' + all.map(function (a) { return a.y + ', ' + a.n; }).join('; ') + '.';
+    return '<figure class="lib-fig"><svg class="sketch lib-chart" data-draw viewBox="0 0 ' + W + ' 150" role="img" aria-label="' + esc(aria) + '">' +
+      '<path class="under" d="M2 ' + BASE + 'H' + (W - 2) + '"/>' + shapes + words + '</svg>' +
+      '<figcaption>Fig. 3: Books finished each year. The busiest was ' + best.y + ', with ' + best.n + '.</figcaption></figure>';
+  }
+
+  /* Fig. 4: how the stars fall */
+  function ratingFigure(books) {
+    var rated = books.filter(function (b) { return b.rating; });
+    if (!rated.length) return '';
+    var avg = rated.reduce(function (s, b) { return s + b.rating; }, 0) / rated.length;
+    var rows = [5, 4, 3, 2, 1].map(function (r) { return { r: r, n: rated.filter(function (b) { return b.rating === r; }).length }; });
+    var max = Math.max.apply(null, rows.map(function (x) { return x.n; })) || 1;
+    return '<figure class="lib-fig"><ul class="lib-rates" data-draw>' + rows.map(function (x, i) {
+      return '<li>' + starsHtml(x.r) +
+        '<span class="lib-rates__bar" aria-hidden="true" style="--v:' + (x.n / max).toFixed(3) + ';--d:' + (0.15 + i * 0.1).toFixed(2) + 's"></span>' +
+        '<b>' + x.n + '<span class="visually-hidden"> ' + (x.n === 1 ? 'book' : 'books') + '</span></b></li>';
+    }).join('') + '</ul>' +
+      '<figcaption>Fig. 4: The stars I gave. Average ' + avg.toFixed(1) + ' from ' + rated.length + ' rated books.</figcaption></figure>';
+  }
 
   function renderReferences() {
     var left = $('#ref-left');
     var right = $('#ref-right');
     if (!left || !right) return;
-    var finished = list(refs.finished);
-    var count = typeof refs.finishedCount === 'number' ? refs.finishedCount : finished.length;
-    var spineCount = finished.length ? Math.min(finished.length, 40) : 22;
-    var spines = '';
-    for (var i = 0; i < spineCount; i++) {
-      if (i === 5) spines += '<button type="button" class="spine spine--secret" id="secret-spine" style="height:146px;width:22px" aria-label="A book sticking out of the shelf"></button>';
-      var h = 96 + ((i * 37) % 40);
-      var w = 16 + ((i * 7) % 10);
-      var b = finished[i];
-      spines += '<span class="spine" data-i="' + i + '" style="height:' + h + 'px;width:' + (b ? Math.max(w, 20) : w) + 'px;background:var(--book-' + ((i * 5) % 8 + 1) + ')"' + (b ? ' title="' + esc(b.title) + '"' : '') + '></span>';
-    }
 
-    var reading = list(refs.readingNow).map(function (r) {
-      var pct = Math.max(0, Math.min(100, Number(r.progress) || 0));
-      return '<div class="reading-card"><div class="reading-card__book" aria-hidden="true"></div><div class="reading-card__body">' +
-        '<p class="reading-card__title">' + rich(r.title) + '</p>' +
-        (r.author ? '<p class="reading-card__author">' + rich(r.author) + '</p>' : '') +
-        (r.why ? '<p class="reading-card__why">' + rich(r.why) + '</p>' : '') +
-        '<div class="reading-card__progress" role="img" aria-label="' + pct + '% read"><span style="width:' + pct + '%"></span></div>' +
-        '</div></div>';
+    var shelf = onShelf('read');
+    var reading = onShelf('currently-reading');
+    var waiting = onShelf('to-read');
+    var abandoned = onShelf('did-not-finish');
+    var pages = shelf.reduce(function (s, b) { return s + b.pages; }, 0);
+    var reviewed = shelf.filter(function (b) { return b.review; }).length;
+    var since = shelf.map(function (b) { return b.read.slice(0, 4); }).filter(Boolean).sort()[0] || '';
+    var state = { genre: '', five: false, reviewed: false, q: '', sort: 'year', view: store.get('libView', 'shelf') === 'list' ? 'list' : 'shelf' };
+    var shown = shelf;
+    var SHOW = 12;
+
+    var counts = {};
+    shelf.forEach(function (b) { counts[b.genre.key] = (counts[b.genre.key] || 0) + 1; });
+    var chips = GENRES.filter(function (g) { return counts[g.key]; }).sort(function (a, b) {
+      if (a.key === 'other' || b.key === 'other') return a.key === 'other' ? 1 : -1;
+      return counts[b.key] - counts[a.key];
+    });
+    function total(n, label) { return '<span class="lib-total"><b>' + esc(n) + '</b><span>' + esc(label) + '</span></span>'; }
+
+    var readingHtml = reading.map(function (b) {
+      return '<button type="button" class="reading-card" data-book="' + esc(b.id) + '">' +
+        '<span class="reading-card__book genre--' + b.genre.key + '" aria-hidden="true"></span>' +
+        '<span class="reading-card__body">' +
+          '<span class="reading-card__title">' + esc(b.title) + '</span>' +
+          '<span class="reading-card__author">' + esc(b.author) + (b.pages ? ' · ' + num(b.pages) + ' pages' : '') + '</span>' +
+          (b.line || b.why ? '<span class="reading-card__why">' + rich(b.line || b.why) + '</span>' : '') +
+        '</span></button>';
     }).join('');
 
     left.innerHTML =
-      strip([['Title', 'References'], ['Page', '30']]) +
+      strip([['Title', 'References'], ['Read', num(shelf.length)], ['Since', since], ['Page', '30']]) +
       '<h1 class="hand-xl">References</h1>' +
-      (reading ? '<p class="label gap-l">Reading now</p><div class="reading">' + reading + '</div>' : '') +
-      '<p class="label gap-l">Finished</p>' +
-      '<div class="shelf" id="shelf">' + spines + '</div>' +
-      '<div class="actions"><button type="button" class="btn btn--line" id="pull">Pull one off the shelf</button>' +
-        '<span class="progress__text">' + (count ? plural(count, 'book', 'books') + ' so far' : '[N] books so far') + '</span></div>' +
-      '<p class="shelf-note" id="shelf-note" aria-live="polite" hidden></p>' +
-      '<p class="lede gap-m">Every finished book gets one line: what it changed in how I think, or why it didn\'t.</p>';
-
-    var anti = list(refs.antilibrary).map(function (a, i) {
-      return '<li><span class="anti__box" style="--r:' + [-3, 2, -1, 3][i % 4] + 'deg" aria-hidden="true"></span><div>' +
-        '<p class="anti__title">' + rich(a.title) + '</p>' +
-        (a.author ? '<p class="anti__author">' + rich(a.author) + '</p>' : '') +
-        (a.why ? '<p class="anti__why">' + rich(a.why) + '</p>' : '') +
-        '</div></li>';
-    }).join('');
+      (refs.intro ? '<p class="lede">' + rich(refs.intro) + '</p>' : '') +
+      (readingHtml ? '<p class="label gap-l">Reading now</p><div class="reading">' + readingHtml + '</div>' : '') +
+      (shelf.length
+        ? '<p class="label gap-l">The numbers</p>' +
+          '<div class="box lib-stats">' +
+            '<div class="lib-totals">' + total(num(shelf.length), 'books read') + total(num(pages), 'pages') + total(String(reviewed), 'reviews') + '</div>' +
+            '<div class="lib-figs">' + yearChart(shelf) + ratingFigure(shelf) + '</div>' +
+          '</div>' +
+          '<p class="label gap-l">The shelves</p>' +
+          '<div class="lib-tools">' +
+            '<label class="visually-hidden" for="lib-search">Find a title or author</label>' +
+            '<input class="input lib-search" id="lib-search" type="search" placeholder="Find a title or author" autocomplete="off" spellcheck="false">' +
+            '<div class="lib-chips" role="group" aria-label="Shelf">' +
+              '<button type="button" class="lib-chip" data-genre="" aria-pressed="true">All <span>' + shelf.length + '</span></button>' +
+              chips.map(function (g) {
+                return '<button type="button" class="lib-chip" data-genre="' + g.key + '" aria-pressed="false"><i class="genre--' + g.key + '" aria-hidden="true"></i>' + esc(g.label) + ' <span>' + counts[g.key] + '</span></button>';
+              }).join('') +
+            '</div>' +
+            '<div class="lib-bar">' +
+              '<button type="button" class="lib-chip" id="lib-five" aria-pressed="false">' + starsHtml(5) + '<span class="visually-hidden"> only</span></button>' +
+              '<button type="button" class="lib-chip" id="lib-reviewed" aria-pressed="false">With a review</button>' +
+              '<label class="lib-sort"><span class="field-label">Order</span><select id="lib-sort" class="lib-select">' +
+                '<option value="year">By year read</option><option value="rating">By my stars</option><option value="title">A to Z</option><option value="pages">By length</option>' +
+              '</select></label>' +
+              '<span class="lib-view" role="group" aria-label="Show as">' +
+                '<button type="button" class="lib-chip" data-view="shelf" aria-pressed="' + (state.view === 'shelf') + '">Shelves</button>' +
+                '<button type="button" class="lib-chip" data-view="list" aria-pressed="' + (state.view === 'list') + '">List</button>' +
+              '</span>' +
+            '</div>' +
+          '</div>' +
+          '<p class="lib-count" id="lib-count" aria-live="polite"></p>' +
+          '<div id="lib-books"></div>' +
+          '<p class="legend">Spine height is page count, and colour is the shelf. <span class="legend__star">★</span> five stars. A red ribbon means I wrote a review.</p>' +
+          '<div class="actions"><button type="button" class="btn btn--line" id="pull">Pull one off the shelf</button></div>'
+        : '<p class="hand-m gap-l">The shelves are empty for now. They fill up from Goodreads on the next sync.</p>') +
+      (abandoned.length
+        ? '<p class="lib-dnf gap-l"><span class="label">Didn\'t finish</span>' + abandoned.map(function (b) {
+            return '<button type="button" class="lib-dnf__book" data-book="' + esc(b.id) + '"><s>' + esc(b.title) + '</s></button><span class="lib-dnf__by">' + esc(b.author) + '</span>';
+          }).join('') + '</p>'
+        : '') +
+      (gr.profile
+        ? '<p class="note-mono gap-m">All of this lives on <a class="ink-link" href="' + esc(gr.profile) + '" target="_blank" rel="noopener">Goodreads</a> and is copied here every morning' + (gr.synced ? ' (last change ' + esc(fmt(gr.synced)) + ')' : '') + '.</p>'
+        : '');
 
     right.innerHTML =
-      strip([['Title', 'Antilibrary'], ['Page', '31']]) +
-      '<h2 class="hand-xl">The antilibrary</h2>' +
-      '<p class="lede">Books I haven\'t read yet, and why each one is here. They say more about where I\'m going than the ones I\'ve finished.</p>' +
-      '<ul class="anti">' + anti + '</ul>' +
+      strip([['Title', 'Antilibrary'], ['Waiting', String(waiting.length)], ['Page', '31']]) +
+      '<h2 class="hand-xl" id="antilibrary">The antilibrary</h2>' +
+      '<p class="lede">' + (waiting.length ? plural(waiting.length, 'book', 'books') + ' I haven\'t read yet, newest first. ' : '') + 'They say more about where I\'m going than the ones I\'ve finished.</p>' +
+      (waiting.length
+        ? '<ul class="anti anti--compact" id="anti">' + waiting.map(function (b, i) {
+            return '<li' + (i >= SHOW ? ' hidden data-extra' : '') + '><span class="anti__box" style="--r:' + [-3, 2, -1, 3][i % 4] + 'deg" aria-hidden="true"></span>' +
+              '<button type="button" class="anti__open" data-book="' + esc(b.id) + '">' +
+                '<span class="anti__title">' + esc(b.title) + '</span>' +
+                '<span class="anti__author">' + esc(b.author) + (b.pages ? ' · ' + num(b.pages) + ' pages' : '') + '</span>' +
+                (b.why ? '<span class="anti__why">' + rich(b.why) + '</span>' : '') +
+              '</button></li>';
+          }).join('') + '</ul>'
+        : '') +
+      (waiting.length > SHOW ? '<button type="button" class="btn btn--line gap-s" id="anti-more" aria-expanded="false" aria-controls="anti">Show all ' + waiting.length + '</button>' : '') +
       '<div class="box box--dashed gap-l"><p class="label">Lend me a book</p>' +
         composerHtml({
           id: 'lend',
@@ -1197,24 +1488,181 @@
       body: function (v) { return 'Title: ' + (v.title || '') + '\n\nWhy: ' + (v.why || ''); }
     });
 
-    var pulled = -1;
-    $('#pull').addEventListener('click', function () {
-      var spinesEls = $$('.spine[data-i]', left);
-      if (!spinesEls.length) return;
-      var n = Math.floor(Math.random() * spinesEls.length);
-      if (n === pulled && spinesEls.length > 1) n = (n + 3) % spinesEls.length;
-      pulled = n;
-      spinesEls.forEach(function (el) { el.classList.remove('is-pulled'); });
-      spinesEls[n].classList.add('is-pulled');
-      var b = finished[n];
-      var note = $('#shelf-note');
-      note.hidden = false;
-      note.innerHTML = b
-        ? rich(b.title) + (b.author ? ', ' + rich(b.author) : '') + (b.line ? ': “' + rich(b.line) + '”' : '')
-        : 'Book ' + (n + 1) + ': [title], “[your one-line review]”';
+    /* the shelves: filter, order, group, then draw as spines or a list */
+    var ORDER = {
+      year: function (a, b) { return b.read.localeCompare(a.read) || a.sortTitle.localeCompare(b.sortTitle); },
+      rating: function (a, b) { return b.rating - a.rating || b.read.localeCompare(a.read); },
+      title: function (a, b) { return a.sortTitle.localeCompare(b.sortTitle); },
+      pages: function (a, b) { return b.pages - a.pages || a.sortTitle.localeCompare(b.sortTitle); }
+    };
+    var ORDER_WORDS = { year: 'newest first', rating: 'most stars first', title: 'A to Z', pages: 'longest first' };
+
+    function matches(b) {
+      if (state.genre && b.genre.key !== state.genre) return false;
+      if (state.five && b.rating !== 5) return false;
+      if (state.reviewed && !b.review) return false;
+      return !state.q || b.find.indexOf(state.q) !== -1;
+    }
+    function groupKey(b) {
+      if (state.sort === 'year') return b.read ? b.read.slice(0, 4) : 'Undated';
+      if (state.sort === 'rating') return String(b.rating);
+      if (state.sort === 'title') { var c = b.sortTitle.charAt(0).toUpperCase(); return /[A-Z]/.test(c) ? c : '#'; }
+      if (!b.pages) return '?';
+      return b.pages >= 600 ? '600+' : b.pages >= 400 ? '400-599' : b.pages >= 200 ? '200-399' : '<200';
+    }
+    function groupName(key) {
+      if (state.sort === 'rating') return key === '0' ? 'Not rated' : plural(Number(key), 'star', 'stars');
+      if (state.sort === 'pages') return { '?': 'Length unknown', '600+': '600 pages and up', '<200': 'Under 200 pages' }[key] || key.replace('-', '–') + ' pages';
+      return key;
+    }
+    function groupTab(key) {
+      if (state.sort === 'rating') return key === '0' ? '–' : key + '★';
+      return key === 'Undated' ? '?' : key;
+    }
+    function grouped(books) {
+      var out = [];
+      books.forEach(function (b) {
+        var k = groupKey(b);
+        var last = out[out.length - 1];
+        if (!last || last.key !== k) out.push(last = { key: k, books: [] });
+        last.books.push(b);
+      });
+      return out;
+    }
+
+    function spineHtml(b) {
+      var p = b.pages || 320;
+      var h = Math.round(Math.max(64, Math.min(134, 50 + p * 0.11)));
+      var w = Math.round(Math.max(18, Math.min(32, 14 + p / 42)));
+      var label = b.title + ', ' + b.author + '. ' + (b.rating ? b.rating + ' of 5 stars' : 'Not rated') +
+        (b.read ? '. Read ' + fmt(b.read, 'month') : '') + (b.review ? '. Reviewed' : '');
+      return '<li><button type="button" class="lib-spine genre--' + b.genre.key + (b.review ? ' has-review' : '') + '" data-book="' + esc(b.id) + '"' +
+        ' style="--h:' + h + 'px;--w:' + w + 'px" aria-label="' + esc(label) + '" title="' + esc(b.title + ' · ' + b.author) + '">' +
+        '<span class="lib-spine__title" aria-hidden="true">' + esc(b.title) + '</span>' +
+        (b.rating === 5 ? '<span class="lib-spine__star" aria-hidden="true">★</span>' : '') +
+        '</button></li>';
+    }
+    function shelfHtml(groups) {
+      var html = '', count = 0;
+      groups.forEach(function (g) {
+        if (state.sort !== 'title') html += '<li class="lib-divider" aria-hidden="true"><span><b>' + esc(groupTab(g.key)) + '</b><small>' + g.books.length + '</small></span></li>';
+        g.books.forEach(function (b) {
+          html += spineHtml(b);
+          if (++count === 6) html += '<li><button type="button" class="lib-spine lib-spine--secret" id="secret-spine" style="--h:140px;--w:22px" aria-label="A book sticking out of the shelf"></button></li>';
+        });
+      });
+      return '<ul class="lib-shelf" aria-label="Books on the shelf">' + html + '</ul>';
+    }
+    function listHtml(groups) {
+      return groups.map(function (g) {
+        return '<h3 class="lib-group">' + esc(groupName(g.key)) + ' <small>' + plural(g.books.length, 'book', 'books') + '</small></h3>' +
+          '<ul class="lib-list">' + g.books.map(function (b) {
+            return '<li><button type="button" class="lib-item" data-book="' + esc(b.id) + '">' +
+              '<span class="lib-item__swatch genre--' + b.genre.key + '" aria-hidden="true"></span>' +
+              '<span class="lib-item__main"><span class="lib-item__title">' + esc(b.title) + '</span>' +
+                '<span class="lib-item__by">' + esc(b.author) + (b.review ? ' · reviewed' : '') + '</span></span>' +
+              '<span class="lib-item__meta">' + starsHtml(b.rating) + (b.read ? '<span class="lib-item__when">' + esc(fmt(b.read, 'month')) + '</span>' : '') + '</span>' +
+              '</button></li>';
+          }).join('') + '</ul>';
+      }).join('');
+    }
+
+    var booksEl = $('#lib-books');
+    function paint() {
+      if (!booksEl) return;
+      shown = shelf.filter(matches).sort(ORDER[state.sort]);
+      $('#lib-count').textContent = shown.length === shelf.length
+        ? 'All ' + shelf.length + ' books, ' + ORDER_WORDS[state.sort] + '.'
+        : 'Showing ' + shown.length + ' of ' + shelf.length + ' books, ' + ORDER_WORDS[state.sort] + '.';
+      booksEl.innerHTML = !shown.length
+        ? '<p class="hand-m gap-s">Nothing on the shelf matches that.</p><button type="button" class="btn btn--text" id="lib-clear">Clear the filters</button>'
+        : state.view === 'list' ? listHtml(grouped(shown)) : shelfHtml(grouped(shown));
+      if (card && card.el.open) markBook(card.list[card.index].id);
+    }
+    function pressOnly(selector, on) {
+      $$(selector, left).forEach(function (el) { el.setAttribute('aria-pressed', String(el === on)); });
+    }
+    function clearFilters() {
+      state.genre = '';
+      state.five = false;
+      state.reviewed = false;
+      state.q = '';
+      $('#lib-search').value = '';
+      pressOnly('[data-genre]', $('[data-genre=""]', left));
+      $('#lib-five').setAttribute('aria-pressed', 'false');
+      $('#lib-reviewed').setAttribute('aria-pressed', 'false');
+      paint();
+    }
+
+    if (booksEl) {
+      paint();
+      $('.lib-chips', left).addEventListener('click', function (e) {
+        var chip = e.target.closest ? e.target.closest('[data-genre]') : null;
+        if (!chip) return;
+        state.genre = chip.getAttribute('data-genre');
+        pressOnly('[data-genre]', chip);
+        paint();
+      });
+      [['#lib-five', 'five'], ['#lib-reviewed', 'reviewed']].forEach(function (pair) {
+        var btn = $(pair[0], left);
+        btn.addEventListener('click', function () {
+          state[pair[1]] = !state[pair[1]];
+          btn.setAttribute('aria-pressed', String(state[pair[1]]));
+          paint();
+        });
+      });
+      $('#lib-search').addEventListener('input', function (e) { state.q = fold(e.target.value.trim()); paint(); });
+      $('#lib-sort').addEventListener('change', function (e) { state.sort = ORDER[e.target.value] ? e.target.value : 'year'; paint(); });
+      $$('[data-view]', left).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.view = btn.getAttribute('data-view');
+          store.set('libView', state.view);
+          pressOnly('[data-view]', btn);
+          paint();
+        });
+      });
+      $('#pull').addEventListener('click', function () {
+        var pool = shown.length ? shown : shelf;
+        var pick = pool[Math.floor(Math.random() * pool.length)];
+        if (pick) openBook(pick.id, pool);
+      });
+    }
+
+    left.addEventListener('click', function (e) {
+      var t = e.target.closest ? e.target : null;
+      if (!t) return;
+      if (t.closest('#secret-spine')) { findSecret('spine'); return; }
+      if (t.closest('#lib-clear')) { clearFilters(); return; }
+      var hit = t.closest('[data-book]');
+      if (!hit) return;
+      var from = hit.closest('#lib-books') ? shown : hit.closest('.reading') ? reading : abandoned;
+      openBook(hit.getAttribute('data-book'), from);
     });
-    var secret = $('#secret-spine');
-    if (secret) secret.addEventListener('click', function () { findSecret('spine'); });
+    right.addEventListener('click', function (e) {
+      var t = e.target.closest ? e.target : null;
+      if (!t) return;
+      var more = t.closest('#anti-more');
+      if (more) {
+        var open = more.getAttribute('aria-expanded') !== 'true';
+        $$('[data-extra]', right).forEach(function (li) { li.hidden = !open; });
+        more.setAttribute('aria-expanded', String(open));
+        more.textContent = open ? 'Show fewer' : 'Show all ' + waiting.length;
+        return;
+      }
+      var hit = t.closest('[data-book]');
+      if (hit) openBook(hit.getAttribute('data-book'), waiting);
+    });
+
+    // A link straight to one book: references.html#book-21
+    function openFromHash() {
+      var m = /^#book-(\w+)$/.exec(location.hash);
+      if (!m) return;
+      var b = library.filter(function (x) { return x.id === m[1]; })[0];
+      if (b) openBook(b.id, b.shelf === 'read' ? shown : onShelf(b.shelf));
+    }
+    window.addEventListener('hashchange', openFromHash);
+    openFromHash();
+    if (location.hash === '#antilibrary') setTimeout(function () { scrollToEl($('#antilibrary')); }, 60);
   }
 
   /* ============================================================

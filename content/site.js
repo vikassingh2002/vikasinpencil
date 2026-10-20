@@ -15,7 +15,7 @@ NB.site = {
 
   name: "Vikas Singh",
   email: "hello@vikasinpencil.com",   // shown on the inside cover (see README: email forwarding)
-  linkedin: "",                        // e.g. "https://www.linkedin.com/in/your-handle"
+  linkedin: "https://www.linkedin.com/in/vikas-singh-profile/",
   cvFile: "",                          // e.g. "assets/cv.pdf" once you add the PDF; empty hides the button
 
   begun: "Oct 2026",

@@ -16,7 +16,7 @@ NB.today = {
   currently: [
     { label: "Learning", text: "How AI agents plan, use tools and fail.", see: "E-01" },
     { label: "Building", text: "A small research assistant, starting from zero.", see: "E-01" },
-    { label: "Reading", text: "[The book you're reading]", see: "references" },
+    { label: "Reading", text: "*The Count of Monte Cristo*, by Alexandre Dumas.", see: "references" },
     { label: "Thinking about", text: "Whether the energy transition is a storage problem before it's a generation problem.", see: "H-04" },
     { label: "Done", text: "Write the first page of this notebook.", done: true }
   ],
