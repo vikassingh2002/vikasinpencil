@@ -15,6 +15,14 @@ NB.site = {
     "Learning to build useful things with AI."
   ],
   "rewardLine": "Reward: a good conversation.",
+  "pencilLines": [
+    "Hi, I'm Vikas. Come on in.",
+    "Currently: building with AI",
+    "Hypothesis first, then test.",
+    "Never erase. Strike it out.",
+    "Seven notes are hidden here.",
+    "Go on, open the notebook."
+  ],
   "thirtySeconds": [
     "B.Sc. in Physics from Mumbai University, MBA in International Business from IIFT Kolkata. Now a Consultant in Digital Engineering & R&D at Capgemini.",
     "Over the next year, I am seriously exploring AI product building. I know some Python; modern AI applications are still new territory.",

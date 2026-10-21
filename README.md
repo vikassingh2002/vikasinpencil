@@ -23,7 +23,7 @@ Each notebook section has one file in `content/`:
 
 | File | Section |
 |---|---|
-| `site.js` | Your name, email, the cover, the 30-second version, house rules, hidden notes |
+| `site.js` | Your name, email, the cover, the lines the cover pencil writes (`pencilLines`), the 30-second version, house rules, hidden notes |
 | `today.js` | The Today page (rewrite it on the 20th of each month) |
 | `hypotheses.js` | Hypotheses |
 | `experiments.js` | Experiments |

@@ -825,7 +825,7 @@
 
   function renderCover() {
     $$('[data-bind]').forEach(function (el) {
-      var map = { name: site.name, subject: site.coverSubject, pagesLeft: site.coverPagesLeft, tagline: site.tagline };
+      var map = { name: site.name, subject: site.coverSubject, pagesLeft: site.coverPagesLeft, tagline: site.tagline, reward: site.rewardLine };
       var val = map[el.getAttribute('data-bind')];
       if (val) el.textContent = val;
     });
@@ -850,9 +850,127 @@
       meta.innerHTML = line1.map(nowrap).join(' · ') + '<br>' + line2.map(nowrap).join(' · ');
     }
     var band = $('#band');
-    if (band) band.addEventListener('click', function () { snapBand(false); });
+    if (band) band.addEventListener('click', function (e) { e.stopPropagation(); snapBand(false); });
     var draft = $('#cover-draft');
     if (draft) draft.hidden = !site.draft;
+    coverBook();
+    coverPencil();
+  }
+
+  /* The first click opens the cover where it lies; the next one turns the page. */
+  function coverBook() {
+    var book = $('#book');
+    if (!book) return;
+    var openBtn = $('#cover-open');
+    var turn = $('.book__turn', book);
+    function setOpen(open) {
+      book.classList.toggle('is-open', open);
+      if (turn) turn.tabIndex = open ? 0 : -1;
+      if (openBtn && openBtn.firstChild && openBtn.firstChild.nodeType === 3) openBtn.firstChild.nodeValue = open ? 'Turn the page ' : 'Open the notebook ';
+    }
+    if (openBtn) openBtn.addEventListener('click', function (e) {
+      if (book.classList.contains('is-open')) return; // the page turn takes it from here
+      e.preventDefault();
+      setOpen(true);
+    });
+    book.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('a, button')) return;
+      if (!book.classList.contains('is-open')) setOpen(true);
+      else turnTo(new URL('contents.html', location.href).href, 'next');
+    });
+
+    // The notebook leans a little towards the pointer, as if you were looking at it from there.
+    var fine = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    if (!fine || reduceMotion) return;
+    document.addEventListener('pointermove', function (e) {
+      var x = e.clientX / window.innerWidth - 0.5;
+      var y = e.clientY / window.innerHeight - 0.5;
+      book.style.setProperty('--ry', (-8 + x * 12).toFixed(2) + 'deg');
+      book.style.setProperty('--rx', (5 - y * 8).toFixed(2) + 'deg');
+    });
+    document.documentElement.addEventListener('mouseleave', function () {
+      book.style.removeProperty('--ry');
+      book.style.removeProperty('--rx');
+    });
+  }
+
+  /* The pencil writes a line on the desk: once by itself when you arrive, then whenever it's picked up. */
+  function coverPencil() {
+    var stage = $('#cover-stage');
+    var pen = $('#pencil');
+    var note = $('#cover-note');
+    var book = $('#book');
+    var lines = list(site.pencilLines);
+    if (!stage || !pen || !note || !book || !lines.length) return;
+    pen.hidden = false;
+    var P = { x: 0, y: 0, a: 22 };
+    var busy = false;
+    var k = 0;
+    function small() { return !!(window.matchMedia && window.matchMedia('(max-width: 560px)').matches); }
+    function place() {
+      pen.style.transform = 'translate(' + (P.x - 11).toFixed(1) + 'px,' + (P.y - 196).toFixed(1) + 'px) rotate(' + P.a.toFixed(1) + 'deg) scale(' + (small() ? 0.72 : 0.85) + ')';
+    }
+    function rest() {
+      return small()
+        ? { x: book.offsetWidth - 22, y: book.offsetHeight + 64, a: -16 }
+        : { x: book.offsetWidth + 34, y: book.offsetHeight + 34, a: 22 };
+    }
+    function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+    function glide(to, ms, done) {
+      var from = { x: P.x, y: P.y, a: P.a };
+      var t0 = null;
+      function frame(now) {
+        if (t0 === null) t0 = now;
+        var p = Math.min((now - t0) / ms, 1);
+        var q = ease(p);
+        P.x = from.x + (to.x - from.x) * q;
+        P.y = from.y + (to.y - from.y) * q;
+        P.a = from.a + (to.a - from.a) * q;
+        place();
+        if (p < 1) requestAnimationFrame(frame); else if (done) done();
+      }
+      requestAnimationFrame(frame);
+    }
+    P = rest();
+    place();
+    pen.classList.add('is-ready');
+
+    function write() {
+      if (busy) return;
+      busy = true;
+      note.style.transition = 'opacity 0.3s ease';
+      note.style.opacity = '0';
+      setTimeout(function () {
+        note.textContent = lines[k++ % lines.length];
+        note.style.clipPath = 'inset(0 100% 0 0)';
+        note.style.opacity = '1';
+        var w = note.offsetWidth;
+        var x0 = note.offsetLeft;
+        var y0 = note.offsetTop + note.offsetHeight * 0.78;
+        if (reduceMotion) { note.style.clipPath = 'none'; busy = false; return; }
+        glide({ x: x0, y: y0, a: 22 }, 650, function () {
+          var t0 = null;
+          function stroke(now) {
+            if (t0 === null) t0 = now;
+            var p = Math.min((now - t0) / 1900, 1);
+            note.style.clipPath = 'inset(0 ' + (100 - p * 100).toFixed(2) + '% 0 0)';
+            P.x = x0 + p * w;
+            P.y = y0 - 1 + Math.sin(p * 72) * 2.2;
+            place();
+            if (p < 1) { requestAnimationFrame(stroke); return; }
+            note.style.clipPath = 'none';
+            setTimeout(function () { glide(rest(), 750, function () { busy = false; }); }, 350);
+          }
+          requestAnimationFrame(stroke);
+        });
+      }, 300);
+    }
+    pen.addEventListener('click', write);
+    window.addEventListener('resize', function () { if (!busy) { P = rest(); place(); } });
+    if (!session.get('pencil', false)) {
+      session.set('pencil', true);
+      setTimeout(write, 1700);
+    }
   }
 
   /* ============================================================

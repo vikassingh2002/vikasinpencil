@@ -16,23 +16,28 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap">
-<link rel="stylesheet" href="assets/css/notebook.css?v=20261021-direction">
+<link rel="stylesheet" href="assets/css/notebook.css?v=20261021-blueprint">
 </head>
 <body>
 <div class="nb nb--cover" data-page="cover">
   <main id="main" class="cover">
     <header class="cover__head">
       <p class="cover__kicker">Lab notebook No. 1 · <span data-bind="name">Vikas Singh</span></p>
-      <h1 class="cover__title"><span class="cover__line">Vikas</span> <span class="cover__line"><span class="cover__in">in</span> Pencil</span><svg class="sketch cover__scribble" data-draw viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="ink" pathLength="1" d="M5 13c44-6 92-9 142-7s100 5 148-1"/></svg></h1>
+      <h1 class="cover__title"><span class="cover__line">Vikas</span> <span class="cover__line"><span class="cover__in">in</span> Pencil</span></h1>
     </header>
 
-    <div class="cover__stage">
+    <div class="cover__stage" id="cover-stage">
+      <div class="measure measure--w" aria-hidden="true"><span>148 mm</span></div>
+      <div class="measure measure--h" aria-hidden="true"><span>210 mm</span></div>
       <div class="book js-turn" id="book">
+        <div class="book__shadow" aria-hidden="true"></div>
         <div class="book__block" aria-hidden="true"></div>
         <div class="book__tips" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-        <div class="book__inside" aria-hidden="true">
+        <div class="book__inside">
           <p class="book__inside-kicker">If found, please return to</p>
           <p class="book__inside-name" data-bind="name">Vikas Singh</p>
+          <p class="book__reward" data-bind="reward">Reward: a good conversation.</p>
+          <a class="book__turn" href="contents.html" tabindex="-1">Turn the page →</a>
         </div>
         <nav class="book__tabs" aria-label="Jump to a section">
           <a class="book-tab" href="today.html">Today</a>
@@ -57,6 +62,19 @@
           <button type="button" class="book__band" id="band" aria-label="Snap the elastic band"><span></span></button>
         </div>
       </div>
+      <button type="button" class="pencil" id="pencil" aria-label="Pick up the pencil and write a line" hidden>
+        <svg viewBox="0 0 22 196" aria-hidden="true" focusable="false">
+          <rect x="4" y="0" width="14" height="12" rx="3" fill="#E48A7E"/>
+          <rect x="4" y="12" width="14" height="16" fill="#C9A24E"/>
+          <path d="M4 18h14M4 23h14" stroke="#9C7A30" stroke-width="0.8"/>
+          <rect x="4" y="28" width="4.7" height="146" fill="#2E5C94"/>
+          <rect x="8.7" y="28" width="4.6" height="146" fill="#3F76B6"/>
+          <rect x="13.3" y="28" width="4.7" height="146" fill="#244C7C"/>
+          <path d="M4 174 L18 174 L11 196 Z" fill="#E6C59A"/>
+          <path d="M8.4 188 L13.6 188 L11 196 Z" fill="#2B2B2B"/>
+        </svg>
+      </button>
+      <p class="cover__note" id="cover-note" aria-live="polite"></p>
     </div>
 
     <div class="cover__text">
@@ -74,17 +92,17 @@
 </div>
 <noscript><p class="noscript">This notebook needs JavaScript to turn its pages.</p></noscript>
 <script>window.NB={errors:[]};window.addEventListener('error',function(e){if(e&&e.filename&&/\/content\//.test(e.filename)){NB.errors.push(e.filename.split('/').slice(-2).join('/')+', line '+e.lineno);}});</script>
-<script src="content/notes.js?v=20261021-direction"></script>
-<script src="content/site.js?v=20261021-direction"></script>
-<script src="content/today.js?v=20261021-direction"></script>
+<script src="content/notes.js?v=20261021-blueprint"></script>
+<script src="content/site.js?v=20261021-blueprint"></script>
+<script src="content/today.js?v=20261021-blueprint"></script>
 <script src="content/hypotheses.js"></script>
-<script src="content/experiments.js?v=20261021-direction"></script>
+<script src="content/experiments.js?v=20261021-blueprint"></script>
 <script src="content/books.js"></script>
 <script src="content/shelves.js"></script>
 <script src="content/media.js"></script>
 <script src="content/references.js"></script>
-<script src="content/errata.js?v=20261021-direction"></script>
-<script src="content/pocket.js?v=20261021-direction"></script>
-<script src="assets/js/notebook.js?v=20261021-direction"></script>
+<script src="content/errata.js?v=20261021-blueprint"></script>
+<script src="content/pocket.js?v=20261021-blueprint"></script>
+<script src="assets/js/notebook.js?v=20261021-blueprint"></script>
 </body>
 </html>

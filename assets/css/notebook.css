@@ -7,10 +7,14 @@
    ========================================================= */
 
 :root {
-  --desk: #23201D;
-  --desk-ink: #EDEAE3;
-  --desk-muted: #B9B3A8;
-  --desk-line: rgba(237, 234, 227, 0.55);
+  /* the desk is a blueprint: deep blue with a coarse and a fine grid */
+  --desk: #12304F;
+  --desk-ink: #EEF3FA;
+  --desk-muted: #A9C2E2;
+  --desk-line: rgba(207, 224, 245, 0.5);
+  --bp-grid: rgba(255, 255, 255, 0.07);
+  --bp-fine: rgba(255, 255, 255, 0.025);
+  --bp-ink: #CFE0F5;
 
   --paper: #FAFAF6;
   --paper-back: #E9E2D2;
@@ -86,10 +90,10 @@
 /* At night the desk lamp dims: darker desk, softer paper. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --desk: #171513;
-    --desk-ink: #E8E4DA;
-    --desk-muted: #A9A296;
-    --desk-line: rgba(232, 228, 218, 0.5);
+    --desk: #0D2540;
+    --desk-ink: #E6EDF6;
+    --desk-muted: #9BB4D4;
+    --desk-line: rgba(207, 224, 245, 0.45);
     --paper: #E9E5D9;
     --paper-back: #D9D1BE;
     --paper-edge: #C9BFA9;
@@ -110,10 +114,10 @@
   }
 }
 :root[data-theme="dark"] {
-  --desk: #171513;
-  --desk-ink: #E8E4DA;
-  --desk-muted: #A9A296;
-  --desk-line: rgba(232, 228, 218, 0.5);
+  --desk: #0D2540;
+  --desk-ink: #E6EDF6;
+  --desk-muted: #9BB4D4;
+  --desk-line: rgba(207, 224, 245, 0.45);
   --paper: #E9E5D9;
   --paper-back: #D9D1BE;
   --paper-edge: #C9BFA9;
@@ -139,7 +143,13 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--desk);
+  background-color: var(--desk);
+  background-image:
+    linear-gradient(var(--bp-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px),
+    linear-gradient(var(--bp-fine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bp-fine) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px, 12px 12px, 12px 12px;
   color: var(--ink);
   font-family: var(--serif);
   font-size: 18px;
@@ -813,33 +823,52 @@ figcaption {
 .cover__in { font-size: 0.56em; font-weight: 600; color: var(--desk-muted); }
 .cover__scribble { position: absolute; left: 4%; bottom: -0.06em; width: 92%; height: 0.2em; }
 .cover__scribble .ink { stroke: var(--peach); stroke-width: 3.2; vector-effect: non-scaling-stroke; }
+/* The notebook on the blueprint: a real book in 3D, tilting a little with the pointer,
+   with drafting lines measuring it and a pencil beside it. */
 .cover__stage {
   grid-area: stage;
+  position: relative;
   width: min(400px, calc(100vw - 160px));
   max-width: 100%;
-  margin-right: 107px;
+  margin: 34px 107px 0 0;
+  padding-bottom: 78px;
+  perspective: 1400px;
 }
 .book {
+  --rx: 5deg;
+  --ry: -8deg;
   position: relative;
   width: 100%;
   aspect-ratio: 3 / 4;
-  transform: rotate(-1.5deg);
-  transition: transform 300ms var(--ease);
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition: transform 450ms var(--ease);
+  cursor: pointer;
 }
-.book:hover { transform: rotate(-0.8deg) translateY(-4px); }
+.book__shadow {
+  position: absolute;
+  inset: 7% -5% -6% 7%;
+  border-radius: 16px;
+  background: rgba(3, 12, 26, 0.6);
+  filter: blur(20px);
+  transform: translateZ(-34px);
+}
 .book__block {
   position: absolute;
-  top: 8px;
-  bottom: 8px;
-  right: -6px;
-  width: 8px;
-  border-radius: 0 3px 3px 0;
-  background: repeating-linear-gradient(180deg, var(--paper-edge-light) 0 2px, var(--paper-edge) 2px 3px);
+  top: 1.6%;
+  bottom: 1.6%;
+  left: 3%;
+  right: -3%;
+  border-radius: 0 9px 9px 0;
+  background: repeating-linear-gradient(90deg, #EFE8D8 0 2px, #CFC4AC 2px 3px);
+  transform: translateZ(-7px);
 }
 .book__inside {
   position: absolute;
   inset: 0;
-  padding: 18% 14%;
+  display: flex;
+  flex-direction: column;
+  padding: 17% 13%;
   border-radius: 4px 12px 12px 4px;
   background-color: var(--paper);
   background-image:
@@ -847,7 +876,72 @@ figcaption {
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 20px 20px;
   color: var(--ink);
-  box-shadow: 0 30px 60px var(--shadow-desk);
+  transform: translateZ(-2px);
+}
+.book__reward { margin-top: 14px; font-family: var(--hand); font-size: clamp(20px, 2vw, 25px); font-weight: 600; line-height: 1.15; color: var(--graphite); }
+.book__turn {
+  margin-top: auto;
+  align-self: flex-start;
+  font-family: var(--hand);
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 700;
+  color: var(--red);
+  text-decoration: none;
+}
+.book__turn:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* drafting lines: the notebook's width and height, inked in as the page loads */
+.measure { position: absolute; color: var(--bp-ink); font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; pointer-events: none; }
+.measure--w { left: 0; right: 0; top: -26px; height: 13px; border-top: 1px solid currentColor; transform-origin: left center; animation: nb-measure-x 1.2s var(--ease) 0.3s both; }
+.measure--h { left: -30px; top: 0; bottom: 78px; width: 13px; border-left: 1px solid currentColor; transform-origin: center top; animation: nb-measure-y 1.2s var(--ease) 0.45s both; }
+.measure::before,
+.measure::after { content: ""; position: absolute; background: currentColor; }
+.measure--w::before, .measure--w::after { top: -7px; width: 1px; height: 13px; }
+.measure--w::before { left: 0; }
+.measure--w::after { right: 0; }
+.measure--h::before, .measure--h::after { left: -7px; width: 13px; height: 1px; }
+.measure--h::before { top: 0; }
+.measure--h::after { bottom: 0; }
+.measure span { position: absolute; padding: 0 6px; background: var(--desk); animation: nb-fade 0.6s ease 1.1s both; }
+.measure--w span { left: 50%; top: -8px; transform: translateX(-50%); }
+.measure--h span { top: 50%; left: -8px; transform: translate(-50%, -50%) rotate(-90deg); white-space: nowrap; }
+@keyframes nb-measure-x { from { transform: scaleX(0); } }
+@keyframes nb-measure-y { from { transform: scaleY(0); } }
+@keyframes nb-fade { from { opacity: 0; } }
+
+/* the pencil: picks itself up and writes a line on the desk */
+.pencil {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 22px;
+  height: 196px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(5px 8px 5px rgba(3, 12, 26, 0.45));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.pencil.is-ready { opacity: 1; }
+.pencil svg { display: block; width: 100%; height: 100%; }
+.pencil:focus-visible { outline-color: var(--desk-ink); outline-offset: 4px; }
+.cover__note {
+  position: absolute;
+  left: 0;
+  bottom: 18px;
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--hand);
+  font-size: clamp(24px, 2.3vw, 30px);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--desk-ink);
+  clip-path: inset(0 100% 0 0);
 }
 .book__inside-kicker {
   font-family: var(--mono);
@@ -894,23 +988,37 @@ figcaption {
 .book-tab:hover,
 .book-tab:focus-visible { transform: translateX(0); background: var(--manila-hover); }
 
+/* blueprint-blue cloth: light across it, a faint printed grid, a fine inset line */
 .book__cover {
   position: absolute;
   inset: 0;
   border-radius: 6px 14px 14px 6px;
-  background-color: var(--cover);
+  background-color: #1C3A66;
   background-image:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, 0.22)),
+    linear-gradient(rgba(220, 235, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 235, 255, 0.07) 1px, transparent 1px),
     repeating-linear-gradient(45deg, var(--cover-weave-light) 0 1px, transparent 1px 4px),
     repeating-linear-gradient(-45deg, var(--cover-weave-dark) 0 1px, transparent 1px 4px);
-  box-shadow: 0 30px 60px var(--shadow-desk);
+  background-size: auto, 20px 20px, 20px 20px, auto, auto;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   transform-origin: left center;
   backface-visibility: hidden;
-  transition: transform 640ms cubic-bezier(0.5, 0, 0.2, 1);
+  transition: transform 1s cubic-bezier(0.45, 0, 0.2, 1);
 }
-.book.is-opening .book__cover { transform: perspective(1800px) rotateY(-118deg); }
-.book.is-closing .book__cover { animation: nb-cover-close 700ms cubic-bezier(0.5, 0, 0.2, 1) both; }
+.book__cover::before {
+  content: "";
+  position: absolute;
+  inset: 4% 13% 4% 9%;
+  border: 1px solid rgba(220, 235, 255, 0.2);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.book.is-open .book__cover,
+.book.is-opening .book__cover { transform: rotateY(-158deg); }
+.book.is-closing .book__cover { animation: nb-cover-close 800ms cubic-bezier(0.45, 0, 0.2, 1) both; }
 @keyframes nb-cover-close {
-  from { transform: perspective(1800px) rotateY(-118deg); }
+  from { transform: rotateY(-158deg); }
   to { transform: none; }
 }
 .book__spine {
@@ -1026,7 +1134,7 @@ figcaption {
 }
 .cover__intro { font-size: clamp(21px, 2.1vw, 28px); line-height: 1.35; text-wrap: balance; }
 .cover__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.cover__snap { font-family: var(--hand); font-size: 30px; font-weight: 700; color: var(--peach); }
+.cover__snap { font-family: var(--hand); font-size: 30px; font-weight: 700; color: #FFD36B; }
 .cover__meta {
   font-family: var(--mono);
   font-size: 12px;
@@ -1061,7 +1169,8 @@ figcaption {
 
 /* On a phone the fore-edge tabs become plain tab tips; the buttons do the navigating. */
 @media (max-width: 560px) {
-  .cover__stage { width: min(340px, calc(100vw - 64px)); margin-right: 18px; }
+  .cover__stage { width: min(320px, calc(100vw - 80px)); margin: 30px 18px 0 12px; }
+  .measure--h { left: -22px; }
   .book__tabs { display: none; }
   .book__tips {
     position: absolute;
@@ -2314,16 +2423,32 @@ html.has-card { overflow: hidden; }
   .spread--plated .page--right { order: 2; border-radius: 0 0 4px 4px; }
 }
 
+/* On phones the tabs sit along the bottom edge, where the thumb already is. */
 @media (max-width: 720px) {
+  .nb { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    max-width: none;
+    margin: 0;
+    padding: 8px max(10px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px));
     flex-wrap: nowrap;
+    gap: 5px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 8px 4px 0;
+    background: var(--desk);
+    border-top: 1px solid var(--desk-line);
+    box-shadow: 0 -12px 28px rgba(3, 12, 26, 0.45);
     scrollbar-width: none;
   }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { flex: 0 0 auto; padding: 0 14px; }
+  .tab { flex: 0 0 auto; min-height: 42px; padding: 0 14px; border-radius: 8px; transform: none; }
+  .tab:hover, .tab:focus-visible { transform: none; }
+  .tab[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--red); }
+  .slip { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
   .ribbon { right: 28px; height: 110px; }
   .hyp-row__meta { padding-left: 0; }
   .conf-big { font-size: 56px; }
