@@ -464,6 +464,7 @@
     setTimeout(go, 230);
   }
   function step(dir) {
+    if (pageIndex(current) < 0) return; // a page outside the notebook's order, like the brief
     var i = pageIndex(current) + (dir === 'next' ? 1 : -1);
     if (i < 0 || i >= PAGES.length) return;
     turnTo(new URL(PAGES[i].href, location.href).href, dir);
@@ -567,7 +568,7 @@
         '<div class="topbar__right">' +
           (site.draft ? '<span class="stamp-draft" title="Placeholder content. Set draft to false in content/site.js when it is real.">Draft</span>' : '') +
           '<span class="notes-badge" id="nb-badge" hidden></span>' +
-          '<a class="topbar__quiet" href="contents.html">The 30-second version</a>' +
+          '<a class="topbar__quiet" href="brief.html">The notebook in 30 seconds</a>' +
         '</div>';
     }
     var tabs = $('#nb-tabs');
@@ -2374,7 +2375,71 @@
     }).join('');
   }
 
+  /* ============================================================
+     PAGE: The notebook at a glance (brief.html)
+     One screen for someone with thirty seconds: a line about me, then
+     one sentence from each section, all read from the content files.
+     ============================================================ */
+
+  function renderBrief() {
+    var el = $('#brief');
+    if (!el) return;
+    function cell(no, label, text, meta, href) {
+      return '<a class="brief__cell" href="' + esc(href) + '">' +
+        '<span class="brief__label">' + esc(no + ' · ' + label) + '</span>' +
+        '<span class="brief__text">' + text + '</span>' +
+        '<span class="brief__go">' + meta + ' →</span></a>';
+    }
+    var cells = [];
+
+    var now = list(today.currently)[0];
+    if (now) cells.push(['On the desk', rich(now.text), esc(now.label || 'Today'), 'today.html']);
+
+    var belief = hyps.filter(isOpenH).sort(function (a, b) { return (Number(b.confidence) || 0) - (Number(a.confidence) || 0); })[0];
+    if (belief) cells.push(['Strongest belief', rich(belief.statement), '<b>' + esc(belief.confidence) + '%</b> sure · Hypotheses', 'hypotheses.html#' + belief.id]);
+
+    var order = { running: 0, planned: 1, concluded: 2 };
+    var test = exps.slice().sort(function (a, b) { return (order[a.status] == null ? 3 : order[a.status]) - (order[b.status] == null ? 3 : order[b.status]); })[0];
+    if (test) {
+      var how = test.status === 'running' ? 'Running' : test.status === 'planned' ? 'Planned' : 'Concluded';
+      cells.push([test.status === 'concluded' ? 'Last tested' : 'Testing next', rich(test.title), esc(how) + ' · Experiments', 'experiments.html#' + test.id]);
+    }
+
+    var notes = list(NB.notes);
+    var latest = notes.reduce(function (best, n) { return !best || String(n.date) > String(best.date) ? n : best; }, null);
+    if (latest) cells.push(['Latest note', '“' + esc(latest.title) + '”', esc(fmt(latest.date, 'short')) + ' · Field notes', 'notes.html#' + latest.id]);
+
+    var reading = everything.filter(function (x) { return x.status === 'doing'; }).sort(function (a, b) { return (a.kind === 'book' ? 0 : 1) - (b.kind === 'book' ? 0 : 1); })[0];
+    var read = library.filter(function (b) { return b.status === 'done'; }).length;
+    if (reading || read) cells.push(['Reading', reading ? esc(reading.title) : 'Between books', (read ? '<b>' + num(read) + '</b> books read · ' : '') + 'References', 'references.html']);
+
+    var retired = hyps.length - hyps.filter(isOpenH).length;
+    var sealed = letters.filter(function (l) { return !letterIsOpen(l); }).length;
+    var honest = [];
+    if (retired) honest.push(plural(retired, 'belief', 'beliefs') + ' retired, not erased');
+    if (errata.length) honest.push(plural(errata.length, 'correction', 'corrections') + ', dated');
+    if (sealed) honest.push(plural(sealed, 'letter', 'letters') + ' sealed until they open');
+    if (honest.length) cells.push(['Kept honest', esc(honest.join('; ')), 'Errata · Back pocket', retired || errata.length ? 'contents.html#errata' : 'pocket.html']);
+
+    var first = site.readFirst || {};
+    var last = lastEntryDate();
+    el.innerHTML =
+      strip([['Data sheet', 'Lab notebook No. 1'], ['Read time', '30 s'], ['Updated', last ? fmt(last) : '']]) +
+      '<h1 class="hand-xl brief__title">The notebook at a glance</h1>' +
+      '<p class="brief__who"><b>' + esc(site.name || '') + '.</b> ' + rich(site.briefLine || list(site.thirtySeconds)[0] || '') + '</p>' +
+      '<div class="brief__grid">' + cells.map(function (c, i) { return cell(pad2(i + 1), c[0], c[1], c[2], c[3]); }).join('') + '</div>' +
+      '<div class="brief__foot">' +
+        (first.href && first.label ? '<a class="brief__first" href="' + esc(first.href) + '">If you read one thing: “' + esc(first.label) + '” →</a>' : '<span></span>') +
+        '<span class="brief__links">' +
+          '<a class="ink-link" href="contents.html">Open the notebook</a>' +
+          (site.email ? '<a class="ink-link" href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>' : '') +
+          (site.linkedin ? '<a class="ink-link" href="' + esc(site.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>' : '') +
+        '</span>' +
+      '</div>';
+  }
+
   var RENDER = {
+    brief: renderBrief,
     notes: renderNotes,
     cover: renderCover,
     contents: renderContents,

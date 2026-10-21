@@ -15,6 +15,8 @@ NB.site = {
     "Learning to build useful things with AI."
   ],
   "rewardLine": "Reward: a good conversation.",
+  "briefLine": "Physics graduate, IIFT MBA, consultant at Capgemini, spending this year learning to build useful things with AI.",
+  "readFirst": { "label": "Before I build an agent", "href": "notes.html#N-02" },
   "pencilLines": [
     "Hi, I'm Vikas. Come on in.",
     "Currently: building with AI",
