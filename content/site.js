@@ -4,7 +4,7 @@ NB.site = {
   "draft": false,
   "name": "Vikas Singh",
   "email": "hello@vikasinpencil.com",
-  "linkedin": "",
+  "linkedin": "https://www.linkedin.com/in/vikas-singh-profile/",
   "cvFile": "",
   "begun": "Oct 2026",
   "coverSubject": "things I haven't figured out yet",
@@ -16,7 +16,7 @@ NB.site = {
   ],
   "rewardLine": "Reward: a good conversation.",
   "briefLine": "Physics graduate, IIFT MBA, consultant at Capgemini, spending this year learning to build useful things with AI.",
-  "readFirst": { "label": "Before I build an agent", "href": "notes.html#N-02" },
+  "readFirst": { "label": "Before I build an agent", "href": "notes.html#N-02", "summary": "Why my first project is small, with answers I can check, rather than an impressive demo." },
   "pencilLines": [
     "Hi, I'm Vikas. Come on in.",
     "Currently: building with AI",

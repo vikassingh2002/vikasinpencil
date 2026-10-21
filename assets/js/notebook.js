@@ -2377,64 +2377,73 @@
 
   /* ============================================================
      PAGE: The notebook at a glance (brief.html)
-     One screen for someone with thirty seconds: a line about me, then
-     one sentence from each section, all read from the content files.
+     One screen for a busy decision maker: who I am, where I'm heading,
+     what I'm building and learning, one idea and one piece worth their
+     time, and how to reach me. All of it is read from the content files.
      ============================================================ */
 
   function renderBrief() {
     var el = $('#brief');
     if (!el) return;
-    function cell(no, label, text, meta, href) {
-      return '<a class="brief__cell" href="' + esc(href) + '">' +
-        '<span class="brief__label">' + esc(no + ' · ' + label) + '</span>' +
+    function firstSentence(s) { var m = /^.*?[.!?](\s|$)/.exec(String(s || '')); return (m ? m[0] : String(s || '')).trim(); }
+    function cell(label, text, sub, go, href) {
+      var inner = '<span class="brief__label">' + esc(label) + '</span>' +
         '<span class="brief__text">' + text + '</span>' +
-        '<span class="brief__go">' + meta + ' →</span></a>';
+        (sub ? '<span class="brief__sub">' + sub + '</span>' : '') +
+        (go ? '<span class="brief__go">' + go + ' →</span>' : '');
+      return href ? '<a class="brief__cell" href="' + esc(href) + '">' + inner + '</a>' : '<div class="brief__cell">' + inner + '</div>';
+    }
+    function item(label) {
+      var all = list(today.currently);
+      for (var i = 0; i < all.length; i++) if (String(all[i].label).toLowerCase() === label) return all[i];
+      return null;
     }
     var cells = [];
 
-    var now = list(today.currently)[0];
-    if (now) cells.push(['On the desk', rich(now.text), esc(now.label || 'Today'), 'today.html']);
-
-    var belief = hyps.filter(isOpenH).sort(function (a, b) { return (Number(b.confidence) || 0) - (Number(a.confidence) || 0); })[0];
-    if (belief) cells.push(['Strongest belief', rich(belief.statement), '<b>' + esc(belief.confidence) + '%</b> sure · Hypotheses', 'hypotheses.html#' + belief.id]);
+    var heading = item('direction') || list(today.currently).slice(-1)[0];
+    if (heading) cells.push(cell('Where I\'m heading', rich(heading.text), '', 'Today', 'today.html'));
 
     var order = { running: 0, planned: 1, concluded: 2 };
-    var test = exps.slice().sort(function (a, b) { return (order[a.status] == null ? 3 : order[a.status]) - (order[b.status] == null ? 3 : order[b.status]); })[0];
-    if (test) {
-      var how = test.status === 'running' ? 'Running' : test.status === 'planned' ? 'Planned' : 'Concluded';
-      cells.push([test.status === 'concluded' ? 'Last tested' : 'Testing next', rich(test.title), esc(how) + ' · Experiments', 'experiments.html#' + test.id]);
+    var build = exps.slice().sort(function (a, b) { return (order[a.status] == null ? 3 : order[a.status]) - (order[b.status] == null ? 3 : order[b.status]); })[0];
+    if (build) {
+      var how = build.status === 'running' ? 'Running' : build.status === 'planned' ? 'Planning' : 'Done';
+      cells.push(cell('What I\'m building', rich(build.title), build.question ? rich(build.question) : '', esc(how) + ' · Experiments', 'experiments.html#' + build.id));
     }
 
-    var notes = list(NB.notes);
-    var latest = notes.reduce(function (best, n) { return !best || String(n.date) > String(best.date) ? n : best; }, null);
-    if (latest) cells.push(['Latest note', '“' + esc(latest.title) + '”', esc(fmt(latest.date, 'short')) + ' · Field notes', 'notes.html#' + latest.id]);
+    var learning = item('learning');
+    if (learning) cells.push(cell('What I\'m learning', rich(learning.text), '', 'Field notes', 'notes.html'));
 
-    var reading = everything.filter(function (x) { return x.status === 'doing'; }).sort(function (a, b) { return (a.kind === 'book' ? 0 : 1) - (b.kind === 'book' ? 0 : 1); })[0];
-    var read = library.filter(function (b) { return b.status === 'done'; }).length;
-    if (reading || read) cells.push(['Reading', reading ? esc(reading.title) : 'Between books', (read ? '<b>' + num(read) + '</b> books read · ' : '') + 'References', 'references.html']);
-
-    var retired = hyps.length - hyps.filter(isOpenH).length;
-    var sealed = letters.filter(function (l) { return !letterIsOpen(l); }).length;
-    var honest = [];
-    if (retired) honest.push(plural(retired, 'belief', 'beliefs') + ' retired, not erased');
-    if (errata.length) honest.push(plural(errata.length, 'correction', 'corrections') + ', dated');
-    if (sealed) honest.push(plural(sealed, 'letter', 'letters') + ' sealed until they open');
-    if (honest.length) cells.push(['Kept honest', esc(honest.join('; ')), 'Errata · Back pocket', retired || errata.length ? 'contents.html#errata' : 'pocket.html']);
+    var idea = hyps.filter(isOpenH).sort(function (a, b) { return (Number(b.confidence) || 0) - (Number(a.confidence) || 0); })[0];
+    if (idea) cells.push(cell('One idea worth your time', rich(idea.statement), idea.why ? rich(firstSentence(idea.why)) : '', '<b>' + esc(idea.confidence) + '%</b> sure · Hypotheses', 'hypotheses.html#' + idea.id));
 
     var first = site.readFirst || {};
+    if (first.href && first.label) {
+      var id = String(first.href).split('#')[1];
+      var note = list(NB.notes).filter(function (n) { return n.id === id; })[0];
+      var words = note ? list(note.paragraphs).join(' ').split(/\s+/).length : 0;
+      var minutes = words ? Math.max(1, Math.round(words / 200)) : 0;
+      cells.push(cell('Best thing to read', '“' + esc(first.label) + '”', first.summary ? rich(first.summary) : '', (minutes ? minutes + ' min read · ' : '') + 'Field notes', first.href));
+    }
+
+    var reach = [];
+    if (site.email) reach.push('<a class="ink-link" href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>');
+    if (site.linkedin) reach.push('<a class="ink-link" href="' + esc(site.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>');
+    if (reach.length) cells.push(cell('Reach me', '<span class="brief__reach">' + reach.join('') + '</span>', '', '', ''));
+
+    var read = library.filter(function (b) { return b.status === 'done'; }).length;
+    var wrong = errata.length + (hyps.length - hyps.filter(isOpenH).length);
+    var also = [];
+    if (read) also.push(num(read) + ' books on the shelf');
+    if (wrong) also.push('a record of where I was wrong');
     var last = lastEntryDate();
     el.innerHTML =
       strip([['Data sheet', 'Lab notebook No. 1'], ['Read time', '30 s'], ['Updated', last ? fmt(last) : '']]) +
       '<h1 class="hand-xl brief__title">The notebook at a glance</h1>' +
       '<p class="brief__who"><b>' + esc(site.name || '') + '.</b> ' + rich(site.briefLine || list(site.thirtySeconds)[0] || '') + '</p>' +
-      '<div class="brief__grid">' + cells.map(function (c, i) { return cell(pad2(i + 1), c[0], c[1], c[2], c[3]); }).join('') + '</div>' +
+      '<div class="brief__grid">' + cells.join('') + '</div>' +
       '<div class="brief__foot">' +
-        (first.href && first.label ? '<a class="brief__first" href="' + esc(first.href) + '">If you read one thing: “' + esc(first.label) + '” →</a>' : '<span></span>') +
-        '<span class="brief__links">' +
-          '<a class="ink-link" href="contents.html">Open the notebook</a>' +
-          (site.email ? '<a class="ink-link" href="mailto:' + esc(site.email) + '">' + esc(site.email) + '</a>' : '') +
-          (site.linkedin ? '<a class="ink-link" href="' + esc(site.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>' : '') +
-        '</span>' +
+        (also.length ? '<p class="brief__also">Also inside: ' + esc(also.join(', and ')) + '.</p>' : '<span></span>') +
+        '<a class="brief__first" href="contents.html">Open the notebook →</a>' +
       '</div>';
   }
 
