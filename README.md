@@ -54,7 +54,7 @@ Copy an existing entry in `content/hypotheses.js`, paste it at the end of the li
 3. Copy the fingerprint it shows into that letter's `fingerprint` in `content/pocket.js`.
 4. On the opening day, paste the letter's text into `text: "..."` and publish. Visitors can paste it into the same box and see it match.
 
-The three fingerprints there now are placeholders: they're the fingerprint of an empty letter.
+The three letters were sealed on 21 October 2026. Keep the separately supplied private text files safe; their bodies are deliberately absent from this public repository. To replace a letter, generate a new fingerprint and update its sealing date.
 
 The repository is public and keeps every past version of every file, so a letter's text must never be committed before its opening day, not even for a minute. The same goes for anything else you wouldn't put on the site itself.
 

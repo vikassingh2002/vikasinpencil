@@ -864,11 +864,11 @@
     var email = site.email || '';
     var contact =
       (email ? '<span class="contact__email selectable" id="email-text">' + esc(email) + '</span><button type="button" class="btn btn--text" id="copy-email">Copy email</button>' : '') +
-      (site.linkedin ? '<a class="ink-link" href="' + esc(site.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>' : '<span>[LinkedIn link]</span>');
+      (site.linkedin ? '<a class="ink-link" href="' + esc(site.linkedin) + '" target="_blank" rel="noopener">LinkedIn</a>' : '');
 
     var cv = site.cvFile
       ? '<a class="btn" href="' + esc(site.cvFile) + '" target="_blank" rel="noopener">Read my CV (PDF)</a>'
-      : '<span class="placeholder-chip">[CV goes here]</span>';
+      : '';
     var mail = email ? '<a class="btn btn--line" href="' + esc(mailto('Hello from your notebook', '')) + '">Email me</a>' : '';
 
     var rules = list(site.houseRules).map(function (r) { return '<li>' + rich(r) + '</li>'; }).join('');
@@ -890,12 +890,13 @@
     var openH = hyps.filter(isOpenH).length;
     var retired = hyps.length - openH;
     var running = exps.filter(function (x) { return x.status === 'running'; }).length;
-    var concluded = exps.length - running;
+    var concluded = exps.filter(function (x) { return x.status === 'concluded'; }).length;
+    var planned = exps.filter(function (x) { return x.status === 'planned'; }).length;
     var sealed = letters.filter(function (l) { return !letterIsOpen(l); }).length;
     var rows = [
       { href: 'today.html', title: 'Today', desc: 'What I\'m working on this month' + (today.date ? ', updated ' + fmt(today.date, 'short') : ''), pn: 'p. 01' },
       { href: 'hypotheses.html', title: 'Hypotheses', desc: plural(openH, 'open', 'open') + ', ' + plural(retired, 'retired', 'retired'), pn: 'p. 04' },
-      { href: 'experiments.html', title: 'Experiments', desc: plural(running, 'running', 'running') + ', ' + plural(concluded, 'concluded', 'concluded'), pn: 'p. 12' },
+      { href: 'experiments.html', title: 'Experiments', desc: plural(running, 'running', 'running') + ', ' + plural(concluded, 'concluded', 'concluded') + (planned ? ', ' + planned + ' planned' : ''), pn: 'p. 12' },
       { href: 'references.html', title: 'References', desc: referencesSummary(), pn: 'p. 30' },
       { href: '#errata', title: 'Errata', desc: 'Where I was wrong: ' + plural(errata.length, 'correction', 'corrections'), pn: 'p. 41' },
       { href: 'pocket.html', title: 'Back pocket', desc: plural(sealed, 'sealed letter', 'sealed letters') + ' and ' + plural(bets.length, 'open bet', 'open bets'), pn: 'back cover' }
@@ -1253,15 +1254,15 @@
         var when = (o.label ? esc(o.label) : '') + (o.date ? (o.label ? ' · ' : '') + esc(fmt(o.date, 'short')) : '');
         return '<li><span class="obs__when">' + when + '</span><span class="obs__text' + (o.pending ? ' obs__text--pending' : '') + '">' + rich(o.text) + '</span></li>';
       }).join('');
-      return strip([['Experiment', x.id], [running ? 'Started' : 'Concluded', fmt(running ? x.started : (x.concluded || ''))], ['Page', x.page || '']]) +
+      return strip([['Experiment', x.id], [x.status === 'planned' ? 'Status' : (running ? 'Started' : 'Concluded'), x.status === 'planned' ? 'On the drawing board' : fmt(running ? x.started : (x.concluded || ''))], ['Page', x.page || '']]) +
         '<h1 class="hand-xl">' + rich(x.title) + '</h1>' +
-        '<p class="chip' + (running ? ' chip--live' : '') + '">' + (running ? '<span class="chip__dot" aria-hidden="true"></span>Running' + (x.progress ? ' · ' + esc(x.progress) : '') : 'Concluded') + '</p>' +
+        '<p class="chip' + (running ? ' chip--live' : '') + '">' + (running ? '<span class="chip__dot" aria-hidden="true"></span>Running' + (x.progress ? ' · ' + esc(x.progress) : '') : (x.status === 'planned' ? 'Planned' : 'Concluded')) + '</p>' +
         (x.redactedNote ? '<p class="redacted-note">' + rich(x.redactedNote) + '</p>' : '') +
         section('Question', x.question) +
         section('Hypothesis', x.hypothesis) +
         section('Method', x.method) +
         (obs ? '<p class="label gap-m">Observations</p><ol class="obs">' + obs + '</ol>' : '') +
-        section(running ? 'So far' : 'What I found', x.summary) +
+        section(x.status === 'planned' ? 'On the drawing board' : (running ? 'So far' : 'What I found'), x.summary) +
         (x.marginNote ? '<p class="margin-note note-right">' + rich(x.marginNote) + '</p>' : '') +
         '<div class="doodle-row"><button type="button" class="coffee" id="coffee" aria-label="A coffee ring on the page"></button></div>';
     }
@@ -1288,13 +1289,13 @@
       var nextPage = x.page && /^\d+$/.test(x.page) ? pad2(Number(x.page) + 1) : '';
       return strip([[x.steps ? 'Figure' : 'Entry', x.steps ? '1' : x.id], ['Page', nextPage]]) +
         (list(x.steps).length ? '<figure>' + stepsHtml(x.steps) + '<figcaption>Fig. 1: Experiment design. Solid: done. Highlighted: this week. Dashed: still ahead.</figcaption></figure>' : '') +
-        section('Result', x.result) +
+        section(x.status === 'planned' ? 'What this should produce' : 'Result', x.result) +
         section('Next', x.next) +
-        (running || x.method ? witnessHtml(x) : '') +
+        (x.status !== 'planned' && (running || x.method) ? witnessHtml(x) : '') +
         '<p class="label gap-l">All experiments</p><ul class="exp-list">' + exps.map(function (e) {
           var plainTitle = String(e.title || '').replace(/\[\[hidden\]\]/g, 'redacted');
-          return '<li><button type="button" class="exp-row" data-id="' + esc(e.id) + '" aria-pressed="' + (e.id === x.id ? 'true' : 'false') + '" aria-label="' + esc(e.id + ': ' + plainTitle + '. ' + (e.status === 'running' ? 'Running' : 'Concluded')) + '">' +
-            '<span class="exp-row__id">' + esc(e.id) + '</span><span class="exp-row__title">' + rich(e.title) + '</span><span class="exp-row__status">' + (e.status === 'running' ? 'Running' : 'Concluded') + '</span></button></li>';
+          return '<li><button type="button" class="exp-row" data-id="' + esc(e.id) + '" aria-pressed="' + (e.id === x.id ? 'true' : 'false') + '" aria-label="' + esc(e.id + ': ' + plainTitle + '. ' + (e.status === 'running' ? 'Running' : (e.status === 'planned' ? 'Planned' : 'Concluded'))) + '">' +
+            '<span class="exp-row__id">' + esc(e.id) + '</span><span class="exp-row__title">' + rich(e.title) + '</span><span class="exp-row__status">' + (e.status === 'running' ? 'Running' : (e.status === 'planned' ? 'Planned' : 'Concluded')) + '</span></button></li>';
         }).join('') + '</ul>' +
         foot([['Signed', 'V.S.'], ['Last entry', fmt(lastEntryDate())]]);
     }

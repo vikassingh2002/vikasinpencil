@@ -1,63 +1,82 @@
-/* =============================================================
-   EXPERIMENTS: projects, written like lab entries.
-
-   Each one can have (leave out anything you don't need):
-     id, status ("running" or "concluded"), title, started,
-     concluded, page, progress, question, hypothesis, method,
-     observations (a dated log), marginNote, steps (Figure 1),
-     result, next, summary.
-
-   Client work: write [[hidden]] where a name should be blacked
-   out, and add a redactedNote saying why. Never put a client's
-   name, figures or documents here. Check your firm's policy first.
-
-   Add  featured: true  to the one that should open first.
-   ============================================================= */
+/* Edit the text here to keep the notebook yours. */
 window.NB = window.NB || {};
-
 NB.experiments = [
   {
-    id: "E-01",
-    featured: true,
-    status: "running",
-    title: "Build an AI research assistant from zero",
-    started: "2026-10-06",
-    page: "12",
-    progress: "week 2 of 4",
-    question: "Can I go from “uses ChatGPT” to “built a working research assistant” in 30 days?",
-    hypothesis: "Yes, if I build something small every week instead of finishing courses first. Confidence: 60%.",
-    method: "Four weekly builds, each adding one ability: a prompt that summarises a report; tools, so it can search; memory, so it remembers a project; evals, so I can measure where it's wrong. Everything goes on this page, including the failures.",
-    observations: [
-      { date: "2026-10-13", label: "Week 1", text: "The summary sounded right and skipped the one number that mattered. Fluent isn't the same as correct." },
-      { date: "2026-10-20", label: "Week 2", text: "Tool use works, but it searches too eagerly. Adding a “stop and plan” step before it reaches for a tool." },
-      { date: "2026-10-27", label: "Week 3", text: "Memory. Not written yet.", pending: true },
-      { date: "2026-11-03", label: "Week 4", text: "Evals. Not written yet.", pending: true }
+    "id": "E-01",
+    "featured": true,
+    "status": "running",
+    "title": "Build an AI research assistant from zero",
+    "started": "2026-10-06",
+    "page": "12",
+    "progress": "week 2 of 4",
+    "question": "Can I go from “uses ChatGPT” to “built a working research assistant” in 30 days?",
+    "hypothesis": "Yes, if I build something small every week instead of finishing courses first. Confidence: 60%.",
+    "method": "Four weekly builds, each adding one ability: a prompt that summarises a report; tools, so it can search; memory, so it remembers a project; evals, so I can measure where it's wrong. Everything goes on this page, including the failures.",
+    "observations": [
+      {
+        "date": "2026-10-13",
+        "label": "Week 1",
+        "text": "The summary sounded right and skipped the one number that mattered. Fluent isn't the same as correct."
+      },
+      {
+        "date": "2026-10-20",
+        "label": "Week 2",
+        "text": "Tool use works, but it searches too eagerly. Adding a “stop and plan” step before it reaches for a tool."
+      }
     ],
-    marginNote: "Surprise: it's best at the boring parts.",
-    // Figure 1. state: "done", "now", "next" or "goal"
-    steps: [
-      { when: "Week 1", name: "Prompt", state: "done" },
-      { when: "Week 2", name: "Tools", state: "now" },
-      { when: "Week 3", name: "Memory", state: "next" },
-      { when: "Week 4", name: "Evals", state: "next" },
-      { when: "November", name: "Ship it?", state: "goal" }
+    "marginNote": "Surprise: it's best at the boring parts.",
+    "steps": [
+      {
+        "when": "Week 1",
+        "name": "Prompt",
+        "state": "done"
+      },
+      {
+        "when": "Week 2",
+        "name": "Tools",
+        "state": "now"
+      },
+      {
+        "when": "Week 3",
+        "name": "Memory",
+        "state": "next"
+      },
+      {
+        "when": "Week 4",
+        "name": "Evals",
+        "state": "next"
+      },
+      {
+        "when": "November",
+        "name": "Ship it?",
+        "state": "goal"
+      }
     ],
-    result: "Pending. My prediction for how this ends is sealed in the back pocket.",
-    next: "If it works: three real users by December. If it doesn't: a full write-up in Errata, and a smaller second attempt."
+    "result": "Still running. The question is not whether it can produce a convincing answer, but whether I can tell when that answer deserves to be trusted. I will call this useful when I can check its sources and recognise its limits.",
+    "next": "Test it on a small set of reports with answers I can check by hand. Keep a record of missing numbers, unsupported claims and unnecessary searches. Then decide what is worth building next."
   },
   {
-    id: "E-02",
-    status: "concluded",
-    title: "What actually drives property prices in Indian cities?",
-    page: "16",
-    summary: "[Two lines on what you tested, how, and what you found.]"
+    "id": "E-02",
+    "status": "planned",
+    "title": "What actually drives property prices in Indian cities?",
+    "page": "16",
+    "summary": "An investigation on the drawing board. The first task is finding a dataset whose gaps I can describe honestly.",
+    "question": "When two homes look similar on paper, what explains the difference in their asking prices?",
+    "hypothesis": "Location and access may explain more than the features that are easiest to count. I want to separate that intuition from what the data can actually support.",
+    "method": "Start with one city and a small, documented sample of public listings. Compare prices per unit of area, check for duplicate listings, and distinguish asking prices from completed transactions. Add complexity only after a simple comparison is useful.",
+    "result": "No findings yet. An asking-price model would describe listings, not establish what a home is worth.",
+    "next": "Choose a city, record the source and collection date, and write down the sampling limits before making the first chart."
   },
   {
-    id: "E-03",
-    status: "concluded",
-    title: "Mapping a [[hidden]] value chain for a [[hidden]] client",
-    page: "18",
-    redactedNote: "Client work. The method is mine to show; the names aren't.",
-    summary: "[The method in two lines, with no client details.]"
+    "id": "E-03",
+    "status": "planned",
+    "title": "Follow the value, not just the arrows",
+    "page": "18",
+    "summary": "A planned public-data exercise in explaining a system. No client material, disguised client figures or claims about a completed engagement.",
+    "question": "What makes a value-chain map useful for a decision, rather than just a good-looking slide?",
+    "hypothesis": "The useful map is the one that shows where an assumption, a bottleneck or a dependency could change the decision.",
+    "method": "Use a public example: follow a rooftop solar installation from equipment to installation, financing and maintenance. Separate physical flows, money flows and responsibilities. Mark what is known, what is estimated and what needs checking.",
+    "result": "The output will be a map with a short note on which decisions it can support and which it cannot.",
+    "next": "Choose a clearly bounded example and document each important link before drawing the finished map."
   }
 ];
