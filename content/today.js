@@ -12,8 +12,8 @@ NB.today = {
     },
     {
       "label": "Preparing to build",
-      "text": "A research assistant for public sustainability reports. Starting with one report and answers I can check myself.",
-      "see": "E-01"
+      "text": "A first responder for satellite anomalies: an agent that spots unusual readings in satellite telemetry, investigates the likely cause and drafts a response for a person to approve.",
+      "see": "E-04"
     },
     {
       "label": "Reading",
@@ -32,7 +32,7 @@ NB.today = {
     }
   ],
   "question": "What is the smallest useful task I can give an agent and check properly?",
-  "questionSee": "E-01",
+  "questionSee": "E-04",
   "sticky": {
     "text": "Ask me why big numbers are the most underrated idea in business.",
     "see": "H-01"
@@ -73,6 +73,11 @@ NB.today = {
     }
   ],
   "log": [
+    {
+      "date": "2026-10-21",
+      "text": "Chose the first build: a first responder for satellite anomalies. The sustainability research assistant waits its turn.",
+      "see": "E-04"
+    },
     {
       "date": "2026-10-21",
       "text": "Set a direction: explore AI product building seriously, beginning with practical agents and consulting workflows.",

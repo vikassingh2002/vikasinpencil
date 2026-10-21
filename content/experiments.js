@@ -2,8 +2,49 @@
 window.NB = window.NB || {};
 NB.experiments = [
   {
-    "id": "E-01",
+    "id": "E-04",
     "featured": true,
+    "status": "planned",
+    "title": "A first responder for satellite anomalies",
+    "page": "20",
+    "question": "Can an agent notice unusual satellite telemetry early, work out the likely cause and draft a response that an operator only has to approve?",
+    "hypothesis": "Fixed alarm limits fire late and explain nothing. A detector that learns what normal looks like, paired with an agent that investigates the way an operator would, should give earlier warnings and clearer explanations, while a person keeps every decision.",
+    "method": "Two parts. A detector, scored on the European Space Agency's public anomaly benchmark of real, anonymised mission telemetry. And an investigator agent, tested on a small simulated satellite I will build in Python: a battery, a heater, a solar panel and an orbit, with faults I inject on purpose. The agent can look up readings, check whether the satellite is in sunlight, search past incidents and procedures, and write a report. It never sends a command.",
+    "steps": [
+      {
+        "when": "First",
+        "name": "Simulated satellite",
+        "state": "next"
+      },
+      {
+        "when": "Then",
+        "name": "Detector on ESA data",
+        "state": "next"
+      },
+      {
+        "when": "Build",
+        "name": "Investigator agent",
+        "state": "next"
+      },
+      {
+        "when": "Check",
+        "name": "Diagnosis + false alarms",
+        "state": "next"
+      },
+      {
+        "when": "Later",
+        "name": "Operator demo",
+        "state": "goal"
+      }
+    ],
+    "result": "A demo an operator could follow: an early warning, the evidence behind it, ranked likely causes and a proposed action from a written procedure, waiting for approval. With scores: anomalies caught, how early, false alarms per day and how often the right cause comes first.",
+    "next": "Build the simulated satellite: a battery that charges in sunlight and drains in shadow, and a heater that keeps it warm. Then break the heater and see what the readings look like.",
+    "summary": "On the drawing board. My first agent project, chosen because it joins physics, real engineering data and agents. Public and simulated data only; no results are claimed yet.",
+    "tools": "Proposed: Python, the ESA anomaly benchmark, a small physics simulation and an LLM API for the investigator. Statistics and machine learning for detection; the language model only for investigating and explaining.",
+    "lessons": "Questions to test: does it raise alarms earlier than a fixed limit without crying wolf? Does it rank the real cause first? Does every claim in its report point to a reading or a document? Does it stop and ask when the evidence is thin?"
+  },
+  {
+    "id": "E-01",
     "status": "planned",
     "title": "A research assistant for public sustainability reports",
     "page": "12",
@@ -42,7 +83,8 @@ NB.experiments = [
     "editorialHistory": "An earlier version described a four-week build, dated 6–20 October 2026, with prompt and tool-use observations and a “week 2 of 4” label. Those were starter copy, not a verified project log. This entry now records a proposed build. Lessons about missing numbers and unnecessary searches are checks to perform, not reported results.",
     "summary": "On the drawing board. A first project for learning how AI can support research work; no working agent or measured result is claimed yet.",
     "tools": "Proposed: Python and an LLM API. Retrieval and external tools can follow if needed. Prefer a small budget and simple components.",
-    "lessons": "Questions to test: does it omit important numbers, invent support, confuse reporting periods or use tools unnecessarily? What should happen when the source does not contain an answer?"
+    "lessons": "Questions to test: does it omit important numbers, invent support, confuse reporting periods or use tools unnecessarily? What should happen when the source does not contain an answer?",
+    "marginNote": "On hold since 21 Oct. E-04 comes first; this one stays on the list."
   },
   {
     "id": "E-02",

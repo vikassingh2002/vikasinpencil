@@ -2,6 +2,19 @@
 window.NB = window.NB || {};
 NB.notes = [
   {
+    "id": "N-04",
+    "date": "2026-10-21",
+    "title": "Why a satellite",
+    "topic": "AI · Space · Working note",
+    "paragraphs": [
+      "My first agent project was going to be a research assistant for sustainability reports. It is still a sensible idea, but I could not get excited about it. A project I care about is one I will finish, so I went looking for something closer to the things I enjoy.",
+      "Satellites send home hundreds of health readings: temperatures, voltages, battery levels. Operators watch them with small teams, often at night, and alarms tend to fire late and explain very little. I want to build an agent that notices trouble early, investigates the way an operator would, and drafts a response. A person approves every step, and the agent never commands the spacecraft.",
+      "It joins three things I like: physics, real engineering data and AI agents. The European Space Agency has published real mission telemetry with the anomalies marked, so I can measure the detector honestly. To test the reasoning, I will build a small simulated satellite and break it on purpose.",
+      "Plans, not results. The first step is the simulated satellite. I will record what works and what doesn't here as I go."
+    ],
+    "see": "E-04"
+  },
+  {
     "id": "N-01",
     "date": "2026-10-21",
     "title": "A direction, not a new identity",

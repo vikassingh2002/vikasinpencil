@@ -16,7 +16,7 @@ NB.site = {
   ],
   "rewardLine": "Reward: a good conversation.",
   "briefLine": "Physics graduate, IIFT MBA, consultant at Capgemini, spending this year learning to build useful things with AI.",
-  "readFirst": { "label": "Before I build an agent", "href": "notes.html#N-02", "summary": "Why my first project is small, with answers I can check, rather than an impressive demo." },
+  "readFirst": { "label": "Why a satellite", "href": "notes.html#N-04", "summary": "Why my first agent will watch over a satellite, and how I plan to test it honestly." },
   "pencilLines": [
     "Hi, I'm Vikas. Come on in.",
     "Currently: building with AI",
