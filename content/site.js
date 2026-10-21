@@ -11,7 +11,7 @@ window.NB = window.NB || {};
 NB.site = {
   // While this is true, a pencil "Draft" stamp shows on every page.
   // Set it to false once the [placeholders] are gone and you are ready to share.
-  draft: true,
+  draft: false,
 
   name: "Vikas Singh",
   email: "hello@vikasinpencil.com",   // shown on the inside cover (see README: email forwarding)

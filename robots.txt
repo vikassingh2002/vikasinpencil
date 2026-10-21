@@ -1,6 +1,2 @@
-# While the notebook is a draft, ask search engines to stay out.
-# At launch, replace the two lines below with:
-#   User-agent: *
-#   Allow: /
 User-agent: *
-Disallow: /
+Allow: /
