@@ -1,59 +1,48 @@
-/* Edit the text here to keep the notebook yours. */
+/* Edit this file to update the notebook. No build step needed. */
 window.NB = window.NB || {};
 NB.experiments = [
   {
     "id": "E-01",
     "featured": true,
-    "status": "running",
-    "title": "Build an AI research assistant from zero",
-    "started": "2026-10-06",
+    "status": "planned",
+    "title": "A research assistant for public sustainability reports",
     "page": "12",
-    "progress": "week 2 of 4",
-    "question": "Can I go from “uses ChatGPT” to “built a working research assistant” in 30 days?",
-    "hypothesis": "Yes, if I build something small every week instead of finishing courses first. Confidence: 60%.",
-    "method": "Four weekly builds, each adding one ability: a prompt that summarises a report; tools, so it can search; memory, so it remembers a project; evals, so I can measure where it's wrong. Everything goes on this page, including the failures.",
-    "observations": [
-      {
-        "date": "2026-10-13",
-        "label": "Week 1",
-        "text": "The summary sounded right and skipped the one number that mattered. Fluent isn't the same as correct."
-      },
-      {
-        "date": "2026-10-20",
-        "label": "Week 2",
-        "text": "Tool use works, but it searches too eagerly. Adding a “stop and plan” step before it reaches for a tool."
-      }
-    ],
-    "marginNote": "Surprise: it's best at the boring parts.",
+    "question": "Can a small assistant extract a few useful facts from a public sustainability report, with page references I can check?",
+    "hypothesis": "A narrow task with explicit sources and human review should be more useful than a broad instruction to summarise everything. That is what I want to test.",
+    "method": "Begin with one public report and a handful of questions with manually checked answers. Use Python and an LLM API to produce structured findings with page references. Add retrieval, tools or memory only when a specific limitation makes them necessary. Keep a person in charge of interpreting the output.",
     "steps": [
       {
-        "when": "Week 1",
-        "name": "Prompt",
-        "state": "done"
-      },
-      {
-        "when": "Week 2",
-        "name": "Tools",
-        "state": "now"
-      },
-      {
-        "when": "Week 3",
-        "name": "Memory",
+        "when": "First",
+        "name": "One public report",
         "state": "next"
       },
       {
-        "when": "Week 4",
-        "name": "Evals",
+        "when": "Then",
+        "name": "Reference answers",
         "state": "next"
       },
       {
-        "when": "November",
-        "name": "Ship it?",
+        "when": "Build",
+        "name": "Extract + cite",
+        "state": "next"
+      },
+      {
+        "when": "Check",
+        "name": "Errors + cost",
+        "state": "next"
+      },
+      {
+        "when": "Later",
+        "name": "Useful prototype",
         "state": "goal"
       }
     ],
-    "result": "Still running. The question is not whether it can produce a convincing answer, but whether I can tell when that answer deserves to be trusted. I will call this useful when I can check its sources and recognise its limits.",
-    "next": "Test it on a small set of reports with answers I can check by hand. Keep a record of missing numbers, unsupported claims and unnecessary searches. Then decide what is worth building next."
+    "result": "A small, inspectable prototype: a source report, structured answers, supporting passages and a record of mistakes and cost.",
+    "next": "Choose one public report and five questions. Write the reference answers before trying to automate them.",
+    "editorialHistory": "An earlier version described a four-week build, dated 6–20 October 2026, with prompt and tool-use observations and a “week 2 of 4” label. Those were starter copy, not a verified project log. This entry now records a proposed build. Lessons about missing numbers and unnecessary searches are checks to perform, not reported results.",
+    "summary": "On the drawing board. A first project for learning how AI can support research work; no working agent or measured result is claimed yet.",
+    "tools": "Proposed: Python and an LLM API. Retrieval and external tools can follow if needed. Prefer a small budget and simple components.",
+    "lessons": "Questions to test: does it omit important numbers, invent support, confuse reporting periods or use tools unnecessarily? What should happen when the source does not contain an answer?"
   },
   {
     "id": "E-02",

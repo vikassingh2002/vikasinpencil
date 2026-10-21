@@ -329,13 +329,13 @@
     var r = String(ref);
     if (/^H-\d+$/i.test(r)) return 'hypotheses.html#' + r.toUpperCase();
     if (/^E-\d+$/i.test(r)) return 'experiments.html#' + r.toUpperCase();
-    var map = { today: 'today.html', hypotheses: 'hypotheses.html', experiments: 'experiments.html', references: 'references.html', pocket: 'pocket.html', errata: 'contents.html#errata', contents: 'contents.html' };
+    var map = { notes: 'notes.html', today: 'today.html', hypotheses: 'hypotheses.html', experiments: 'experiments.html', references: 'references.html', pocket: 'pocket.html', errata: 'contents.html#errata', contents: 'contents.html' };
     return map[r.toLowerCase()] || null;
   }
   function refLabel(ref) {
     var r = String(ref);
     if (/^[HE]-\d+$/i.test(r)) return r.toUpperCase();
-    var names = { today: 'p. 01', hypotheses: 'p. 04', experiments: 'p. 12', references: 'p. 30', pocket: 'back pocket', errata: 'errata', contents: 'contents' };
+    var names = { notes: 'Field notes', today: 'p. 01', hypotheses: 'p. 04', experiments: 'p. 12', references: 'p. 30', pocket: 'back pocket', errata: 'errata', contents: 'contents' };
     return names[r.toLowerCase()] || r;
   }
   function xref(ref, prefix) {
@@ -377,6 +377,7 @@
 
   function lastEntryDate() {
     var dates = [today.date];
+    list(NB.notes).forEach(function (n) { dates.push(n.date); });
     hyps.forEach(function (h) {
       dates.push(h.opened);
       list(h.history).forEach(function (p) { dates.push(p && p.date); });
@@ -410,10 +411,12 @@
     { key: 'hypotheses', href: 'hypotheses.html', label: 'Hypotheses' },
     { key: 'experiments', href: 'experiments.html', label: 'Experiments' },
     { key: 'references', href: 'references.html', label: 'References' },
-    { key: 'pocket', href: 'pocket.html', label: 'Back pocket' }
+    { key: 'pocket', href: 'pocket.html', label: 'Back pocket' },
+    { key: 'notes', href: 'notes.html', label: 'Field notes' }
   ];
-  var TABS = [PAGES[1], PAGES[2], PAGES[3], PAGES[4], PAGES[5], { key: 'errata', href: 'contents.html#errata', label: 'Errata' }, PAGES[6]];
-  var SECTIONS = ['contents', 'today', 'hypotheses', 'experiments', 'references', 'pocket'];
+  var TABS = PAGES.filter(function (p) { return p.key !== 'cover'; });
+  TABS.splice(TABS.length - 1, 0, { key: 'errata', href: 'contents.html#errata', label: 'Errata' });
+  var SECTIONS = ['contents', 'today', 'hypotheses', 'experiments', 'references', 'pocket', 'notes'];
 
   function pageIndex(key) {
     for (var i = 0; i < PAGES.length; i++) if (PAGES[i].key === key) return i;
@@ -883,6 +886,7 @@
         '<ul class="thirty__list">' + list(site.thirtySeconds).map(function (l) { return '<li>' + rich(l) + '</li>'; }).join('') + '</ul>' +
         '<div class="actions">' + cv + mail + '</div>' +
       '</div>' +
+      section('A little more about me', site.about) + section('About the work here', site.publicWorkNote) +
       '<div class="rules"><p class="label">House rules</p><ol class="rules__list">' + rules +
         '<li class="rules__secret"><button type="button" class="rule-secret" id="secret-rule" aria-label="Rule four, not written yet">?</button></li>' +
       '</ol></div>';
@@ -894,9 +898,10 @@
     var planned = exps.filter(function (x) { return x.status === 'planned'; }).length;
     var sealed = letters.filter(function (l) { return !letterIsOpen(l); }).length;
     var rows = [
-      { href: 'today.html', title: 'Today', desc: 'What I\'m working on this month' + (today.date ? ', updated ' + fmt(today.date, 'short') : ''), pn: 'p. 01' },
+      { href: 'today.html', title: 'Today', desc: 'What has my attention' + (today.date ? ', updated ' + fmt(today.date, 'short') : ''), pn: 'p. 01' },
       { href: 'hypotheses.html', title: 'Hypotheses', desc: plural(openH, 'open', 'open') + ', ' + plural(retired, 'retired', 'retired'), pn: 'p. 04' },
       { href: 'experiments.html', title: 'Experiments', desc: plural(running, 'running', 'running') + ', ' + plural(concluded, 'concluded', 'concluded') + (planned ? ', ' + planned + ' planned' : ''), pn: 'p. 12' },
+      { href: 'notes.html', title: 'Field notes', desc: 'Learning, writing and questions along the way', pn: 'p. 24' },
       { href: 'references.html', title: 'References', desc: referencesSummary(), pn: 'p. 30' },
       { href: '#errata', title: 'Errata', desc: 'Where I was wrong: ' + plural(errata.length, 'correction', 'corrections'), pn: 'p. 41' },
       { href: 'pocket.html', title: 'Back pocket', desc: plural(sealed, 'sealed letter', 'sealed letters') + ' and ' + plural(bets.length, 'open bet', 'open bets'), pn: 'back cover' }
@@ -998,7 +1003,7 @@
       '<p class="label gap-l">Currently</p>' +
       '<ul class="checklist">' + items + '</ul>' +
       (today.question
-        ? '<div class="question-box"><p class="label">This month\'s question</p><p class="question">' + rich(today.question) + '</p>' +
+        ? '<div class="question-box"><p class="label">The question on my desk</p><p class="question">' + rich(today.question) + '</p>' +
           (refHref(today.questionSee) ? '<a class="ink-link" href="' + refHref(today.questionSee) + '">My current answer: ' + esc(refLabel(today.questionSee)) + '</a>' : '') +
           '</div>'
         : '');
@@ -1026,8 +1031,8 @@
             '<div class="sticky-under" id="sticky-under" hidden><p class="margin-note">Nothing stuck here but pencil.</p><button type="button" class="btn btn--text" id="unpeel">Stick it back</button></div>' +
           '</div>'
         : '') +
-      (since ? '<p class="label gap-l">Since last month</p><ul class="since">' + since + '</ul>' : '') +
-      foot([['Signed', 'V.S.'], ['Next update', fmt(today.nextUpdate)]]);
+      (since ? '<p class="label gap-l">A change of direction</p><ul class="since">' + since + '</ul>' : '') +
+      (list(today.log).length ? '<p class="label gap-l">Notebook log</p><ul class="since">' + today.log.map(function (entry) { return '<li><span class="field__key">' + esc(fmt(entry.date)) + '</span><p class="prose">' + rich(entry.text) + (entry.see ? ' ' + xref(entry.see) : '') + '</p></li>'; }).join('') + '</ul>' : '') + foot([['Signed', 'V.S.'], ['Updates', 'When there is something to add']]);
 
     var peel = $('#peel');
     var stickyEl = $('#sticky');
@@ -1242,25 +1247,31 @@
     }).join('') + '</div>';
   }
 
+  function projectLinks(x) {
+    return [['Try it', x.demo], ['Source', x.source]].filter(function (link) { return /^https?:\/\//i.test(link[1] || ''); }).map(function (link) { return '<a class="btn btn--line" href="' + esc(link[1]) + '" target="_blank" rel="noopener">' + esc(link[0]) + '</a>'; }).join(' ');
+  }
   function renderExperiments() {
     var left = $('#exp-left');
     var right = $('#exp-right');
     if (!left || !right) return;
     var selId = firstSelection(exps, function (x) { return x.status === 'running'; });
 
+    function projectIndex() {
+      return '<details class="project-index" open><summary class="label">Choose an experiment</summary><ul class="exp-list">' + exps.map(function (p) { return '<li><a class="ink-link" href="#' + esc(p.id) + '">' + esc(p.id + ' · ' + p.title) + '</a></li>'; }).join('') + '</ul></details>';
+    }
     function writeup(x) {
       var running = x.status === 'running';
       var obs = list(x.observations).map(function (o) {
         var when = (o.label ? esc(o.label) : '') + (o.date ? (o.label ? ' · ' : '') + esc(fmt(o.date, 'short')) : '');
         return '<li><span class="obs__when">' + when + '</span><span class="obs__text' + (o.pending ? ' obs__text--pending' : '') + '">' + rich(o.text) + '</span></li>';
       }).join('');
-      return strip([['Experiment', x.id], [x.status === 'planned' ? 'Status' : (running ? 'Started' : 'Concluded'), x.status === 'planned' ? 'On the drawing board' : fmt(running ? x.started : (x.concluded || ''))], ['Page', x.page || '']]) +
+      return projectIndex() + strip([['Experiment', x.id], [x.status === 'planned' ? 'Status' : (running ? 'Started' : 'Concluded'), x.status === 'planned' ? 'On the drawing board' : fmt(running ? x.started : (x.concluded || ''))], ['Page', x.page || '']]) +
         '<h1 class="hand-xl">' + rich(x.title) + '</h1>' +
         '<p class="chip' + (running ? ' chip--live' : '') + '">' + (running ? '<span class="chip__dot" aria-hidden="true"></span>Running' + (x.progress ? ' · ' + esc(x.progress) : '') : (x.status === 'planned' ? 'Planned' : 'Concluded')) + '</p>' +
         (x.redactedNote ? '<p class="redacted-note">' + rich(x.redactedNote) + '</p>' : '') +
         section('Question', x.question) +
         section('Hypothesis', x.hypothesis) +
-        section('Method', x.method) +
+        section('Method', x.method) + section('Tools & materials', x.tools) + section(x.status === 'planned' ? 'Questions to test' : 'Lessons', x.lessons) + projectLinks(x) + (x.editorialHistory ? '<details class="gap-m"><summary class="ink-link">Earlier wording, corrected</summary><p class="prose">' + rich(x.editorialHistory) + '</p></details>' : '') +
         (obs ? '<p class="label gap-m">Observations</p><ol class="obs">' + obs + '</ol>' : '') +
         section(x.status === 'planned' ? 'On the drawing board' : (running ? 'So far' : 'What I found'), x.summary) +
         (x.marginNote ? '<p class="margin-note note-right">' + rich(x.marginNote) + '</p>' : '') +
@@ -2226,7 +2237,21 @@
      Start
      ------------------------------------------------------------ */
 
+
+  function renderNotes() {
+    var left = $('#notes-left'), right = $('#notes-right');
+    if (!left || !right) return;
+    var entries = list(NB.notes);
+    left.innerHTML = strip([['Title', 'Field notes'], ['Page', '24']]) +
+      '<h1 class="hand-xl">Field notes</h1><p class="lede">Things I am learning, questions I am carrying, and thoughts that need more than a margin.</p><p class="prose gap-m">AI and building have my attention. Books, business, science, history and the rest are welcome here too. No posting schedule.</p>' +
+      '<p class="label gap-l">On these pages</p><ul class="exp-list">' + entries.map(function (n) { return '<li><a class="ink-link" href="#' + esc(n.id) + '">' + esc(n.title) + '</a><p class="field__key">' + esc(n.topic + ' · ' + fmt(n.date)) + '</p></li>'; }).join('') + '</ul>' + foot([['Signed','V.S.']]);
+    right.innerHTML = strip([['Title', 'Notes'], ['Page', '25']]) + entries.map(function (n) {
+      return '<article class="field-entry" id="' + esc(n.id) + '"><p class="label">' + esc(n.topic + ' · ' + fmt(n.date)) + '</p><h2 class="hand-l">' + esc(n.title) + '</h2>' + list(n.paragraphs).map(function (p) { return '<p class="prose gap-m">' + rich(p) + '</p>'; }).join('') + (n.see ? '<p class="gap-m">' + xref(n.see, 'Alongside: ') + '</p>' : '') + '</article>';
+    }).join('');
+  }
+
   var RENDER = {
+    notes: renderNotes,
     cover: renderCover,
     contents: renderContents,
     today: renderToday,

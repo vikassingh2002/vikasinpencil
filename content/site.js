@@ -1,4 +1,4 @@
-/* Edit the text here to keep the notebook yours. */
+/* Edit this file to update the notebook. No build step needed. */
 window.NB = window.NB || {};
 NB.site = {
   "draft": false,
@@ -11,15 +11,15 @@ NB.site = {
   "coverPagesLeft": "most of them",
   "tagline": "Written in pencil. Nothing here is final.",
   "coverLines": [
-    "Trained in physics. Working in strategy.",
-    "Taking notes on what comes next."
+    "Trained in physics. Working in consulting.",
+    "Learning to build useful things with AI."
   ],
   "rewardLine": "Reward: a good conversation.",
   "thirtySeconds": [
-    "Trained in physics, now a consultant at Capgemini.",
-    "Interested in the questions where energy, technology and strategy meet.",
-    "Learning how AI systems are built, one small experiment at a time.",
-    "Here you will find work in progress, books that stayed with me, and ideas I am willing to change my mind about."
+    "B.Sc. in Physics from Mumbai University, MBA in International Business from IIFT Kolkata. Now a Consultant in Digital Engineering & R&D at Capgemini.",
+    "Over the next year, I am seriously exploring AI product building. I know some Python; modern AI applications are still new territory.",
+    "My immediate focus is practical agents and useful workflows. Longer term, I want to see whether something I build can become an independent business.",
+    "This is also a home for books, economics, history, science, philosophy and questions that do not fit a job description."
   ],
   "houseRules": [
     "Write the hypothesis before the result.",
@@ -35,5 +35,7 @@ NB.site = {
     "spine": "A Short History of Nearly Everything belongs here for the scale of its questions. A useful reminder to zoom out before getting lost in the details.",
     "pocket": "A fourth envelope, unsealed: if you found this, write to me. I answer every letter."
   },
-  "secretsDone": "That's all seven. Email me and say so. I'd like to know who you are."
+  "secretsDone": "That's all seven. Email me and say so. I'd like to know who you are.",
+  "about": "I have spent a lot of time exploring different subjects. Recently, turning an idea into something real with AI has started to pull those interests together. I want to combine the business questions I meet in consulting with the practical ability to build and test a solution. I am at the beginning of that process. The approach for now: build, understand, experiment, improve, document. There is still plenty of room here for a novel, a historical detour or a question with no useful application.",
+  "publicWorkNote": "The experiments here use public or personal material. They are my own learning projects, not accounts of internal or client work."
 };

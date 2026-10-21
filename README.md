@@ -163,3 +163,12 @@ The site is plain files, so moving means uploading this folder to the new host a
 - Resolve any bets that are due (`outcome: true` or `false`).
 - Anything you got wrong goes in `errata.js`.
 - Commit the changes (see "Publishing a change") and check the site.
+
+## Field notes and building updates
+
+- Edit content/notes.js to add a note: a unique id (N-04), date, title, topic, paragraphs, and optional see link (E-01 or references). No schedule required.
+- content/today.js holds the current snapshot and a dated log. Add milestones only when they happen.
+- Experiments support planned, running and concluded. Optional tools, lessons, demo and source fields add context; demo/source must be full HTTPS links. Never mark a proposed tool as something already used.
+- The earlier E-01 progress was starter copy. Its correction is visible in Errata and on the entry; add actual observations only after doing the work.
+- Field notes are intentionally broad: books, history, science and personal writing belong alongside AI.
+- Update content when there is something to record. The original monthly routine above is optional, not a public promise.

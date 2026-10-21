@@ -2339,3 +2339,11 @@ html.has-card { overflow: hidden; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Field notes and an early route to every experiment. */
+.field-entry { padding-bottom: 32px; margin-bottom: 32px; border-bottom: 1px solid var(--rule-soft); scroll-margin-top: 24px; }
+.field-entry:last-child { border-bottom: 0; }
+.project-index { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--rule-soft); }
+.project-index summary { cursor: pointer; }
+.project-index .exp-list { margin-top: 12px; }
+@media (min-width: 1072px) { .tabs { flex-wrap: wrap; } }
