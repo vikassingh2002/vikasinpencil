@@ -10,7 +10,7 @@ window.NB = window.NB || {};
 
 NB.goodreads = {
 "profile":"https://www.goodreads.com/user/show/115146123",
-"synced":"2026-10-20",
+"synced":"2026-10-21",
 "books":[
 {"id":"7126","shelf":"currently-reading","title":"The Count of Monte Cristo","subtitle":"","series":"","author":"Alexandre Dumas","rating":0,"read":"","added":"2026-09-20","published":"1846","pages":1276,"avg":4.31,"tags":["classic"],"review":"","cover":"assets/covers/7126.jpg","spine":"#101113","accent":"#f6f6f4"},
 {"id":"13356644","shelf":"read","title":"The Physics of Wall Street","subtitle":"A Brief History of Predicting the Unpredictable","series":"","author":"James Owen Weatherall","rating":4,"read":"2026-05-22","added":"2026-05-22","published":"2013","pages":286,"avg":3.81,"tags":[],"review":"","cover":"assets/covers/13356644.jpg","spine":"#ed1b24","accent":"#e54e4f"},
@@ -187,7 +187,7 @@ NB.goodreads = {
 {"id":"11347342","shelf":"to-read","title":"His Majesty’s Opponent","subtitle":"Subhas Chandra Bose and India’s Struggle against Empire","series":"","author":"Sugata Bose","rating":0,"read":"","added":"2021-08-13","published":"2011","pages":336,"avg":4.18,"tags":[],"review":"","cover":"assets/covers/11347342.jpg","spine":"#46413b","accent":"#f2f2f0"},
 {"id":"58573636","shelf":"to-read","title":"ASOCA","subtitle":"A Sutra","series":"","author":"Irwin Allan Sealy","rating":0,"read":"","added":"2021-08-09","published":"","pages":440,"avg":3.79,"tags":[],"review":"","cover":"assets/covers/58573636.jpg","spine":"#2f3f3f","accent":"#508976"},
 {"id":"36149971","shelf":"to-read","title":"India’s Most Fearless","subtitle":"True Stories of Modern Military Heroes","series":"","author":"Shiv Aroor","rating":0,"read":"","added":"2021-07-26","published":"","pages":256,"avg":4.44,"tags":[],"review":"","cover":"assets/covers/36149971.jpg","spine":"#2b0706","accent":"#fefff8"},
-{"id":"20625812","shelf":"to-read","title":"An Indian Pilgrim (unedited)","subtitle":"","series":"","author":"Subhas Chandra Bose","rating":0,"read":"","added":"2021-07-13","published":"1948","pages":null,"avg":4.34,"tags":[],"review":"","cover":"assets/covers/20625812.jpg","spine":"#e9d1b2","accent":"#a68872"},
+{"id":"20625812","shelf":"to-read","title":"An Indian Pilgrim (unedited)","subtitle":"","series":"","author":"Subhas Chandra Bose","rating":0,"read":"","added":"2021-07-13","published":"1948","pages":null,"avg":4.35,"tags":[],"review":"","cover":"assets/covers/20625812.jpg","spine":"#e9d1b2","accent":"#a68872"},
 {"id":"112803","shelf":"to-read","title":"Gandhi","subtitle":"An Autobiography","series":"","author":"Mahatma Gandhi","rating":0,"read":"","added":"2021-06-26","published":"1927","pages":528,"avg":4.13,"tags":[],"review":"","cover":"assets/covers/112803.jpg","spine":"#812d20","accent":"#fffff7"},
 {"id":"23692271","shelf":"to-read","title":"Sapiens","subtitle":"A Brief History of Humankind","series":"","author":"Yuval Noah Harari","rating":0,"read":"","added":"2021-06-26","published":"2011","pages":512,"avg":4.31,"tags":[],"review":"","cover":"assets/covers/23692271.jpg","spine":"#fffff7","accent":"#c9aa9d"},
 {"id":"66354","shelf":"to-read","title":"Flow","subtitle":"The Psychology of Optimal Experience","series":"","author":"Mihály Csíkszentmihályi","rating":0,"read":"","added":"2021-06-21","published":"1990","pages":303,"avg":4.11,"tags":["psychological","self-help","non-fiction"],"review":"","cover":"assets/covers/66354.jpg","spine":"#ffffff","accent":"#50747a"},
