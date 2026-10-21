@@ -448,9 +448,10 @@
     if (current === 'cover') {
       var book = $('#book');
       if (book && dir === 'next') {
+        var banded = !book.classList.contains('band-off');
         snapBand(true);
-        book.classList.add('is-opening');
-        setTimeout(go, 620);
+        setTimeout(function () { book.classList.add('is-opening'); }, banded ? 520 : 0);
+        setTimeout(go, banded ? 1140 : 620);
         return;
       }
       go();
@@ -864,6 +865,11 @@
     var openBtn = $('#cover-open');
     var turn = $('.book__turn', book);
     function setOpen(open) {
+      // The band comes off first; the cover follows once it's gone.
+      if (open && !book.classList.contains('band-off')) {
+        snapBand(true);
+        if (!reduceMotion) { setTimeout(function () { setOpen(true); }, 520); return; }
+      }
       book.classList.toggle('is-open', open);
       if (turn) turn.tabIndex = open ? 0 : -1;
       if (openBtn && openBtn.firstChild && openBtn.firstChild.nodeType === 3) openBtn.firstChild.nodeValue = open ? 'Turn the page ' : 'Open the notebook ';

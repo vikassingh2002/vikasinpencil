@@ -1114,13 +1114,25 @@ figcaption {
   box-shadow: inset 3px 0 0 var(--cover-weave-light), 2px 0 4px var(--shadow-desk);
   transition: transform var(--quick) var(--ease);
 }
-.book__band:hover span { transform: scaleX(1.15); }
-.book.band-off .book__band { pointer-events: none; }
-.book.band-off .book__band span { animation: nb-band-snap 460ms cubic-bezier(0.3, 1.4, 0.6, 1) forwards; }
+/* The band holds the notebook shut: it gives a little when you reach for it, and opening the
+   notebook pulls it taut, lets it spring back, then slips it off the edge. Where it sat, the
+   cloth keeps a faint pressed line. */
+.book__band { cursor: grab; }
+.book__band:hover span { transform: translateX(3px) scaleX(1.18); }
+.book.band-off .book__band { pointer-events: none; background: linear-gradient(90deg, transparent 13px, rgba(255, 255, 255, 0.05) 13px 31px, transparent 31px); }
+.book.band-off .book__band span { animation: nb-band-snap 640ms cubic-bezier(0.3, 0.1, 0.3, 1) forwards; }
+.book.band-off { animation: nb-twang 460ms ease 200ms; }
 @keyframes nb-band-snap {
   0% { transform: none; opacity: 1; }
-  30% { transform: translateX(10px) scaleX(1.3); opacity: 1; }
-  100% { transform: translateX(70px) rotate(14deg); opacity: 0; }
+  30% { transform: translateX(16px) scaleX(1.7); opacity: 1; }
+  44% { transform: translateX(9px) scaleX(0.85); opacity: 1; }
+  62% { transform: translateX(34px) rotate(4deg); opacity: 1; }
+  100% { transform: translateX(130px) translateY(46px) rotate(26deg); opacity: 0; }
+}
+@keyframes nb-twang {
+  30% { transform: rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(-1.1deg); }
+  60% { transform: rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(0.6deg); }
+  85% { transform: rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(-0.2deg); }
 }
 
 .cover__text {
