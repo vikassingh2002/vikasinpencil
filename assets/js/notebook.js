@@ -410,9 +410,9 @@
     { key: 'today', href: 'today.html', label: 'Today' },
     { key: 'hypotheses', href: 'hypotheses.html', label: 'Hypotheses' },
     { key: 'experiments', href: 'experiments.html', label: 'Experiments' },
+    { key: 'notes', href: 'notes.html', label: 'Field notes' },
     { key: 'references', href: 'references.html', label: 'References' },
-    { key: 'pocket', href: 'pocket.html', label: 'Back pocket' },
-    { key: 'notes', href: 'notes.html', label: 'Field notes' }
+    { key: 'pocket', href: 'pocket.html', label: 'Back pocket' }
   ];
   var TABS = PAGES.filter(function (p) { return p.key !== 'cover'; });
   TABS.splice(TABS.length - 1, 0, { key: 'errata', href: 'contents.html#errata', label: 'Errata' });
