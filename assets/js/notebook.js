@@ -2385,11 +2385,88 @@
     pocket: renderPocket
   };
 
+  /* ------------------------------------------------------------
+     Holding the shorter page: on a laptop, when one page of a spread
+     is much shorter, its writing stays in view while you read down the
+     other, the way a hand holds the left page of a notebook. Links on
+     it to entries on the other page show which one you're reading.
+     ------------------------------------------------------------ */
+
+  function holdPages() {
+    var pages = $$('.spread > .page--left, .spread > .page--right');
+    if (pages.length !== 2) return;
+    // Pages are re-rendered as you click around, so keep their writing wrapped.
+    function wrap(page) {
+      var first = page.firstElementChild;
+      if (first && first.classList.contains('page__flow') && first === page.lastElementChild) return first;
+      var flow = document.createElement('div');
+      flow.className = 'page__flow';
+      while (page.firstChild) flow.appendChild(page.firstChild);
+      page.appendChild(flow);
+      return flow;
+    }
+    var flows = pages.map(wrap);
+    var held = null;
+    var targets = [];
+    var wide = window.matchMedia ? window.matchMedia('(min-width: 1072px)') : null;
+
+    function layout() {
+      flows = pages.map(wrap);
+      flows.forEach(function (f) { f.classList.remove('is-held'); f.style.removeProperty('--read'); });
+      held = null;
+      if (!wide || !wide.matches) return;
+      var h0 = flows[0].offsetHeight, h1 = flows[1].offsetHeight;
+      var i = h0 < h1 ? 0 : 1;
+      var short = flows[i], long = flows[1 - i];
+      if (long.offsetHeight - short.offsetHeight < 240 || short.offsetHeight > window.innerHeight - 48) return;
+      short.classList.add('is-held');
+      held = { flow: short, page: pages[i], other: pages[1 - i] };
+      targets = $$('a[href^="#"]', short).map(function (a) {
+        var id = decodeURIComponent(a.getAttribute('href').slice(1));
+        var el = id && document.getElementById(id);
+        return el && held.other.contains(el) ? { link: a, el: el } : null;
+      }).filter(Boolean);
+      progress();
+    }
+    function progress() {
+      if (!held) return;
+      var r = held.other.getBoundingClientRect();
+      var span = r.height - window.innerHeight;
+      var p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 1;
+      held.flow.style.setProperty('--read', p.toFixed(3));
+      if (!targets.length) return;
+      var line = window.innerHeight * 0.35;
+      var on = targets[0];
+      targets.forEach(function (t) { if (t.el.getBoundingClientRect().top <= line) on = t; });
+      targets.forEach(function (t) {
+        var here = t === on;
+        t.link.classList.toggle('is-reading', here);
+        if (here) t.link.setAttribute('aria-current', 'location'); else t.link.removeAttribute('aria-current');
+      });
+    }
+
+    window.addEventListener('scroll', progress, { passive: true });
+    var again = null;
+    function soon() { clearTimeout(again); again = setTimeout(layout, 120); }
+    window.addEventListener('resize', soon);
+    if (wide && wide.addEventListener) wide.addEventListener('change', soon);
+    if ('MutationObserver' in window) {
+      var watch = new MutationObserver(function (list) {
+        for (var k = 0; k < list.length; k++) if (list[k].target === pages[0] || list[k].target === pages[1]) { soon(); return; }
+      });
+      pages.forEach(function (p) { watch.observe(p, { childList: true }); });
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(soon);
+    window.addEventListener('load', soon);
+    layout();
+  }
+
   try {
     showContentErrors();
     markVisited();
     if (current !== 'cover') { renderChrome(); renderCorners(); }
     if (RENDER[current]) RENDER[current]();
+    if (current !== 'cover') holdPages();
     updateBadge();
     drawIn(document);
     initSwipe();

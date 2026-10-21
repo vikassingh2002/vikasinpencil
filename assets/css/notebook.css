@@ -2477,6 +2477,29 @@ html.has-card { overflow: hidden; }
   }
 }
 
+/* The shorter page of a spread stays in view while you read the longer one (notebook.js: holdPages),
+   with a pencil line in its margin filling in as you go and a tick by the entry you're reading. */
+.page__flow { position: relative; }
+.page__flow.is-held { position: sticky; top: 20px; }
+.page__flow.is-held::before,
+.page__flow.is-held::after { content: ""; position: absolute; left: -12px; top: 0; width: 2px; border-radius: 1px; pointer-events: none; }
+.page__flow.is-held::before { height: 100%; background: var(--graphite-faint); }
+.page__flow.is-held::after { height: calc(var(--read, 0) * 100%); background: var(--graphite); transition: height 120ms linear; }
+.page__flow a.is-reading { position: relative; text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.page__flow a.is-reading::before {
+  content: "✓";
+  position: absolute;
+  left: -30px;
+  top: -6px;
+  font-family: var(--hand);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--red);
+  text-decoration: none;
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
 /* Field notes and an early route to every experiment. */
 .field-entry { padding-bottom: 32px; margin-bottom: 32px; border-bottom: 1px solid var(--rule-soft); scroll-margin-top: 24px; }
 .field-entry:last-child { border-bottom: 0; }
