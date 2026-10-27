@@ -495,7 +495,7 @@
   }
   function folded(key, openByDefault) {
     var on = key in ui.open ? ui.open[key] : openByDefault;
-    return '<details class="desk__fold" data-keep="' + key + '"' + (on ? ' open' : '') + '>';
+    return '<details class="desk__fold" data-keep="' + key + '" data-was="' + (on ? 1 : 0) + '"' + (on ? ' open' : '') + '>';
   }
 
   /* ------------------------------------------------------------
@@ -1154,6 +1154,7 @@
     if (secretKey) html = '<section class="signin"><h1 class="hand-xl">The desk is switched off</h1><p class="desk__banner desk__banner--warn">assets/js/desk-config.js holds a secret key. Anyone can read that file, so the desk won\'t use it. Replace it with the publishable key, and in Supabase, create a new secret key and delete this one.</p></section>';
     else if (ui.view === 'signin' && client && mode !== 'owner') html = signinHtml();
     else if (!canEdit() || ui.preview) html = visitorHtml();
+    else if (mode === 'owner' && !heard && !rows.length) html = '<header class="desk__top"><p class="desk__kicker">Desk</p></header><p class="muted gap-l">Opening the desk…</p>'; // a new device: wait for the cloud's copy
     else html = topHtml() + '<div class="desk__slot" id="slot">' + slotHtml() + '</div>' + (ui.view === 'doors' || ui.view === 'settings' ? '' : doorsStripHtml(false)) + footHtml();
     root.innerHTML = html;
     if (focusSel) {
@@ -1191,9 +1192,13 @@
       if (el.type === 'checkbox') el.checked = kept[id]; else el.value = kept[id];
     });
   }
+  // Remember the sections you open or close; browsers also announce the ones drawn open, so skip those.
   root.addEventListener('toggle', function (e) {
-    var key = e.target.getAttribute && e.target.getAttribute('data-keep');
-    if (key) ui.open[key] = e.target.open;
+    var el = e.target;
+    var key = el.getAttribute && el.getAttribute('data-keep');
+    if (!key || el.open === (el.getAttribute('data-was') === '1')) return;
+    ui.open[key] = el.open;
+    el.setAttribute('data-was', el.open ? '1' : '0');
   }, true);
   root.addEventListener('focusout', function () { setTimeout(flushWaiting, 0); });
 
