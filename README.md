@@ -9,6 +9,7 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `content/` | Everything the site says | **Yes. This is the only folder you normally touch.** |
 | `assets/img/` | Favicon and the link-preview image | Add your CV here as `cv.pdf` |
 | `index.html` and the other `.html` files | Page shells | Rarely |
+| `desk.html`, `assets/js/desk.js`, `assets/css/desk.css` | Your private desk (see "Your desk" below) | Only for new desk features |
 | `assets/css/notebook.css` | The look | Only for design changes |
 | `assets/js/notebook.js` | How the notebook behaves | Only for new features |
 | `robots.txt` | Tells search engines to stay out while it's a draft | Once, at launch |
@@ -92,6 +93,21 @@ The References page is everything that's shaped how you think. The two pages hol
 - **Link previews:** `assets/img/share-library.png` is the image WhatsApp and LinkedIn show for the References link. WhatsApp keeps old previews for a while, so a changed image can take a day or so to appear in chats.
 - **Link to a single thing:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id). Anything in the log has a link too: open its card and copy the address.
 - GitHub pauses scheduled jobs in a repository after 60 days with no commits. If the shelves stop updating, open the **Actions** tab and re-enable "Sync Goodreads".
+
+## Your desk (private)
+
+`desk.html` is your own home page, separate from the public notebook: **vikasinpencil.com/desk.html**. It isn't linked from any public page and asks search engines not to list it. It's built around three questions: what do I want to do, what's the easiest way to begin, and where did I leave off?
+
+- **Continue:** your projects, one clear next step each, their milestones, and the notes you leave for next time. The projects start out as your running and planned experiments from `content/experiments.js`; add your own, or put any of them away.
+- **Choose:** say how much energy and time you have, and it suggests a few things: the next step on your project, a book you're reading, a question worth thinking through, and always one thing away from the screen.
+- **Capture:** thoughts, ideas and questions, out of your head. "To read or watch" goes to Unwind instead.
+- **Unwind:** films, albums and talks you saved on purpose, two minutes of breathing, and a list of things to do away from screens.
+- **Focus sessions:** "Pick it up" and "Just 5 minutes" start a quiet timer. When it ends, it asks where you stopped, and that note greets you next time.
+- **"I'm stuck":** helps you shrink the next step, or swap it for something lighter.
+
+**Where it's kept:** everything you write on the desk stays in that browser, on that device. Nothing is sent anywhere, and nothing goes into this public repository. That also means your laptop and your phone each have their own desk. Use **Download a backup** at the foot of the page now and then; **Restore a backup** brings it back, or copies it to another device.
+
+**On your phone:** open the desk and choose "Add to Home Screen" (Safari) or "Install app" (Chrome). It opens like an app, with its own icon.
 
 ## What visitors can do, and where it's saved
 
