@@ -1,7 +1,7 @@
 {
   "name": "Desk · Vikas in Pencil",
   "short_name": "Desk",
-  "description": "A private desk for choosing what to do next.",
+  "description": "A desk for choosing what to do next.",
   "start_url": "desk.html",
   "scope": "./",
   "display": "standalone",

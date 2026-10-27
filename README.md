@@ -9,7 +9,9 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `content/` | Everything the site says | **Yes. This is the only folder you normally touch.** |
 | `assets/img/` | Favicon and the link-preview image | Add your CV here as `cv.pdf` |
 | `index.html` and the other `.html` files | Page shells | Rarely |
-| `desk.html`, `assets/js/desk.js`, `assets/css/desk.css` | Your private desk (see "Your desk" below) | Only for new desk features |
+| `desk.html`, `assets/js/desk.js`, `assets/css/desk.css` | Your desk (see "Your desk" below) | Only for new desk features |
+| `assets/js/desk-config.js` | Which Supabase project the desk uses | Once, when connecting Supabase |
+| `supabase/schema.sql` | The desk's database and who may do what | Run once in Supabase; rarely edited |
 | `assets/css/notebook.css` | The look | Only for design changes |
 | `assets/js/notebook.js` | How the notebook behaves | Only for new features |
 | `robots.txt` | Tells search engines to stay out while it's a draft | Once, at launch |
@@ -94,20 +96,53 @@ The References page is everything that's shaped how you think. The two pages hol
 - **Link to a single thing:** `vikasinpencil.com/references.html#book-21` opens that book's card (the number is its Goodreads id). Anything in the log has a link too: open its card and copy the address.
 - GitHub pauses scheduled jobs in a repository after 60 days with no commits. If the shelves stop updating, open the **Actions** tab and re-enable "Sync Goodreads".
 
-## Your desk (private)
+## Your desk
 
-`desk.html` is your own home page, separate from the public notebook: **vikasinpencil.com/desk.html**. It isn't linked from any public page and asks search engines not to list it. It's built around three questions: what do I want to do, what's the easiest way to begin, and where did I leave off?
+`desk.html` is your own home page, beside the public notebook: **vikasinpencil.com/desk.html**. A small door icon leads there from the landing page and from the top bar of every page. Search engines are asked not to list it. It's built around three questions: what do I want to do, what's the easiest way to begin, and where did I leave off?
 
-- **Continue:** your projects, one clear next step each, their milestones, and the notes you leave for next time. The projects start out as your running and planned experiments from `content/experiments.js`; add your own, or put any of them away.
-- **Choose:** say how much energy and time you have, and it suggests a few things: the next step on your project, a book you're reading, a question worth thinking through, and always one thing away from the screen.
-- **Capture:** thoughts, ideas and questions, out of your head. "To read or watch" goes to Unwind instead.
-- **Unwind:** films, albums and talks you saved on purpose, two minutes of breathing, and a list of things to do away from screens.
+- **Continue:** your projects, each with one clear next step, its milestones and the notes you leave for next time. Rename, share, put away, bring back or delete any of them.
+- **Choose:** say how much energy and time you have, and it suggests a few things: the next step on your project, something from your Library, a question worth thinking through, and always one thing away from the screen.
+- **Capture:** thoughts, ideas and questions, out of your head. Edit them, sort them, or turn one into a project or the next step. "To read or watch" goes to the Library.
+- **Unwind:** films, albums and talks you saved on purpose, two minutes of breathing, and your list of things to do away from screens.
+- **Library:** books, articles, essays, videos and anything else, with a link and a note. Mark them started or finished.
+- **Doors:** your usual websites and tools, in groups you name, in the order you choose.
 - **Focus sessions:** "Pick it up" and "Just 5 minutes" start a quiet timer. When it ends, it asks where you stopped, and that note greets you next time.
 - **"I'm stuck":** helps you shrink the next step, or swap it for something lighter.
 
-**Where it's kept:** everything you write on the desk stays in that browser, on that device. Nothing is sent anywhere, and nothing goes into this public repository. That also means your laptop and your phone each have their own desk. Use **Download a backup** at the foot of the page now and then; **Restore a backup** brings it back, or copies it to another device.
+Nothing is filled in for you. A new desk offers a few starting points (your notebook's experiments, some doors, some off-screen ideas), and you choose whether to use them.
+
+### Who can see it, and who can change it
+
+- **You** sign in (the "Owner sign in" link at the foot of the desk) and can change everything.
+- **Everyone else** sees only what you mark **Show this to visitors**: projects, Library items and doors. Notes, captured ideas and everything else are never shown, and the database refuses to share them even by mistake. Settings → "See what visitors see" shows you exactly what they get.
+- The rules live in the database itself (`supabase/schema.sql`), not in the page, so knowing the address or reading the code doesn't let anyone in. Only the account listed as the owner can change anything.
+
+### Where it's kept
+
+In your Supabase project: a free database that the desk signs in to. Open the desk on your laptop or your phone, sign in, and it's the same desk. Every change is saved on the device first and reaches the cloud a moment later, so the desk keeps working offline and catches up when you're back online. The line at the top right says **Saved**, **Saving…** or **Offline · will sync**.
+
+Signing out removes your private things from that device. They stay in the cloud.
+
+Until Supabase is connected, the desk keeps everything in the browser instead, and says so at the top.
+
+**Backups:** Settings → **Download a backup** saves everything as one file. **Restore a backup** adds a backup's items back and never deletes anything. It also reads backups from the first, browser-only desk.
+
+**The first desk:** if a browser still has the earlier, browser-only desk, the desk offers to **Bring it in** once you've signed in.
 
 **On your phone:** open the desk and choose "Add to Home Screen" (Safari) or "Install app" (Chrome). It opens like an app, with its own icon.
+
+### Connecting Supabase (once)
+
+1. Make a free account at [supabase.com](https://supabase.com) and create a project. Pick the region nearest you (Mumbai). Supabase asks for a database password: let it generate one and keep it in your password manager. The desk never needs it.
+2. In the project, open **SQL Editor**, paste all of `supabase/schema.sql`, and press **Run**.
+3. **Authentication → Users → Add user → Create new user:** your email and a strong password, with "Auto Confirm User" ticked.
+4. Back in the SQL Editor, run the last line of `schema.sql` with your email in it. That makes you the owner.
+5. In **Authentication**, turn off **Allow new users to sign up**. (Even if someone did sign up, they couldn't change anything.)
+6. Copy the **Project URL** and the **publishable key** (it starts with `sb_publishable_`; older projects call it the "anon public" key) into `assets/js/desk-config.js`.
+
+Both of those are meant to be public, so they're safe in this repository. **Never** put the secret key (`sb_secret_…` or `service_role`) or the database password in any file here: anyone can read this repository. The desk refuses to run with a secret key in its config.
+
+**The free plan pauses** a project after about a week with no activity (using the desk counts). A paused project keeps your things: open the Supabase dashboard, restore it, and the desk works again. Restoring isn't possible forever, though, so download a backup now and then.
 
 ## What visitors can do, and where it's saved
 

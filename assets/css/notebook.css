@@ -240,6 +240,9 @@ h1, h2, h3 { font-weight: inherit; }
   text-underline-offset: 4px;
 }
 .topbar a.topbar__quiet:hover { color: var(--desk-ink); }
+/* A small door to the desk: there if you look for it */
+.topbar a.topbar__door { justify-content: center; min-width: 44px; color: var(--desk-muted); opacity: 0.6; transition: opacity var(--quick) var(--ease); }
+.topbar a.topbar__door:hover, .topbar a.topbar__door:focus-visible { color: var(--desk-ink); opacity: 1; }
 
 .stamp-draft {
   display: inline-block;
@@ -1158,6 +1161,8 @@ figcaption {
 .cover__hint { font-size: 16px; font-style: italic; color: var(--desk-muted); }
 .cover__hint-link { color: var(--desk-ink); text-decoration: underline; text-decoration-color: var(--desk-line); text-underline-offset: 4px; }
 .cover__hint-link:hover { text-decoration-color: var(--desk-ink); }
+.cover__door { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--desk-muted); opacity: 0.5; transition: opacity var(--quick) var(--ease); }
+.cover__door:hover, .cover__door:focus-visible { color: var(--desk-ink); opacity: 1; }
 .cover__extras { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 18px; }
 .nowrap { white-space: nowrap; }
 .book__tips { display: none; }

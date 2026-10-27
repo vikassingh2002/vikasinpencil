@@ -305,6 +305,7 @@
   var ICON = {
     back: '<svg class="icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M13 8H3M7 4L3 8l4 4"/></svg>',
     next: '<svg class="icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg>',
+    door: '<svg class="icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M4 14.5V2.5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v12M2.5 14.5h11M9.5 8.5v.01"/></svg>',
     pencil: '<svg class="icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16"><path d="M2 14l1-3.6 8.6-8.6a1.4 1.4 0 0 1 2 0l.6.6a1.4 1.4 0 0 1 0 2L5.6 13zM9.8 3.6l2.6 2.6"/></svg>',
     arrow: '<svg class="step-arrow" aria-hidden="true" viewBox="0 0 22 14"><path d="M1 7h18M14 2l5 5-5 5"/></svg>',
     arrowLater: '<svg class="step-arrow step-arrow--later" aria-hidden="true" viewBox="0 0 22 14"><path d="M1 7h18M14 2l5 5-5 5"/></svg>',
@@ -569,6 +570,7 @@
           (site.draft ? '<span class="stamp-draft" title="Placeholder content. Set draft to false in content/site.js when it is real.">Draft</span>' : '') +
           '<span class="notes-badge" id="nb-badge" hidden></span>' +
           '<a class="topbar__quiet" href="brief.html">The notebook in 30 seconds</a>' +
+          '<a class="topbar__door" href="desk.html" aria-label="The desk" title="The desk">' + ICON.door + '</a>' +
         '</div>';
     }
     var tabs = $('#nb-tabs');
