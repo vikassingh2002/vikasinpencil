@@ -997,19 +997,27 @@
       var rest = url.replace(/^https?:\/\//i, '').split('#')[0];
       return ' href="' + esc('intent://' + rest + '#Intent;scheme=' + scheme + ';package=' + app + ';S.browser_fallback_url=' + encodeURIComponent(url) + ';end') + '"';
     }
+    if (!url && app) {
+      // An app with no website (an audiobook player, say): web pages can't start it directly,
+      // so open its Play Store page, where "Open" starts it.
+      var play = 'https://play.google.com/store/apps/details?id=' + app;
+      return ' href="' + esc('intent://details?id=' + app + '#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url=' + encodeURIComponent(play) + ';end') + '"';
+    }
     return ' href="' + esc(url) + '"' + (/^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : '');
   }
+  // Doors this device can open: a door with no website only works on an Android phone.
+  function opensHere(l) { return !!safeUrl(l.data.url) || (ANDROID && !!appId(l.data.app)); }
   function linkFormHtml(r) {
     var d = r ? r.data : { category: categories()[0] || 'Everyday' };
     var id = r ? r.id : 'new';
     return '<form class="desk__form edit" data-form="link" data-id="' + esc(id) + '">' +
       '<div class="form-grid">' +
         '<div><label class="field-label" for="kf-title-' + id + '">Name</label><input class="input" id="kf-title-' + id + '" name="title" value="' + esc(d.title || '') + '" autocomplete="off" required></div>' +
-        '<div><label class="field-label" for="kf-url-' + id + '">Address</label><input class="input" id="kf-url-' + id + '" name="url" value="' + esc(d.url || '') + '" autocomplete="off" inputmode="url" placeholder="https://…" required></div>' +
+        '<div><label class="field-label" for="kf-url-' + id + '">Address</label><input class="input" id="kf-url-' + id + '" name="url" value="' + esc(d.url || '') + '" autocomplete="off" inputmode="url" placeholder="https://…"></div>' +
         '<div><label class="field-label" for="kf-cat-' + id + '">Group</label><input class="input" id="kf-cat-' + id + '" name="category" value="' + esc(d.category || 'Everyday') + '" list="door-groups" autocomplete="off"></div>' +
         '<div><label class="field-label" for="kf-app-' + id + '">Android app (optional)</label><input class="input" id="kf-app-' + id + '" name="app" value="' + esc(d.app || '') + '" autocomplete="off" placeholder="Paste its Google Play link"></div>' +
       '</div>' +
-      '<p class="note-mono">With an app, this door opens the app on an Android phone, and the website everywhere else.</p>' +
+      '<p class="note-mono">With an app, this door opens the app on an Android phone, and the website everywhere else. For an app with no website, leave Address empty: the door then shows only on Android, and opens the app\'s Play Store page, where Open starts it.</p>' +
       sharedBox(r, 'kf-' + id) +
       '<div class="actions"><button class="btn" type="submit">' + (r ? 'Save' : 'Add the door') + '</button>' + (r ? '<button type="button" class="btn btn--text" data-act="cancel">Cancel</button>' : '') + '</div>' +
     '</form>';
@@ -1035,9 +1043,12 @@
             return '<div class="doorgroup"><p class="doorgroup__name">' + esc(g.name) + '</p><ul class="linkrows">' + g.items.map(function (l, i) {
               if (ui.editId === l.id) return '<li>' + linkFormHtml(l) + '</li>';
               var url = safeUrl(l.data.url);
+              var app = appId(l.data.app);
+              var where = url ? esc(url.replace(/^https?:\/\//, '')) + (app ? ' · opens the app on Android' : '')
+                : app ? 'Phone only · opens ' + esc(app) + ' on Android' : 'This address doesn\'t work. Edit it.';
               return '<li class="linkrow"><div class="linkrow__main">' +
-                (url ? '<a class="ink-link"' + doorAttrs(l) + '>' + esc(l.data.title) + '</a>' : esc(l.data.title)) +
-                (l.shared ? ' ' + SHARED_TAG : '') + '<p class="linkrow__url">' + (url ? esc(url.replace(/^https?:\/\//, '')) + (appId(l.data.app) ? ' · opens the app on Android' : '') : 'This address doesn\'t work. Edit it.') + '</p></div>' +
+                (opensHere(l) ? '<a class="ink-link"' + doorAttrs(l) + '>' + esc(l.data.title) + '</a>' : esc(l.data.title)) +
+                (l.shared ? ' ' + SHARED_TAG : '') + '<p class="linkrow__url">' + where + '</p></div>' +
                 '<div class="linkrow__acts">' +
                   '<button type="button" class="iconbtn" data-act="door-move" data-id="' + esc(l.id) + '" data-v="-1" aria-label="Move ' + esc(l.data.title) + ' up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
                   '<button type="button" class="iconbtn" data-act="door-move" data-id="' + esc(l.id) + '" data-v="1" aria-label="Move ' + esc(l.data.title) + ' down"' + (i === g.items.length - 1 ? ' disabled' : '') + '>↓</button>' +
@@ -1052,12 +1063,10 @@
     '</section>';
   }
   function doorsStripHtml(onlyShared) {
-    var groups = grouped(links().filter(function (l) { return !onlyShared || l.shared; }));
+    var groups = grouped(links().filter(function (l) { return (!onlyShared || l.shared) && opensHere(l); }));
     if (!groups.length) return onlyShared ? '' : '<nav class="doors" aria-label="Doors"><p class="label">Doors</p><p class="muted">Your usual sites and tools can wait here. <a class="ink-link" href="#doors">Add some doors</a></p></nav>';
     return '<nav class="doors" aria-labelledby="doors-title"><p class="label" id="doors-title">Doors</p>' + groups.map(function (g) {
       return '<div class="doors__group">' + (groups.length > 1 ? '<p class="doors__cat">' + esc(g.name) + '</p>' : '') + '<ul class="doors__list">' + g.items.map(function (l) {
-        var url = safeUrl(l.data.url);
-        if (!url) return '';
         return '<li><a class="door"' + doorAttrs(l) + '>' + esc(l.data.title) + '</a></li>';
       }).join('') + '</ul></div>';
     }).join('') + (onlyShared ? '' : '<p><a class="btn btn--text" href="#doors">Change the doors</a></p>') + '</nav>';
@@ -1963,9 +1972,9 @@
     offline: function (val) { var text = val('text'); if (text) { put(make('offline', { text: text })); render('#off-new'); } },
     link: function (val, form) {
       var url = typedUrl(val('url'));
-      if (!url) { say('That address doesn\'t look right. Try one starting with https://'); return; }
       var app = appId(val('app'));
       if (val('app') && !app) { say('That app link doesn\'t look right. Paste the app\'s Google Play link.'); return; }
+      if (!url && !(app && !val('url'))) { say(val('url') ? 'That address doesn\'t look right. Try one starting with https://' : 'Add an address, or an Android app.'); return; }
       var id = form.getAttribute('data-id');
       var r = id === 'new' ? make('link', {}) : find(id);
       if (!r) return;
