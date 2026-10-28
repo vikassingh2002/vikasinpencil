@@ -10,6 +10,6 @@
    with the site for anyone to read. */
 window.NB = window.NB || {};
 NB.deskConfig = {
-  supabaseUrl: '', // Project URL, like https://abcdefgh.supabase.co
-  supabaseKey: ''  // Publishable key (sb_publishable_…), or the older "anon public" key
+  supabaseUrl: 'https://uptwomqoxomdyfcgezmx.supabase.co', // Project URL
+  supabaseKey: 'sb_publishable_aHvlgo0zRyjYsD-VVHX1BA_csZfpU4a' // Publishable key (sb_publishable_…), or the older "anon public" key
 };
