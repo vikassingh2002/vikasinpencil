@@ -131,6 +131,7 @@
   }
 
   var site = NB.site || {};
+  var me = String(site.name || '').split(' ')[0] || 'the owner'; // the desk's owner, by name
   var cfg = NB.deskConfig || {};
   var secretKey = looksSecret(cfg.supabaseKey);
   var configured = !!(cfg.supabaseUrl && cfg.supabaseKey) && !secretKey;
@@ -1125,10 +1126,10 @@
     var top =
       '<header class="desk__top"><p class="desk__kicker">Desk · ' + esc(longDay(d)) + '</p><p class="desk__right"><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
       (ui.preview ? '<p class="desk__banner">This is what visitors see. <button type="button" class="btn btn--text" data-act="preview-off">Back to my desk</button></p>' : '') +
-      (mode === 'stranger' ? '<p class="desk__banner">You\'re signed in as ' + esc(user && user.email) + ', which isn\'t this desk\'s owner, so you see what\'s shared. <button type="button" class="btn btn--text" data-act="signout">Sign out</button></p>' : '') +
+      (mode === 'stranger' ? '<p class="desk__banner">You\'re signed in as ' + esc(user && user.email) + ', which isn\'t ' + esc(me) + '\'s account, so you see what\'s shared. <button type="button" class="btn btn--text" data-act="signout">Sign out</button></p>' : '') +
       (problem && mode === 'visitor' ? '<p class="desk__banner desk__banner--warn">' + esc(problem) + (user ? ' <button type="button" class="btn btn--text" data-act="recheck">Try again</button>' : '') + '</p>' : '') +
       '<h1 class="desk__ask desk__ask--visit">' + esc(name) + '\'s desk</h1>' +
-      '<p class="lede">The projects, reading and doors that are shared from it. It\'s a working desk, so it changes; only its owner can change it.</p>';
+      '<p class="lede">The projects, reading and doors that are shared from it. It\'s a working desk, so it changes; only ' + esc(me) + ' can change it.</p>';
     var body = '';
     if (mode === 'loading' || (!heard && !ui.preview)) body = '<p class="muted gap-l">Opening the desk…</p>';
     else if (!ps.length && !lib.length && !links().some(function (l) { return l.shared; })) body = '<p class="hand-m gap-l">Nothing is shared from the desk right now.</p>';
@@ -1148,8 +1149,8 @@
       }).join('') + '</ul>' : '';
       body += doorsStripHtml(true);
     }
-    var foot = '<footer class="desk__foot"><p>Only the owner can change this desk.' +
-      (mode === 'visitor' && client && !user && !ui.preview ? ' <a class="ink-link" href="#signin">Owner sign in</a>' : '') + '</p></footer>';
+    var foot = '<footer class="desk__foot"><p>Only ' + esc(me) + ' can change this desk.' +
+      (mode === 'visitor' && client && !user && !ui.preview ? ' <a class="ink-link" href="#signin">Sign in as ' + esc(me) + '</a>' : '') + '</p></footer>';
     return top + body + foot;
   }
 
@@ -1157,7 +1158,7 @@
     return '<header class="desk__top"><p class="desk__kicker">Desk</p><p class="desk__right"><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
       '<section class="signin">' +
         '<h1 class="hand-xl">Sign in to the desk</h1>' +
-        '<p class="lede">For the desk\'s owner. Everyone else can see what\'s shared without signing in.</p>' +
+        '<p class="lede">For ' + esc(me) + '. Everyone else can see what\'s shared without signing in.</p>' +
         '<form class="desk__form" data-form="signin" novalidate>' +
           '<label class="field-label" for="si-email">Email</label><input class="input" id="si-email" name="email" type="email" autocomplete="username" required>' +
           '<label class="field-label" for="si-password">Password</label><input class="input" id="si-password" name="password" type="password" autocomplete="current-password" required>' +
