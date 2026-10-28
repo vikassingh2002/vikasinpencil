@@ -979,6 +979,26 @@
     '</section>';
   }
 
+  // On an Android phone a door can open an app instead of its website, falling back to the
+  // site when the app isn't installed. (An installed desk opens plain links in a browser tab,
+  // which never hands them to apps.)
+  var ANDROID = /Android/i.test(navigator.userAgent);
+  function appId(s) {
+    s = String(s || '').trim();
+    var m = /[?&]id=([\w.]+)/.exec(s); // a Google Play link works as well as the bare id
+    if (m) s = m[1];
+    return /^[a-zA-Z]\w*(\.[a-zA-Z]\w*)+$/.test(s) ? s : '';
+  }
+  function doorAttrs(l) {
+    var url = safeUrl(l.data.url);
+    var app = appId(l.data.app);
+    if (ANDROID && app && /^https?:\/\//i.test(url)) {
+      var scheme = /^https/i.test(url) ? 'https' : 'http';
+      var rest = url.replace(/^https?:\/\//i, '').split('#')[0];
+      return ' href="' + esc('intent://' + rest + '#Intent;scheme=' + scheme + ';package=' + app + ';S.browser_fallback_url=' + encodeURIComponent(url) + ';end') + '"';
+    }
+    return ' href="' + esc(url) + '"' + (/^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : '');
+  }
   function linkFormHtml(r) {
     var d = r ? r.data : { category: categories()[0] || 'Everyday' };
     var id = r ? r.id : 'new';
@@ -987,7 +1007,9 @@
         '<div><label class="field-label" for="kf-title-' + id + '">Name</label><input class="input" id="kf-title-' + id + '" name="title" value="' + esc(d.title || '') + '" autocomplete="off" required></div>' +
         '<div><label class="field-label" for="kf-url-' + id + '">Address</label><input class="input" id="kf-url-' + id + '" name="url" value="' + esc(d.url || '') + '" autocomplete="off" inputmode="url" placeholder="https://…" required></div>' +
         '<div><label class="field-label" for="kf-cat-' + id + '">Group</label><input class="input" id="kf-cat-' + id + '" name="category" value="' + esc(d.category || 'Everyday') + '" list="door-groups" autocomplete="off"></div>' +
+        '<div><label class="field-label" for="kf-app-' + id + '">Android app (optional)</label><input class="input" id="kf-app-' + id + '" name="app" value="' + esc(d.app || '') + '" autocomplete="off" placeholder="Paste its Google Play link"></div>' +
       '</div>' +
+      '<p class="note-mono">With an app, this door opens the app on an Android phone, and the website everywhere else.</p>' +
       sharedBox(r, 'kf-' + id) +
       '<div class="actions"><button class="btn" type="submit">' + (r ? 'Save' : 'Add the door') + '</button>' + (r ? '<button type="button" class="btn btn--text" data-act="cancel">Cancel</button>' : '') + '</div>' +
     '</form>';
@@ -1014,8 +1036,8 @@
               if (ui.editId === l.id) return '<li>' + linkFormHtml(l) + '</li>';
               var url = safeUrl(l.data.url);
               return '<li class="linkrow"><div class="linkrow__main">' +
-                (url ? '<a class="ink-link" href="' + esc(url) + '"' + (/^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l.data.title) + '</a>' : esc(l.data.title)) +
-                (l.shared ? ' ' + SHARED_TAG : '') + '<p class="linkrow__url">' + (url ? esc(url.replace(/^https?:\/\//, '')) : 'This address doesn\'t work. Edit it.') + '</p></div>' +
+                (url ? '<a class="ink-link"' + doorAttrs(l) + '>' + esc(l.data.title) + '</a>' : esc(l.data.title)) +
+                (l.shared ? ' ' + SHARED_TAG : '') + '<p class="linkrow__url">' + (url ? esc(url.replace(/^https?:\/\//, '')) + (appId(l.data.app) ? ' · opens the app on Android' : '') : 'This address doesn\'t work. Edit it.') + '</p></div>' +
                 '<div class="linkrow__acts">' +
                   '<button type="button" class="iconbtn" data-act="door-move" data-id="' + esc(l.id) + '" data-v="-1" aria-label="Move ' + esc(l.data.title) + ' up"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
                   '<button type="button" class="iconbtn" data-act="door-move" data-id="' + esc(l.id) + '" data-v="1" aria-label="Move ' + esc(l.data.title) + ' down"' + (i === g.items.length - 1 ? ' disabled' : '') + '>↓</button>' +
@@ -1036,7 +1058,7 @@
       return '<div class="doors__group">' + (groups.length > 1 ? '<p class="doors__cat">' + esc(g.name) + '</p>' : '') + '<ul class="doors__list">' + g.items.map(function (l) {
         var url = safeUrl(l.data.url);
         if (!url) return '';
-        return '<li><a class="door" href="' + esc(url) + '"' + (/^https?:/i.test(url) ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l.data.title) + '</a></li>';
+        return '<li><a class="door"' + doorAttrs(l) + '>' + esc(l.data.title) + '</a></li>';
       }).join('') + '</ul></div>';
     }).join('') + (onlyShared ? '' : '<p><a class="btn btn--text" href="#doors">Change the doors</a></p>') + '</nav>';
   }
@@ -1942,12 +1964,15 @@
     link: function (val, form) {
       var url = typedUrl(val('url'));
       if (!url) { say('That address doesn\'t look right. Try one starting with https://'); return; }
+      var app = appId(val('app'));
+      if (val('app') && !app) { say('That app link doesn\'t look right. Paste the app\'s Google Play link.'); return; }
       var id = form.getAttribute('data-id');
       var r = id === 'new' ? make('link', {}) : find(id);
       if (!r) return;
       r.data.title = val('title');
       r.data.url = url;
       r.data.category = val('category') || 'Everyday';
+      r.data.app = app;
       r.shared = !!form.elements.shared.checked;
       put(r);
       resetEditing();
