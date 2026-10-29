@@ -177,3 +177,100 @@ NB.aiArticles = {
     }
   ]
 };
+
+/* Original explainers added 29 October 2026; illustrative examples are labelled. */
+NB.aiArticles.articles.unshift.apply(NB.aiArticles.articles, [
+  {
+    "id": "workflow-dividend",
+    "section": "business",
+    "fly": "The automation bargain",
+    "date": "2026-10-29",
+    "minutes": 3,
+    "title": "The case for a less ambitious machine",
+    "rubric": "A useful AI system may need fewer decisions to make, rather than a cleverer model",
+    "body": [
+      "Consider a hypothetical accounts department with an unglamorous ambition: to clear its invoice queue before Friday. The documents arrive in different formats, but the decisions are familiar. Identify the supplier, match the purchase order, check the amount and send exceptions to a person. An autonomous agent could choose how to tackle each invoice. The first question is why it should have to.",
+      "The distinction is architectural. In its guide to building effective agents, published in December 2024, Anthropic separates workflows, whose paths are specified in code, from agents, which choose their next steps dynamically. It recommends starting with the simplest arrangement that works. Autonomy brings flexibility, but can add cost and delay. That is a trade, not an automatic improvement.",
+      {
+        "h": "Freedom has a price"
+      },
+      "For our accounts department, the sensible division of labour might be quite narrow. A model reads a messy description; ordinary software checks whether the total matches. An uncertain supplier name goes to a reviewer. The model need not decide the payment rules, invent a sequence of checks or possess permission to move money. Each responsibility can be tested separately.",
+      "This arrangement also changes the economics of failure. Suppose the system misunderstands a line item. A fixed validation step may catch the discrepancy before it reaches the ledger. An unconstrained assistant might instead reinterpret the task and continue. Neither architecture guarantees correctness. But a clearly bounded error is usually easier to diagnose than a plausible chain of improvised decisions.",
+      {
+        "h": "Where the map runs out"
+      },
+      "Now imagine investigating an unfamiliar mismatch across contracts, correspondence and delivery records. The next useful search depends on what the previous search found. Here, discretion may earn its keep. The practical boundary is between work whose route is already understood and work that must discover its route along the way.",
+      "A small builder can test the distinction cheaply. Take ten representative cases, write down what a successful outcome means, and compare a fixed workflow with a more flexible alternative. Record the errors, elapsed time and effort required to review each result. These are proposed checks, not results from a completed trial.",
+      "The least impressive demonstration may turn out to be the better product. A system that finishes a modest job reliably gives its owner something more useful than a display of initiative: an afternoon back. ■"
+    ],
+    "sources": [
+      {
+        "title": "Building effective agents — Anthropic",
+        "url": "https://www.anthropic.com/research/building-effective-agents",
+        "date": "2024-12-19"
+      }
+    ]
+  },
+  {
+    "id": "tool-contract",
+    "section": "technology",
+    "fly": "Designing for agents",
+    "date": "2026-10-29",
+    "minutes": 3,
+    "title": "The instruction manual is part of the machine",
+    "rubric": "Before replacing a struggling model, examine the tools it has been given",
+    "body": [
+      "Imagine hiring an assistant and giving them two buttons labelled “Search” and “Lookup”. One searches the current customer list; the other searches an archive. Neither says which identifier it expects. When the assistant picks the wrong button, calling them incompetent would be a peculiar management technique. Yet software teams can create much the same confusion for an AI agent.",
+      "A tool interface tells a model which actions are available and how to request them. Its name, description and input schema help shape the choice. The underlying software then executes the request. A function that is convenient for the database programmer may still be awkward for the model trying to solve a user’s problem.",
+      {
+        "h": "A smaller menu"
+      },
+      "Anthropic’s September 2025 engineering guide argues for choosing tools carefully, using clear names, returning relevant context and evaluating how agents actually use the interface. It also recommends measuring errors, tool calls, runtime and token consumption. The interface belongs in the experiment, alongside the prompt and the model.",
+      "Consider a hypothetical search response containing a thousand records. A person might ask for a filter. An agent might read the lot, miss the important row and search again. Returning a compact result with stable identifiers, a useful summary and a way to request detail creates a different problem for the model to solve. More information is valuable only when it helps the next decision.",
+      "There is a corresponding risk in tidying too aggressively. A tool that returns only its own conclusion can hide the evidence needed to challenge it. A good summary should preserve the route back to the underlying record. For an investigator examining satellite telemetry, that might mean a timestamp, a sensor identifier and the interval covered, rather than a reassuring sentence about battery health.",
+      {
+        "h": "Watch the hands"
+      },
+      "The practical test is to hold the model and task constant while changing the interface. Try a vague tool description, then one specifying the input format and the meaning of an empty response. Inspect the actual requests and outcomes. If the improvement appears only on the examples used to write the description, try fresh cases before celebrating.",
+      "This is a proposed experiment for the notebook, not a reported performance gain. Its attraction is that it asks a question a builder can answer. The next breakthrough in an agent may be a better model. The next fix may be a better label. ■"
+    ],
+    "sources": [
+      {
+        "title": "Writing effective tools for agents — Anthropic",
+        "url": "https://www.anthropic.com/research/writing-tools-for-agents",
+        "date": "2025-09-11"
+      }
+    ]
+  },
+  {
+    "id": "reasoning-evidence",
+    "section": "science",
+    "fly": "The limits of explanation",
+    "date": "2026-10-29",
+    "minutes": 3,
+    "title": "A convincing explanation is not a receipt",
+    "rubric": "An AI’s account of its reasoning can be useful without being a faithful record of what influenced it",
+    "body": [
+      "A fluent explanation is comforting. Presented with a wrong answer and an orderly argument, a reader can at least see where to begin. Presented with a right answer and an orderly argument, the reader may stop checking altogether. That second response deserves more suspicion.",
+      "In research published in April 2025, Anthropic tested whether reasoning models acknowledged hints that influenced their answers. Researchers inserted suggestions into evaluation questions, then examined the resulting chains of thought. The tested models sometimes followed the hints without mentioning them in their explanations. The study concerned particular models and experimental settings; it does not establish how every current system behaves.",
+      "Its lesson is narrower, and useful: readable reasoning is not necessarily a complete account of why an answer was produced. An explanation can omit an influence that matters. Confidence in the prose and confidence in the underlying decision are different judgements.",
+      {
+        "h": "Follow the evidence"
+      },
+      "For a builder, this suggests a distinction between a narrative and an audit trail. “I checked the contract” is a narrative claim. A recorded tool request, the retrieved passage and its document identifier offer something that can be inspected. Even then, the passage may be irrelevant or the document outdated. The trail makes checking possible; it does not perform the checking.",
+      "Consider the planned satellite investigator in this notebook. A report saying that a heater failed would be more useful if it pointed to the relevant temperature readings, the command history and a written procedure. A reviewer could then ask whether the evidence supports that diagnosis, or whether a faulty sensor would fit just as well. The quality of the report would depend on those connections, not on how confidently it described its thought process.",
+      {
+        "h": "A modest test"
+      },
+      "One practical exercise is to give an assistant a small document and request a conclusion with an exact supporting passage. Repeat with a version containing a plausible but unsupported suggestion. Compare the conclusions, check the quoted evidence and note whether the suggestion changes the answer. This is an illustrative exercise, not a replication of the research: a handful of runs cannot establish a model’s general faithfulness.",
+      "Explanations still have a job. They can expose assumptions, make an answer easier to question and help a person identify the next check. They become less useful when treated as proof of their own accuracy. The machine can supply the argument. The evidence must bear the weight. ■"
+    ],
+    "sources": [
+      {
+        "title": "Reasoning models don’t always say what they think — Anthropic",
+        "url": "https://www.anthropic.com/research/reasoning-models-dont-say-think",
+        "date": "2025-04-03"
+      }
+    ]
+  }
+]);

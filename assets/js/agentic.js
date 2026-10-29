@@ -90,7 +90,7 @@
     var here = route.name === 'section' ? route.id : '';
     return '<header class="app-top"><div class="app-top__row">' +
       '<button type="button" class="icon-btn" data-act="menu" aria-label="Menu" aria-expanded="' + menuOpen + '">' + icon('menu') + '</button>' +
-      '<a class="wordmark" href="#/">Agentic AI</a><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
+      '<a class="wordmark" href="#/">Agentic AI</a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
       '<nav class="app-tabs" aria-label="Sections"><a href="#/"' + (route.name === 'today' ? ' aria-current="page"' : '') + '>Home</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
       '</nav></header>';
@@ -108,7 +108,7 @@
       '<span class="acts__right"><button type="button" class="icon-btn" data-act="listen-card" data-id="' + esc(a.id) + '" aria-label="Listen to ' + esc(a.title) + '">' + icon('play') + '</button>' +
       '<button type="button" class="icon-btn' + (on ? ' is-on' : '') + '" data-act="save" data-id="' + esc(a.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved' : 'Save') + '">' + icon('mark') + '</button></span></div>';
   }
-  function picture(a, cls) { var x = Art.get(a.id); return x ? '<span class="' + cls + '" aria-hidden="true">' + x.svg + '</span>' : ''; }
+  function picture(a, cls) { var x = Art.get(a.id, 'thumbnail'); return x ? '<span class="' + cls + '" aria-hidden="true">' + x.svg + '</span>' : ''; }
   function label(a) { return '<span class="lbl">' + esc(a.fly || sectionName(a.section)) + '</span>'; }
   function block(title) { return '<h2 class="block"><span>' + esc(title) + '</span></h2>'; }
 
@@ -131,9 +131,12 @@
     if (!order.length) return topbar() + '<p class="empty">No articles yet.</p>';
     var lead = order[0];
     var rest = order.slice(1);
-    var html = topbar() + '<main class="app-main">' + bigCard(lead) +
-      block('In brief') + '<ul class="carousel">' + rest.slice(0, 5).map(function (a) { return slide(a, true); }).join('') + '<li class="slide slide--more"><a href="#brief">Every article, one line each <span aria-hidden="true">→</span></a></li></ul>' +
-      block('Recent highlights') + '<ul class="carousel">' + rest.slice(5).concat(rest.slice(0, 2)).map(function (a) { return slide(a); }).join('') + '</ul>';
+    var html = topbar() + '<main class="app-main"><div class="edition-line"><span>Ideas, evidence and the business of intelligence</span><span>' + esc(econDate(A.reviewed)) + '</span></div>' +
+      '<div class="news-front"><div class="news-front__lead">' + bigCard(lead) + '</div>' +
+      '<div class="news-front__middle"><ul class="rows">' + rest.slice(0, 2).map(function (a) { return '<li class="news-secondary">' + bigCard(a) + '</li>'; }).join('') + '</ul></div>' +
+      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief</h2><p class="rail-intro">The ideas behind the headlines. Each explained in a few minutes.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief">Every article in a sentence →</a></aside></div>' +
+      block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
+
     sections().forEach(function (s) {
       var inS = articles.filter(function (a) { return a.section === s.id && a !== lead; });
       if (inS.length) html += block(s.name) + '<ul class="rows">' + inS.map(row).join('') + '</ul>';
@@ -206,7 +209,7 @@
     var more = articles.filter(function (x) { return x.section === a.section && x !== a; });
     if (more.length < 2) more = more.concat(articles.filter(function (x) { return x.section !== a.section && !isRead(x); }).slice(0, 2 - more.length));
     var size = readSize();
-    return '<header class="art-top"><a class="icon-btn" href="#/" data-act="back" aria-label="Back">' + icon('back') + '</a>' +
+    return '<div class="desktop-article-header">' + topbar() + '</div><header class="art-top"><a class="icon-btn" href="#/" data-act="back" aria-label="Back">' + icon('back') + '</a>' +
       '<span class="art-top__right"><button type="button" class="icon-btn" data-act="size" aria-label="Text size">' + tt() + '</button>' +
       '<button type="button" class="icon-btn' + (on ? ' is-on' : '') + '" data-act="save" data-id="' + esc(a.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved' : 'Save') + '">' + icon('mark') + '</button>' +
       '<button type="button" class="icon-btn" data-act="share" aria-label="Share">' + icon('share') + '</button></span></header>' +
@@ -217,7 +220,7 @@
         (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption.toUpperCase()) + '</figcaption></figure>' : '') +
         '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + ' · ' + (a.minutes || 3) + ' min read</p>' +
         '<div class="listen"><button type="button" class="listen__btn" data-act="listen" aria-pressed="' + speaking + '">' + icon(speaking ? 'stop' : 'play') + '<b>' + (speaking ? 'Stop' : 'Listen') + '</b> <span>' + listenTime(a) + '</span></button>' +
-          '<span class="listen__tag">AI NARRATED</span></div>' +
+          '<span class="listen__tag">DEVICE VOICE</span></div>' +
         '<div class="art__body">' + body + '</div>' +
         '<p class="art__note">This article appears in the ' + esc(sectionName(a.section)) + ' section of Agentic AI under the headline “' + esc(a.title) + '”</p>' +
         (list(a.sources).length ? '<aside class="art__sources"><h2>Sources</h2><ul>' + a.sources.map(function (x) {

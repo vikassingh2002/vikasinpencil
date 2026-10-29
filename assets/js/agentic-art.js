@@ -112,5 +112,32 @@ window.AgenticArt = (function () {
     }
   };
 
-  return { get: function (id) { return ART[id] ? ART[id]() : null; } };
+  function editorial(id) {
+    var palettes = [['#f1c83d', '#202e52'], ['#e6a08c', '#202e52'], ['#84bdcb', '#183b43']];
+    var index = id === 'tool-contract' ? 1 : id === 'reasoning-evidence' ? 2 : 0;
+    var bg = palettes[index][0], dark = palettes[index][1];
+    var subject = index === 0
+      ? '<path d="M90 265H560" stroke="'+dark+'" stroke-width="4"/><g transform="rotate(-9 205 170)"><rect x="130" y="80" width="160" height="190" fill="#fff9ed"/><path d="M154 118h108m-108 24h85m-85 24h108m-108 24h60" stroke="'+dark+'" stroke-width="7"/><path d="M175 220l18 17 39-43" fill="none" stroke="#d13227" stroke-width="10"/></g><path d="M390 170h95v95h-95zM370 170l67-90 67 90" fill="'+dark+'"/><circle cx="438" cy="184" r="17" fill="'+bg+'"/><path d="M438 201v30" stroke="'+bg+'" stroke-width="8"/>'
+      : index === 1
+      ? '<rect x="65" y="87" width="215" height="184" fill="#fcf7ec"/><path d="M88 121h160m-160 28h110m-110 28h144m-144 28h75" stroke="'+dark+'" stroke-width="7"/><path d="M320 180h60" stroke="'+dark+'" stroke-width="5"/><circle cx="450" cy="177" r="90" fill="'+dark+'"/><path d="M410 126v103m80-103v103m-80-57h80" fill="none" stroke="'+bg+'" stroke-width="20"/><circle cx="410" cy="123" r="17" fill="#fcf7ec"/><circle cx="490" cy="229" r="17" fill="#fcf7ec"/>'
+      : '<rect x="120" y="75" width="210" height="235" fill="#fff9ed" transform="rotate(-7 225 190)"/><path d="M150 127h135m-135 27h100m-100 27h135m-135 27h70" stroke="'+dark+'" stroke-width="7"/><circle cx="386" cy="160" r="83" fill="none" stroke="'+dark+'" stroke-width="17"/><path d="M444 222l78 84" stroke="'+dark+'" stroke-width="28"/><path d="M350 163l24 23 45-54" fill="none" stroke="#fff9ed" stroke-width="12"/>';
+    return { svg: scene(subject, bg), caption: 'Original editorial illustration: ' + (index === 0 ? 'giving automation a bounded job' : index === 1 ? 'a clearer interface between instructions and action' : 'checking the evidence behind an explanation') };
+  }
+  var NEW = ['workflow-dividend', 'tool-contract', 'reasoning-evidence'];
+  return { get: function (id, context) {
+    if (NEW.indexOf(id) !== -1) return editorial(id);
+    // Keep numerical charts readable at article size; avoid chart text in tiny cards.
+    if (context === 'thumbnail' && ['pilots', 'deepseek', 'power', 'novices', 'agents'].indexOf(id) !== -1) {
+      var illustrations = {
+        pilots: ['#e8c449', '<path d="M100 280h440" stroke="#182d46" stroke-width="5"/><path d="M120 280V110h150v170m60 0V180h150v100" fill="#fff7e9" stroke="#182d46" stroke-width="4"/><path d="M145 140h28m35 0h28m-91 35h28m35 0h28m-91 35h28m35 0h28" stroke="#182d46" stroke-width="10"/><path d="M390 85c80-30 135 50 65 95l-42 25-30-34 28-42-21-44" fill="#d33428"/><circle cx="435" cy="130" r="13" fill="#fff7e9"/>'],
+        deepseek: ['#94c2d2', '<rect x="96" y="65" width="300" height="230" fill="#f9f4e9"/><path d="M125 100v160h240" fill="none" stroke="#17364d" stroke-width="4"/><path d="M140 160l45-30 38 15 42-55 34 28 40 115 36 15" fill="none" stroke="#d33428" stroke-width="10"/><g transform="rotate(12 470 175)"><rect x="415" y="120" width="110" height="110" fill="#17364d"/><rect x="438" y="143" width="64" height="64" fill="#f9f4e9"/><path d="M425 106v-18m30 18v-18m30 18v-18m30 18v-18M425 244v18m30-18v18m30-18v18m30-18v18" stroke="#17364d" stroke-width="8"/></g>'],
+        power: ['#193d45', '<path d="M120 270h400" stroke="#adc4c1" stroke-width="4"/><rect x="145" y="94" width="100" height="175" fill="#e1e8dc"/><rect x="267" y="94" width="100" height="175" fill="#e1e8dc"/><path d="M163 126h64m-64 30h64m-64 30h64m58-60h64m-64 30h64m-64 30h64" stroke="#193d45" stroke-width="9"/><path d="M458 58l-65 126h49l-32 114 98-150h-55z" fill="#f4cd46"/>'],
+        novices: ['#e5a28b', '<path d="M105 275h440" stroke="#24364d" stroke-width="4"/><rect x="165" y="170" width="235" height="90" fill="#f9f4e9"/><path d="M170 165l70-100 92 78 78-105" fill="none" stroke="#24364d" stroke-width="14"/><path d="M370 40h44v44" fill="none" stroke="#24364d" stroke-width="12"/><circle cx="450" cy="220" r="44" fill="#24364d"/><path d="M428 220l17 17 30-36" fill="none" stroke="#f9f4e9" stroke-width="9"/>'],
+        agents: ['#c8d5c7', '<circle cx="320" cy="180" r="112" fill="none" stroke="#273a50" stroke-width="4"/><path d="M420 125l20 30 19-37" fill="none" stroke="#d33428" stroke-width="10"/><rect x="100" y="138" width="115" height="84" fill="#273a50"/><rect x="265" y="60" width="110" height="75" fill="#fff8eb"/><rect x="425" y="138" width="115" height="84" fill="#273a50"/><rect x="265" y="240" width="110" height="75" fill="#fff8eb"/><circle cx="138" cy="175" r="9" fill="#fff8eb"/><circle cx="175" cy="175" r="9" fill="#fff8eb"/><path d="M450 167h65m-65 25h45" stroke="#fff8eb" stroke-width="7"/>']
+      };
+      var item = illustrations[id];
+      return { svg: scene(item[1], item[0]), caption: 'Original conceptual illustration; numerical evidence is shown in the article' };
+    }
+    return ART[id] ? ART[id]() : null;
+  } };
 })();
