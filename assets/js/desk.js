@@ -321,7 +321,7 @@
     if (!u) {
       // Signing out on purpose leaves nothing private behind on this device. Being signed out
       // keeps unsent changes here, to send once you're back.
-      if (leaving && was) { forget(CACHE); forget(PENDING + ':' + was); }
+      if (leaving && was) { forget(CACHE); forget(PENDING + ':' + was); forget('nb.cat.v1:' + was); forget('nb.cat.v1:' + was + ':row'); }
       else if (was && Object.keys(pending).length) problem = 'You were signed out before every change reached the cloud. Sign in again on this device and they\'ll be sent.';
       leaving = false;
       mode = 'visitor';
@@ -396,7 +396,7 @@
      Reading the desk
      ------------------------------------------------------------ */
 
-  function setting() { return byKind('setting')[0] || null; }
+  function setting() { return byKind('setting').filter(function (r) { return !(r.data && r.data.scope); })[0] || null; }
   function projects() { return byKind('project'); }
   function current() {
     var s = setting();
@@ -454,7 +454,7 @@
      What's on screen right now (not kept)
      ------------------------------------------------------------ */
 
-  var VIEWS = ['continue', 'choose', 'capture', 'unwind', 'curiosity', 'library', 'doors', 'settings', 'signin'];
+  var VIEWS = ['continue', 'choose', 'capture', 'unwind', 'library', 'doors', 'settings', 'signin'];
   var ui = {
     view: 'home',
     energy: 'some',
@@ -477,16 +477,16 @@
     open: {}, // which folded sections are open
     preview: false,
     authError: '',
-    busy: false,
-    cur: { id: '', guess: -1, skip: false, topic: 'all' } // the curiosity post on screen
+    busy: false
   };
   function viewFromHash() {
     var h = location.hash.replace('#', '').split('/')[0];
     return VIEWS.indexOf(h) !== -1 ? h : 'home';
   }
+  // Curiosity moved to its own page; old links (#curiosity, #curiosity/<post>) go there.
   function postFromHash() {
-    var id = ui.view === 'curiosity' ? location.hash.split('/')[1] || '' : '';
-    if (id !== ui.cur.id) openPost(cardById(decodeURIComponent(id)));
+    var m = /^#curiosity(?:\/(.+))?$/.exec(location.hash);
+    if (m) location.replace('curiosity.html' + (m[1] ? '#d/' + m[1] : ''));
   }
   function resetEditing() {
     ui.stuck = false;
@@ -566,7 +566,7 @@
       '<div class="desk__under">' +
         '<nav class="desk__more" aria-label="More of the desk">' + MORE.map(function (m) {
           var on = ui.view === m[0];
-          return '<a class="desk__morelink' + (on ? ' is-on' : '') + '" href="#' + m[0] + '"' + (on ? ' aria-current="page"' : '') + '>' + esc(m[1]) + '</a>';
+          return '<a class="desk__morelink' + (on ? ' is-on' : '') + '" href="' + (m[0] === 'curiosity' ? 'curiosity.html' : '#' + m[0]) + '"' + (on ? ' aria-current="page"' : '') + '>' + esc(m[1]) + '</a>';
         }).join('') + '</nav>' +
         '<button type="button" class="btn btn--text desk__leave" data-act="leave">Or leave the screen for a while →</button>' +
       '</div>';
@@ -1173,141 +1173,6 @@
       '</section>';
   }
 
-  /* Curiosity: a feed of short posts, like a newsletter reader. Open one, guess first,
-     then read why. Missed posts, and ones you ask for, come back in about two weeks.
-     Hearts save favourites. No score. */
-  var CARDS = list(NB.curiosity).filter(function (c) { return c && c.id && c.scene && list(c.options).length > 1; });
-  var SERIES = { agents: 'Agent Notes' };
-  var FEEDS = [['all', 'All posts'], ['saved', 'Saved']];
-  var AGAIN = 14 * 86400000;
-  var HEART = '<svg class="curio__heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
-  function curState() {
-    var s = setting();
-    var c = s && s.data.curiosity;
-    return c && c.cards ? c : { at: '', cards: {} };
-  }
-  function saveCur(fn) {
-    var s = setting() || make('setting', {});
-    var c = s.data.curiosity && s.data.curiosity.cards ? s.data.curiosity : { at: '', cards: {} };
-    fn(c);
-    s.data.curiosity = c;
-    put(s);
-  }
-  function cardById(id) {
-    for (var i = 0; i < CARDS.length; i++) if (CARDS[i].id === id) return CARDS[i];
-    return null;
-  }
-  function mineOf(c) { return curState().cards[c.id] || null; }
-  function isDue(m) { return !!(m && m.again && m.again <= now()); }
-  function readTime(c) {
-    var words = [c.scene, c.ask, c.why, c.try].concat(list(c.body).map(function (s) { return list(s.p).join(' '); })).join(' ').split(/\s+/).length;
-    return Math.max(1, Math.round(words / 200)) + ' min read';
-  }
-  // The feed's order: posts due back, then new ones (taking turns between the two series), then read ones, oldest first.
-  function feedCards(which) {
-    var st = curState().cards;
-    var pool = CARDS.filter(function (c) {
-      if (which === 'saved') return st[c.id] && st[c.id].saved;
-      return which === 'all' || c.topic === which;
-    });
-    var due = pool.filter(function (c) { return isDue(st[c.id]); }).sort(function (a, b) { return st[a.id].again - st[b.id].again; });
-    var fresh = pool.filter(function (c) { return !(st[c.id] && st[c.id].when); });
-    var mixed = [];
-    var byTopic = { agents: fresh.filter(function (c) { return c.topic === 'agents'; }), talk: fresh.filter(function (c) { return c.topic === 'talk'; }) };
-    for (var i = 0; mixed.length < fresh.length; i++) {
-      if (byTopic.agents[i]) mixed.push(byTopic.agents[i]);
-      if (byTopic.talk[i]) mixed.push(byTopic.talk[i]);
-    }
-    var read = pool.filter(function (c) { return st[c.id] && st[c.id].when && !isDue(st[c.id]); }).sort(function (a, b) { return (st[a.id].when || 0) - (st[b.id].when || 0); });
-    return due.concat(mixed, read);
-  }
-  function openPost(c) {
-    ui.cur.id = c ? c.id : '';
-    ui.cur.guess = -1;
-    ui.cur.skip = false;
-  }
-  function heartBtn(c, big) {
-    var on = !!(mineOf(c) && mineOf(c).saved);
-    return '<button type="button" class="curio__save' + (on ? ' is-on' : '') + (big ? ' curio__save--big' : '') + '" data-act="cur-save" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved. Remove from saved' : 'Save this post') + '">' + HEART + (big ? '<span>' + (on ? 'Saved' : 'Save') + '</span>' : '') + '</button>';
-  }
-  function curTop(back) {
-    return '<header class="desk__top"><p class="desk__kicker">Desk · Curiosity</p>' +
-      '<p class="desk__right">' + syncHtml() + (back
-        ? '<a class="desk__out ink-link" href="#curiosity">← All posts</a>'
-        : '<a class="desk__out ink-link" href="#">← Back to the desk</a>') + '</p></header>';
-  }
-  function feedHtml() {
-    var which = ui.cur.topic;
-    var posts = feedCards(which);
-    var st = curState().cards;
-    return '<div class="curio-page">' + curTop(false) +
-      '<h1 class="curio__masthead">Curiosity</h1>' +
-      '<p class="curio__tagline">Articles on AI agents and how AI works. Each one opens with a small puzzle: guess, then read.</p>' +
-      '<nav class="curio__feeds" aria-label="Show">' + FEEDS.map(function (f) {
-        return '<button type="button" class="curio__feed' + (which === f[0] ? ' is-on' : '') + '" data-act="cur-topic" data-v="' + f[0] + '" aria-pressed="' + (which === f[0]) + '">' + esc(f[1]) + '</button>';
-      }).join('') + '</nav>' +
-      (posts.length
-        ? '<ul class="curio__list">' + posts.map(function (c) {
-            var m = st[c.id];
-            var state = isDue(m) ? '<span class="curio__new">Back again</span>' : !(m && m.when) ? '<span class="curio__new">New</span>'
-              : '<span>' + (m.right ? 'You guessed it' : m.right === false ? 'Coming back' : 'Read') + '</span>';
-            return '<li class="curio__item' + (m && m.when && !isDue(m) ? ' is-read' : '') + '">' +
-              '<a class="curio__link" href="#curiosity/' + esc(c.id) + '">' +
-                '<span class="curio__series">' + esc(SERIES[c.topic] || 'Curiosity') + '</span>' +
-                '<span class="curio__title">' + esc(c.scene) + '</span>' +
-                '<span class="curio__subtitle">' + esc(c.ask) + '</span>' +
-                '<span class="curio__meta">' + esc(readTime(c)) + ' · ' + state + '</span>' +
-              '</a>' + heartBtn(c, false) + '</li>';
-          }).join('') + '</ul>'
-        : '<p class="curio__empty">' + (which === 'saved' ? 'Nothing saved yet. Tap the heart on a post you want to keep.' : 'No posts here yet.') + '</p>') +
-      '</div>';
-  }
-  function postHtml(c) {
-    var g = ui.cur.guess;
-    var answered = g !== -1;
-    var right = g === c.answer;
-    var m = mineOf(c);
-    var comingBack = m && m.again && m.again > now();
-    var opts = '<div class="curio__opts">' + c.options.map(function (o, i) {
-      var cls = 'curio__opt' + (answered && i === c.answer ? ' is-right' : '') + (answered && i === g && !right ? ' is-picked' : '');
-      return '<button type="button" class="' + cls + '" data-act="cur-guess" data-i="' + i + '"' + (answered ? ' aria-disabled="true"' : '') + '>' + esc(o) + '</button>';
-    }).join('') + '</div>';
-    var article = '<div class="curio__article">' + list(c.body).map(function (s) {
-        return (s.h ? '<h2 class="curio__h">' + esc(s.h) + '</h2>' : '') + list(s.p).map(function (para) { return '<p class="curio__body">' + esc(para) + '</p>'; }).join('');
-      }).join('') +
-      (c.try ? '<div class="curio__try"><p class="label">Try this</p><p class="curio__body">' + esc(c.try) + '</p></div>' : '') +
-      (list(c.sources).length ? '<div class="curio__sources"><p class="label">Further reading</p><ul>' + c.sources.map(function (s) {
-        var url = safeUrl(s.url);
-        return '<li>' + (url ? '<a class="ink-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(s.title) + ' ↗</a>' : esc(s.title)) + '</li>';
-      }).join('') + '</ul></div>' : '') +
-      '</div>';
-    var reveal = answered
-      ? '<div class="curio__reveal">' +
-          '<p class="curio__verdict">' + (right ? 'Yes.' : 'Not quite. It\'s: ' + esc(c.options[c.answer]) + '.') + '</p>' +
-          '<p class="curio__body curio__why">' + esc(c.why) + '</p>' +
-        '</div>' + article
-      : ui.cur.skip ? article
-      : '<p class="curio__hint">Guess first. There\'s no score. <button type="button" class="btn btn--text" data-act="cur-skip">Skip to the article</button></p>';
-    var next = feedCards('all').filter(function (x) { return x.id !== c.id; })[0];
-    return '<div class="curio-page">' + curTop(true) +
-      '<article class="curio__post" aria-labelledby="curio-title">' +
-        '<p class="curio__series">' + esc(SERIES[c.topic] || 'Curiosity') + '</p>' +
-        '<h1 class="curio__headline" id="curio-title">' + esc(c.scene) + '</h1>' +
-        '<p class="curio__dek">' + esc(c.ask) + '</p>' +
-        '<p class="curio__byline">Written for ' + esc(me) + ' · ' + esc(readTime(c)) + '</p>' +
-        opts + '<div aria-live="polite">' + reveal + '</div>' +
-        '<footer class="curio__end">' + heartBtn(c, true) +
-          (answered && !comingBack ? '<button type="button" class="btn btn--text" data-act="cur-again">Show me this again later</button>' : '') +
-          (comingBack ? '<span class="note-mono">Coming back in about two weeks</span>' : '') +
-          (next ? '<a class="btn curio__next" href="#curiosity/' + esc(next.id) + '">Next post →</a>' : '') +
-        '</footer>' +
-      '</article></div>';
-  }
-  function curiosityHtml() {
-    var c = cardById(ui.cur.id);
-    return c ? postHtml(c) : feedHtml();
-  }
-
   function slotHtml() {
     if (ui.view === 'continue') return continueHtml();
     if (ui.view === 'choose') return chooseHtml();
@@ -1326,7 +1191,6 @@
     if (secretKey) html = '<section class="signin"><h1 class="hand-xl">The desk is switched off</h1><p class="desk__banner desk__banner--warn">assets/js/desk-config.js holds a secret key. Anyone can read that file, so the desk won\'t use it. Replace it with the publishable key, and in Supabase, create a new secret key and delete this one.</p></section>';
     else if (ui.view === 'signin' && client && mode !== 'owner') html = signinHtml();
     else if (!canEdit() || ui.preview) html = visitorHtml();
-    else if (ui.view === 'curiosity') html = curiosityHtml(); // a page of its own: nothing else on it
     else if (mode === 'owner' && !heard && !rows.length) html = '<header class="desk__top"><p class="desk__kicker">Desk</p></header><p class="muted gap-l">Opening the desk…</p>'; // a new device: wait for the cloud's copy
     else html = topHtml() + '<div class="desk__slot" id="slot">' + slotHtml() + '</div>' + (ui.view === 'doors' || ui.view === 'settings' ? '' : doorsStripHtml(false)) + footHtml();
     root.innerHTML = html;
@@ -1752,8 +1616,7 @@
     if (ui.view !== 'signin') ui.authError = '';
     render(pendingFocus || (ui.view === 'signin' ? '#si-email' : ''));
     pendingFocus = '';
-    if (ui.view === 'curiosity') window.scrollTo(0, 0);
-    else slotIntoView();
+    slotIntoView();
   });
 
   function begin(c) {
@@ -1962,43 +1825,6 @@
       var incoming = fromLegacy(legacy);
       writeJSON(LEGACY_DONE, stamp());
       bringIn(incoming, 'The earlier desk is in. ' + plural(incoming.filter(function (r) { return r.kind !== 'setting'; }).length, 'item', 'items') + ' brought across.');
-    },
-    'cur-topic': function (t) { ui.cur.topic = t.getAttribute('data-v'); render(); },
-    'cur-guess': function (t) {
-      var c = cardById(ui.cur.id);
-      if (!c || ui.cur.guess !== -1) return;
-      var i = Number(t.getAttribute('data-i'));
-      ui.cur.guess = i;
-      saveCur(function (st) {
-        var mine = st.cards[c.id] || {};
-        mine.when = now();
-        mine.right = i === c.answer;
-        mine.again = mine.right ? 0 : now() + AGAIN; // missed ones come back
-        st.cards[c.id] = mine;
-        st.at = c.id;
-      });
-      render();
-    },
-    'cur-skip': function () { ui.cur.skip = true; render(); },
-    'cur-again': function () {
-      var c = cardById(ui.cur.id);
-      if (!c) return;
-      saveCur(function (st) { st.cards[c.id] = st.cards[c.id] || { when: now() }; st.cards[c.id].again = now() + AGAIN; });
-      render();
-      say('It\'ll come back in about two weeks.');
-    },
-    'cur-save': function (t) {
-      var c = cardById(t.getAttribute('data-id'));
-      if (!c) return;
-      var on = false;
-      saveCur(function (st) {
-        var mine = st.cards[c.id] || {};
-        mine.saved = !mine.saved;
-        on = mine.saved;
-        st.cards[c.id] = mine;
-      });
-      render();
-      say(on ? 'Saved. Find it under Saved.' : 'Removed from saved.');
     },
     'skip-legacy': function () { writeJSON(LEGACY_DONE, 'skipped ' + stamp()); render(); }
   };
