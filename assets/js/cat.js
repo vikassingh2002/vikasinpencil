@@ -49,18 +49,23 @@
       '<path class="kitty__mouth" d="M60 59 q-4 5 -8 2 M60 59 q4 5 8 2"/>' +
       '<path class="kitty__whisk" d="M22 54 h16 M22 60 l16 -2 M98 54 h-16 M98 60 l-16 -2"/>' +
     '</g></svg>';
-  var cat = document.createElement('div');
-  cat.className = 'cat-buddy';
-  cat.innerHTML = CAT + '<p class="cat-buddy__say" role="status" aria-live="polite"></p>';
-  document.body.appendChild(cat);
+  // The cat is the publication's logo; now and then it says something in a small note at the bottom.
+  var toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  toast.innerHTML = '<span class="toast__cat" aria-hidden="true">' + CAT + '</span><span class="toast__text"></span>';
+  document.body.appendChild(toast);
   var moodTimer = null;
   function mood(m, line) {
-    cat.setAttribute('data-mood', m || 'idle');
-    var say = cat.querySelector('.cat-buddy__say');
+    if (!line) return;
+    toast.setAttribute('data-mood', m || 'idle');
+    toast.querySelector('.toast__text').textContent = line;
+    toast.classList.add('is-on');
     clearTimeout(moodTimer);
-    if (line) { say.textContent = line; cat.classList.add('is-talking'); }
-    moodTimer = setTimeout(function () { cat.classList.remove('is-talking'); cat.setAttribute('data-mood', 'idle'); say.textContent = ''; }, line ? 4200 : 2600);
+    moodTimer = setTimeout(function () { toast.classList.remove('is-on'); }, 3600);
   }
+  function avatar() { return '<span class="avatar" aria-hidden="true">' + CAT + '</span>'; }
 
   /* ---------- page state (not saved) ---------- */
   var ui = { route: 'home', id: '', variant: '', pick: null, order: null, many: {}, estimate: null, phase: 'predict', confidence: 0, open: {} };
@@ -83,16 +88,25 @@
   }
 
   /* ---------- pieces ---------- */
+  // Like a newsletter: a full masthead on the front page, a slim bar on posts.
   function header() {
-    var links = [['explore', 'Explore'], ['notes', 'Notes'], ['tune', 'Tune']];
+    var tabs = [['', 'Home'], ['explore', 'Explore'], ['notes', 'Notes'], ['tune', 'Tune']];
+    var here = ui.route === 'home' ? '' : ui.route;
+    var nav = '<nav class="tabs" aria-label="Curiosity Cat">' + tabs.map(function (t) {
+      return '<a href="#' + (t[0] || '/') + '"' + (here === t[0] ? ' aria-current="page"' : '') + '>' + t[1] + '</a>';
+    }).join('') + '<a class="tabs__out" href="desk.html">Desk</a></nav>';
+    if (ui.route === 'd' || ui.route === 'recap') {
+      return '<header class="bar"><a class="bar__home" href="#/">' + avatar() + '<span>Curiosity Cat</span></a>' + nav + '</header>';
+    }
+    return '<header class="mast">' +
+      '<a class="mast__logo" href="#/" aria-label="Curiosity Cat, home">' + CAT + '</a>' +
+      '<p class="mast__name"><a href="#/">Curiosity Cat</a></p>' +
+      '<p class="mast__tag">Small discoveries about AI agents and how AI works</p>' +
+    '</header>' + nav;
+  }
+  function footer() {
     var m = Store.mode();
-    return '<header class="top">' +
-      '<a class="top__brand" href="#/" aria-label="Curiosity Cat, home">' + CAT + '<span>Curiosity<em>Cat</em></span></a>' +
-      '<nav class="top__nav" aria-label="Curiosity Cat">' + links.map(function (l) {
-        return '<a href="#' + l[0] + '"' + (ui.route === l[0] ? ' aria-current="page"' : '') + '>' + l[1] + '</a>';
-      }).join('') + '<a class="top__desk" href="desk.html">Desk ↗</a></nav>' +
-      '<p class="top__sync">' + (m === 'cloud' ? 'Synced with your desk' : 'Saved in this browser · <a href="desk.html#signin">sign in to sync</a>') + '</p>' +
-    '</header>';
+    return '<footer class="foot">' + (m === 'cloud' ? 'Your progress syncs with your desk.' : 'Your progress is kept in this browser. <a href="desk.html#signin">Sign in on the desk</a> to sync it.') + '</footer>';
   }
 
   function predictPreview(d, r) {
@@ -121,42 +135,51 @@
     var item = r && r.variant ? r.variant : d;
     var html = header();
     if (u && (!d || u.id !== d.id)) {
-      var stage = S().seen[u.id].stage === 'open' ? 'you hadn\'t predicted yet' : 'the reveal is waiting for you to finish';
-      html += '<a class="resume" href="#d/' + esc(u.id) + '"><span class="resume__tag">Unfinished</span><b>' + esc(u.title) + '</b><span>' + stage + '</span><span class="resume__go">Resume →</span></a>';
+      var stage = S().seen[u.id].stage === 'open' ? 'You hadn\'t made your prediction yet.' : 'You stopped after the reveal.';
+      html += '<a class="resume" href="#d/' + esc(u.id) + '"><span class="resume__tag">Continue reading</span><b>' + esc(u.title) + '</b><span class="resume__note">' + stage + '</span></a>';
     }
     if (d) {
-      html += '<section class="hero" aria-labelledby="hero-title">' +
-        '<p class="hero__why"><span class="chip chip--' + esc(r.kind) + '">' + esc(kindLabel(item.predict.type)) + '</span>' + esc(r.reason) + '</p>' +
-        '<h1 class="hero__title" id="hero-title">' + esc(item.title || d.title) + '</h1>' +
-        '<p class="hero__hook">' + esc(item.hook) + '</p>' +
-        '<p class="hero__ask">' + esc(item.predict.prompt) + '</p>' +
+      html += '<article class="feat" aria-labelledby="feat-title">' +
+        '<p class="kicker">' + esc(r.reason) + '</p>' +
+        '<h1 class="feat__title" id="feat-title"><a href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">' + esc(item.title || d.title) + '</a></h1>' +
+        '<p class="feat__sub">' + esc(item.hook) + '</p>' +
+        '<p class="byline">' + avatar() + '<span><b>Curiosity Cat</b><span class="byline__meta">' + (d.minutes || 3) + ' min read · ' + esc(kindLabel(item.predict.type)) + '</span></span></p>' +
+        '<p class="ask">' + esc(item.predict.prompt) + '</p>' +
         predictPreview(d, r) +
-        '<div class="hero__ways">' +
-          '<a class="cat-btn" href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">Quick discovery · ' + (d.minutes || 3) + ' min</a>' +
-          '<button type="button" class="cat-btn cat-btn--quiet" data-act="deep">Deeper session · 3 discoveries</button>' +
+        '<div class="ways">' +
+          '<a class="cat-btn" href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">Read the discovery</a>' +
+          '<button type="button" class="cat-btn cat-btn--quiet" data-act="deep">Start a 3-part session</button>' +
         '</div>' +
-      '</section>';
+      '</article>';
     } else {
-      html += '<section class="hero"><h1 class="hero__title">Nothing here yet.</h1></section>';
+      html += '<article class="feat"><h1 class="feat__title">Nothing here yet.</h1></article>';
     }
-    html += '<section class="map" aria-labelledby="map-title"><h2 class="sec" id="map-title">Your map</h2>' +
-      '<p class="map__sum">' + st.discovered + ' of ' + st.total + ' discoveries · ' + st.labsDone + ' of ' + st.labsTotal + ' experiments run · ' + st.notes + (st.notes === 1 ? ' note' : ' notes') + '</p>' +
+    var more = [];
+    for (var i = 0; i < 4; i++) {
+      var n = Brain.next(S(), C, now(), (d ? [d.id] : []).concat(more.map(function (x) { return x.id; })));
+      if (!n || more.indexOf(n.d) !== -1) break;
+      more.push(n.d);
+    }
+    if (more.length) html += '<section aria-labelledby="more-title"><h2 class="sec" id="more-title">Up next</h2><ul class="posts">' + more.map(card).join('') + '</ul></section>';
+    if (saved.length) html += '<section aria-labelledby="saved-title"><h2 class="sec" id="saved-title">Saved</h2><ul class="posts">' + saved.map(card).join('') + '</ul></section>';
+    html += '<section class="map" aria-labelledby="map-title"><h2 class="sec" id="map-title">Your progress</h2>' +
+      '<p class="map__sum">' + st.discovered + ' of ' + st.total + ' discoveries · ' + st.labsDone + ' of ' + st.labsTotal + ' simulations · ' + st.notes + (st.notes === 1 ? ' note' : ' notes') + '</p>' +
       '<ul class="map__list">' + st.concepts.map(function (c) {
         var cls = c.done === c.total ? 'is-full' : c.done ? 'is-some' : '';
         return '<li class="map__node ' + cls + '"><span class="map__dot" aria-hidden="true"></span>' + esc(c.name) + '<span class="map__n">' + c.done + '/' + c.total + '</span></li>';
       }).join('') + '</ul></section>';
-    if (saved.length) {
-      html += '<section aria-labelledby="saved-title"><h2 class="sec" id="saved-title">Saved</h2><ul class="cards">' + saved.map(card).join('') + '</ul></section>';
-    }
     return html;
   }
 
+  // A post in a list: headline, subtitle and a small meta line, with a lettered thumbnail.
   function card(d) {
     var s = S().seen[d.id];
-    var state = !s ? 'New' : s.stage === 'done' ? (s.correct === false ? 'Surprised you' : 'Discovered') : 'In progress';
-    return '<li><a class="card" href="#d/' + esc(d.id) + '"><span class="card__concept">' + esc(Brain.conceptName(C, d.concept)) + '</span>' +
-      '<span class="card__title">' + esc(d.title) + '</span><span class="card__meta">' + esc(kindLabel(d.predict.type)) + ' · ' + (d.minutes || 3) + ' min · ' + state +
-      (d.lab ? ' · has a simulation' : '') + '</span></a></li>';
+    var state = !s ? 'New' : s.stage === 'done' ? (s.correct === false ? 'Surprised you' : 'Read') : 'In progress';
+    var name = Brain.conceptName(C, d.concept);
+    return '<li><a class="post" href="#d/' + esc(d.id) + '"><span class="post__text">' +
+      '<span class="post__title">' + esc(d.title) + '</span><span class="post__sub">' + esc(d.hook) + '</span>' +
+      '<span class="post__meta">' + esc(name) + ' · ' + (d.minutes || 3) + ' min read · <span class="' + (!s ? 'is-new' : '') + '">' + state + '</span>' + (d.lab ? ' · simulation' : '') + '</span></span>' +
+      '<span class="post__thumb" aria-hidden="true">' + esc(name.charAt(0)) + '</span></a></li>';
   }
 
   function explore() {
@@ -164,7 +187,7 @@
       return { c: c, ds: Brain.ordered(C).filter(function (d) { return (d.concept || 'other') === c.id; }) };
     }).filter(function (g) { return g.ds.length; });
     return header() + '<section class="page"><h1 class="page__title">Explore</h1><p class="page__lede">The suggested path runs top to bottom, but open anything. Nothing is locked.</p>' +
-      groups.map(function (g) { return '<h2 class="sec">' + esc(g.c.name) + '</h2><ul class="cards">' + g.ds.map(card).join('') + '</ul>'; }).join('') + '</section>';
+      groups.map(function (g) { return '<h2 class="sec">' + esc(g.c.name) + '</h2><ul class="posts">' + g.ds.map(card).join('') + '</ul>'; }).join('') + '</section>';
   }
 
   function notesPage() {
@@ -285,13 +308,16 @@
     var right = revealed ? grade(item) : null;
     var rv = item.reveal || {};
     var html = header() + '<article class="disc' + (revealed ? ' is-revealed' : '') + '" aria-labelledby="disc-title">' +
-      '<p class="disc__meta"><span class="chip">' + esc(Brain.conceptName(C, d.concept)) + '</span>' +
-        (v ? '<span class="chip chip--review">Back with a new scenario</span>' : '') +
-        (inSession ? '<span class="chip chip--session">Session ' + (session.ids.indexOf(d.id) + 1) + ' of ' + session.ids.length + '</span>' : '') +
-        '<button type="button" class="heart' + (S().saved[d.id] ? ' is-on' : '') + '" data-act="save" aria-pressed="' + !!S().saved[d.id] + '" aria-label="' + (S().saved[d.id] ? 'Saved' : 'Save') + '">♥</button></p>' +
-      '<h1 class="disc__title" id="disc-title">' + esc(v ? d.title : d.title) + '</h1>' +
+      '<p class="kicker">' + esc(Brain.conceptName(C, d.concept)) +
+        (v ? ' · Back with a new scenario' : '') +
+        (inSession ? ' · Part ' + (session.ids.indexOf(d.id) + 1) + ' of ' + session.ids.length : '') + '</p>' +
+      '<h1 class="disc__title" id="disc-title">' + esc(d.title) + '</h1>' +
       '<p class="disc__hook">' + esc(item.hook) + '</p>' +
-      '<p class="disc__ask"><span class="chip chip--kind">' + esc(kindLabel(item.predict.type)) + '</span>' + esc(item.predict.prompt) + '</p>' +
+      '<p class="byline">' + avatar() + '<span><b>Curiosity Cat</b><span class="byline__meta">' + (d.minutes || 3) + ' min read · ' + esc(kindLabel(item.predict.type)) + '</span></span></p>' +
+      '<div class="actions"><button type="button" class="heart' + (S().saved[d.id] ? ' is-on' : '') + '" data-act="save" aria-pressed="' + !!S().saved[d.id] + '">' +
+        '<span aria-hidden="true">' + (S().saved[d.id] ? '♥' : '♡') + '</span>' + (S().saved[d.id] ? 'Saved' : 'Save') + '</button>' +
+        '<a class="actions__all" href="#explore">All discoveries</a></div>' +
+      '<p class="disc__ask">' + esc(item.predict.prompt) + '</p>' +
       predictHtml(d, item);
     if (ui.phase === 'sure') html += confidenceHtml();
     if (ui.phase === 'predict' && ready(item) && ['choice', 'conditional', 'spot'].indexOf(item.predict.type) !== -1) html += '<button type="button" class="cat-btn" data-act="lock">Lock it in</button>';
@@ -369,7 +395,7 @@
   /* ---------- drawing ---------- */
   function render(focus) {
     var html = ui.route === 'd' ? discovery() : ui.route === 'explore' ? explore() : ui.route === 'notes' ? notesPage() : ui.route === 'tune' ? tune() : ui.route === 'recap' ? recap() : home();
-    app.innerHTML = html;
+    app.innerHTML = html + footer();
     if (ui.route === 'd' && ui.phase === 'reveal') {
       var d = Brain.byId(C, ui.id);
       var lab = document.getElementById('lab-body');
