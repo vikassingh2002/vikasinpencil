@@ -478,7 +478,7 @@
     preview: false,
     authError: '',
     busy: false,
-    cur: { id: '', guess: -1, more: false, topic: 'all', kept: false } // the curiosity card on screen
+    cur: { id: '', guess: -1, skip: false, topic: 'all' } // the curiosity post on screen
   };
   function viewFromHash() {
     var h = location.hash.replace('#', '').split('/')[0];
@@ -1177,8 +1177,8 @@
      then read why. Missed posts, and ones you ask for, come back in about two weeks.
      Hearts save favourites. No score. */
   var CARDS = list(NB.curiosity).filter(function (c) { return c && c.id && c.scene && list(c.options).length > 1; });
-  var SERIES = { agents: 'Agent Notes', talk: 'Plain Talk' };
-  var FEEDS = [['all', 'For you'], ['agents', SERIES.agents], ['talk', SERIES.talk], ['saved', 'Saved']];
+  var SERIES = { agents: 'Agent Notes' };
+  var FEEDS = [['all', 'All posts'], ['saved', 'Saved']];
   var AGAIN = 14 * 86400000;
   var HEART = '<svg class="curio__heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
   function curState() {
@@ -1200,7 +1200,7 @@
   function mineOf(c) { return curState().cards[c.id] || null; }
   function isDue(m) { return !!(m && m.again && m.again <= now()); }
   function readTime(c) {
-    var words = [c.scene, c.ask, c.why, c.more].join(' ').split(/\s+/).length;
+    var words = [c.scene, c.ask, c.why, c.try].concat(list(c.body).map(function (s) { return list(s.p).join(' '); })).join(' ').split(/\s+/).length;
     return Math.max(1, Math.round(words / 200)) + ' min read';
   }
   // The feed's order: posts due back, then new ones (taking turns between the two series), then read ones, oldest first.
@@ -1224,8 +1224,7 @@
   function openPost(c) {
     ui.cur.id = c ? c.id : '';
     ui.cur.guess = -1;
-    ui.cur.more = false;
-    ui.cur.kept = false;
+    ui.cur.skip = false;
   }
   function heartBtn(c, big) {
     var on = !!(mineOf(c) && mineOf(c).saved);
@@ -1243,7 +1242,7 @@
     var st = curState().cards;
     return '<div class="curio-page">' + curTop(false) +
       '<h1 class="curio__masthead">Curiosity</h1>' +
-      '<p class="curio__tagline">Short posts on AI agents and on saying things well. Open one, guess first, then read why.</p>' +
+      '<p class="curio__tagline">Articles on AI agents and how AI works. Each one opens with a small puzzle: guess, then read.</p>' +
       '<nav class="curio__feeds" aria-label="Show">' + FEEDS.map(function (f) {
         return '<button type="button" class="curio__feed' + (which === f[0] ? ' is-on' : '') + '" data-act="cur-topic" data-v="' + f[0] + '" aria-pressed="' + (which === f[0]) + '">' + esc(f[1]) + '</button>';
       }).join('') + '</nav>' +
@@ -1273,20 +1272,22 @@
       var cls = 'curio__opt' + (answered && i === c.answer ? ' is-right' : '') + (answered && i === g && !right ? ' is-picked' : '');
       return '<button type="button" class="' + cls + '" data-act="cur-guess" data-i="' + i + '"' + (answered ? ' aria-disabled="true"' : '') + '>' + esc(o) + '</button>';
     }).join('') + '</div>';
-    var sayBox = !c.say ? '' : ui.cur.kept
-      ? '<p class="note-mono">Your sentence is in Capture. Good ones can become field notes.</p>'
-      : '<form class="desk__form curio__say" data-form="cur-say"><label class="field-label" for="cur-say">If you like · ' + esc(c.say) + '</label>' +
-        '<textarea class="textarea textarea--hand" id="cur-say" name="text" rows="2" required></textarea>' +
-        '<button class="btn btn--line" type="submit">Keep it in Capture</button></form>';
-    var reveal = !answered
-      ? '<p class="curio__hint">Guess first. There\'s no score.</p>'
-      : '<div class="curio__reveal">' +
+    var article = '<div class="curio__article">' + list(c.body).map(function (s) {
+        return (s.h ? '<h2 class="curio__h">' + esc(s.h) + '</h2>' : '') + list(s.p).map(function (para) { return '<p class="curio__body">' + esc(para) + '</p>'; }).join('');
+      }).join('') +
+      (c.try ? '<div class="curio__try"><p class="label">Try this</p><p class="curio__body">' + esc(c.try) + '</p></div>' : '') +
+      (list(c.sources).length ? '<div class="curio__sources"><p class="label">Further reading</p><ul>' + c.sources.map(function (s) {
+        var url = safeUrl(s.url);
+        return '<li>' + (url ? '<a class="ink-link" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(s.title) + ' ↗</a>' : esc(s.title)) + '</li>';
+      }).join('') + '</ul></div>' : '') +
+      '</div>';
+    var reveal = answered
+      ? '<div class="curio__reveal">' +
           '<p class="curio__verdict">' + (right ? 'Yes.' : 'Not quite. It\'s: ' + esc(c.options[c.answer]) + '.') + '</p>' +
-          '<p class="curio__body">' + esc(c.why) + '</p>' +
-          (c.more ? (ui.cur.more ? '<p class="curio__body curio__more">' + esc(c.more) + '</p>'
-            : '<p><button type="button" class="btn btn--text" data-act="cur-more">Tell me more</button></p>') : '') +
-          sayBox +
-        '</div>';
+          '<p class="curio__body curio__why">' + esc(c.why) + '</p>' +
+        '</div>' + article
+      : ui.cur.skip ? article
+      : '<p class="curio__hint">Guess first. There\'s no score. <button type="button" class="btn btn--text" data-act="cur-skip">Skip to the article</button></p>';
     var next = feedCards('all').filter(function (x) { return x.id !== c.id; })[0];
     return '<div class="curio-page">' + curTop(true) +
       '<article class="curio__post" aria-labelledby="curio-title">' +
@@ -1978,7 +1979,7 @@
       });
       render();
     },
-    'cur-more': function () { ui.cur.more = true; render(); },
+    'cur-skip': function () { ui.cur.skip = true; render(); },
     'cur-again': function () {
       var c = cardById(ui.cur.id);
       if (!c) return;
@@ -2148,15 +2149,6 @@
       if (id === 'new' && fold) ui.open[fold.getAttribute('data-keep')] = true; // ready for the next one
       render(id === 'new' ? '#lf-title-new' : '');
       if (id === 'new') say(r.data.shelf === 'unwind' ? 'Saved for an evening.' : 'Added to the Library.');
-    },
-    'cur-say': function (val) {
-      var c = cardById(ui.cur.id);
-      var text = val('text');
-      if (!c || !text) return;
-      put(make('idea', { text: text + '\n\n(From Curiosity: ' + c.scene + ')', kind: 'thought' }));
-      ui.cur.kept = true;
-      render();
-      say('Kept in Capture.');
     },
     offline: function (val) { var text = val('text'); if (text) { put(make('offline', { text: text })); render('#off-new'); } },
     link: function (val, form) {
