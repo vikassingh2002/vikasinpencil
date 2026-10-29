@@ -24,3 +24,5 @@ Stable routes:
 The earlier undated/evergreen draft collection is preserved in `content/archive/ai-background-2026-10-29.js`. It is not loaded as the October 26 issue. Browser and cloud reading data are retained.
 
 Editorial mix: the current edition contains eight 5–6 minute briefings/explainers and four shorter news analyses. Reading time is calculated from the actual body at 200 words per minute. Do not lengthen read-time labels without adding substantive content.
+
+Back issues dated 28 September, 5 October, 12 October and 19 October 2026 were assembled retrospectively on 29 October, each with its own news window, digest, short reads and public-domain cover painting. Their article photographs come from Wikimedia Commons; credits are in `assets/img/editorial/credits.md`. There is no Node on the author's laptop, so the same checks as `tools/validate-editions.cjs` were run with a Python port before publishing.
