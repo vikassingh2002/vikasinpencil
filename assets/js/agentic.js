@@ -9,6 +9,8 @@
   var NB = window.NB || {};
   var A = NB.aiArticles || { sections: [], articles: [] };
   var Store = window.CatStore;
+  var Art = window.AgenticArt || { get: function () { return null; } };
+  var menuOpen = false;
   var app = document.getElementById('cat');
   if (!app || !Store) return;
 
@@ -52,7 +54,10 @@
   /* ---------- pieces ---------- */
   function masthead() {
     var here = route.name === 'section' ? route.id : route.name === 'article' ? (byId(route.id) || {}).section : route.name;
-    return '<header class="mast"><a class="mast__name" href="#/">Agentic AI</a>' +
+    return '<header class="mast"><div class="mast__top">' +
+      '<button type="button" class="menu-btn" data-act="menu" aria-expanded="' + menuOpen + '" aria-controls="menu"><span class="menu-btn__icon" aria-hidden="true"></span>Menu</button>' +
+      '<a class="mast__name" href="#/">Agentic AI</a>' +
+      '<a class="mast__saved" href="#saved">Saved</a></div>' +
       '<nav class="tabs" aria-label="Sections">' +
         '<a href="#/"' + (route.name === 'front' ? ' aria-current="page"' : '') + '>Latest</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
@@ -60,10 +65,26 @@
         '<a class="tabs__out" href="desk.html">Desk</a>' +
       '</nav></header>';
   }
+  function menu() {
+    if (!menuOpen) return '';
+    return '<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu"><div class="menu__panel">' +
+      '<div class="menu__head"><span class="mast__name">Agentic AI</span><button type="button" class="menu__close" data-act="menu" aria-label="Close menu">×</button></div>' +
+      '<a class="menu__home" href="#/">Latest</a>' +
+      '<h2 class="menu__title">Sections</h2><ul class="menu__list">' + sections().map(function (s) {
+        return '<li><a href="#s/' + esc(s.id) + '">' + esc(s.name) + '</a></li>';
+      }).join('') + '</ul>' +
+      '<h2 class="menu__title">Topics</h2><ul class="menu__list menu__list--topics">' + articles.map(function (x) {
+        return '<li><a href="#a/' + esc(x.id) + '">' + esc(x.fly || x.title) + '</a></li>';
+      }).join('') + '</ul>' +
+      '<h2 class="menu__title">Your reading</h2><ul class="menu__list"><li><a href="#saved">Saved articles</a></li><li><a href="desk.html">Back to the desk</a></li></ul>' +
+    '</div><button type="button" class="menu__shade" data-act="menu" aria-label="Close menu" tabindex="-1"></button></div>';
+  }
   function footer() { return '<footer class="foot">Agentic AI · written for ' + esc(String((NB.site || {}).name || 'you').split(' ')[0]) + ' · reviewed ' + esc(econDate(A.reviewed)) + '</footer>'; }
 
   function teaser(a, big) {
+    var pic = Art.get(a.id);
     return '<li class="story' + (big ? ' story--big' : '') + (isRead(a) ? ' is-read' : '') + '"><a href="#a/' + esc(a.id) + '">' +
+      (pic ? '<span class="story__img" aria-hidden="true">' + pic.svg + '</span>' : '') +
       '<span class="fly">' + esc(a.fly || sectionName(a.section)) + '</span>' +
       '<span class="story__title">' + esc(a.title) + '</span>' +
       '<span class="story__rubric">' + esc(a.rubric) + '</span>' +
@@ -119,6 +140,7 @@
       '<p class="art__rubric">' + esc(a.rubric) + '</p>' +
       '<div class="art__bar"><p class="dateline">' + esc(econDate(a.date || A.reviewed)) + ' <span>|</span> ' + (a.minutes || 3) + ' min read</p>' +
         '<button type="button" class="save' + (on ? ' is-on' : '') + '" data-act="save" aria-pressed="' + on + '"><span aria-hidden="true">' + (on ? '★' : '☆') + '</span> ' + (on ? 'Saved' : 'Save') + '</button></div>' +
+      (Art.get(a.id) ? '<figure class="art__fig">' + Art.get(a.id).svg + '<figcaption>' + esc(Art.get(a.id).caption) + '</figcaption></figure>' : '') +
       '<div class="art__body">' + body + '</div>' +
       (list(a.sources).length ? '<aside class="art__sources" aria-label="Sources"><h2>Sources</h2><ul>' + a.sources.map(function (x) {
         var u = safeUrl(x.url);
@@ -144,7 +166,7 @@
       Store.update(function (s) { var x = s.seen[route.id] || {}; x.stage = 'done'; x.at = Date.now(); s.seen[route.id] = x; });
     }
     var html = route.name === 'article' ? article() : route.name === 'section' ? section() : route.name === 'saved' ? saved() : front();
-    app.innerHTML = html + footer();
+    app.innerHTML = html + footer() + menu();
     document.title = (route.name === 'article' ? byId(route.id).title + ' | ' : '') + 'Agentic AI';
   }
   function go() {
@@ -155,6 +177,14 @@
   }
 
   app.addEventListener('click', function (e) {
+    var m = e.target.closest && e.target.closest('[data-act="menu"]');
+    if (m) {
+      menuOpen = !menuOpen;
+      render();
+      var f = app.querySelector(menuOpen ? '.menu__close' : '.menu-btn');
+      if (f) f.focus();
+      return;
+    }
     var t = e.target.closest && e.target.closest('[data-act="save"]');
     if (!t) return;
     var id = route.id;
@@ -164,7 +194,10 @@
     var b = app.querySelector('[data-act="save"]');
     if (b) b.focus();
   });
-  window.addEventListener('hashchange', go);
+  window.addEventListener('hashchange', function () { menuOpen = false; go(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menuOpen) { menuOpen = false; render(); var b = app.querySelector('.menu-btn'); if (b) b.focus(); }
+  });
 
   app.innerHTML = '<p class="loading">Loading…</p>';
   Store.init().then(function (mode) {
