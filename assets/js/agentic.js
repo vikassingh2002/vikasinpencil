@@ -98,7 +98,7 @@
     var here = route.name === 'section' ? route.id : '';
     return '<header class="app-top"><div class="app-top__row">' +
       '<button type="button" class="icon-btn" data-act="menu" aria-label="Menu" aria-expanded="' + menuOpen + '">' + icon('menu') + '</button>' +
-      '<a class="wordmark" href="#/" aria-label="Agentic AI home"><span>Agentic</span> <span>AI</span></a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
+      '<a class="wordmark" href="#/" aria-label="Agentic AI home"><span>Agentic</span> <span>AI</span></a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="/desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
       '<nav class="app-tabs" aria-label="Sections"><a href="#weekly">Weekly edition</a><a href="#brief">AI in brief</a><a href="#/"' + (route.name === 'today' ? ' aria-current="page"' : '') + '>Home</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
       '</nav></header>';
@@ -147,12 +147,12 @@
       block('AI in brief') + '<ul class="carousel brief-carousel">' + [edition().leadId].concat(list(edition().chunkIds)).map(function(id,i){var a=byId(id);return '<li class="slide"><a href="#brief/' + esc(edition().id) + '/' + i + '">' + picture(a,'slide__img') + '<span class="slide__title">' + esc(i?a.title:'AI’s week: capital, chips and control') + '</span><span class="brief-card-date">' + esc(econDate(edition().date)) + '</span></a></li>';}).join('') + '</ul>' +
       block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
 
-    html += '<a class="edition-feature" href="#weekly/' + esc(edition().id) + '"><span class="edition-feature__image"><img src="' + esc(edition().cover) + '" alt="" loading="lazy"></span><span class="edition-feature__text"><span class="fly">The weekly edition · ' + esc(econDate(edition().date)) + '</span><strong>' + esc(edition().title) + '</strong><span>' + esc(edition().subtitle) + '</span><b>Read the edition →</b></span></a>';
+    html += '<a class="edition-feature" href="#weekly/' + esc(edition().id) + '"><span class="edition-feature__image"><img src="' + esc('/' + edition().cover.replace(/^\/+/, '')) + '" alt="" loading="lazy"></span><span class="edition-feature__text"><span class="fly">The weekly edition · ' + esc(econDate(edition().date)) + '</span><strong>' + esc(edition().title) + '</strong><span>' + esc(edition().subtitle) + '</span><b>Read the edition →</b></span></a>';
     sections().forEach(function (s) {
       var inS = articles.filter(function (a) { return a.section === s.id; });
       html += '<section class="newspaper-section">' + block(s.name) + '<div class="section-stories">' + inS.slice(0, 3).map(function (a) { return bigCard(a); }).join('') + '</div>' + (inS.length > 3 ? '<ul class="rows section-rest">' + inS.slice(3).map(row).join('') + '</ul>' : '') + '</section>';
     });
-    return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="assets/img/editorial/credits.md">Image credits</a><a href="desk.html">Vikas in Pencil</a></nav></footer></main>';
+    return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="/assets/img/editorial/credits.md">Image credits</a><button type="button" class="install-link" data-install-agentic>Install app</button><a href="/desk.html">Vikas in Pencil</a></nav></footer></main>';
   }
 
   function sectionPage() {
@@ -205,7 +205,7 @@
       '<nav class="brief-dots" aria-label="AI in Brief stories">' + Array.from({length:b.count},function(_,i){return '<a href="#brief/' + esc(e.id) + '/' + i + '"' + (i===b.index?' aria-current="page"':'') + ' aria-label="' + (i===0?'News digest':'Short read '+i) + '"><span></span></a>';}).join('') + '</nav>';
   }
   function editionCard(e) {
-    return '<a class="edition-card" href="#weekly/' + esc(e.id) + '"><img src="' + esc(e.cover) + '" alt="Cover artwork for ' + esc(e.title) + '"><time>' + esc(econDate(e.date,true)) + '</time><h2>' + esc(e.title) + '</h2><p>' + e.articleIds.length + ' articles · ' + esc(e.coverageStart) + '–' + esc(e.coverageEnd) + '</p></a>';
+    return '<a class="edition-card" href="#weekly/' + esc(e.id) + '"><img src="' + esc('/' + e.cover.replace(/^\/+/, '')) + '" alt="Cover artwork for ' + esc(e.title) + '"><time>' + esc(econDate(e.date,true)) + '</time><h2>' + esc(e.title) + '</h2><p>' + e.articleIds.length + ' articles · ' + esc(e.coverageStart) + '–' + esc(e.coverageEnd) + '</p></a>';
   }
   function editionArchive() {
     return topbar() + '<main class="app-main"><header class="sec-head"><h1>Browse editions</h1><p>A new issue every Monday. Each edition keeps its own cover, contents and links.</p></header><div class="edition-archive">' + editions.map(editionCard).join('') + '</div><p class="edition-colophon">New editions appear here after publication. Future dates are not published issues.</p></main>';
@@ -215,7 +215,7 @@
     var issue = issueArticles(e);
     return '<div class="weekly-desktop-mast">' + topbar() + '</div><header class="weekly-top"><h1>Weekly</h1><a href="#editions">Browse editions</a></header>' +
       '<nav class="weekly-tabs" aria-label="In this edition"><a href="#brief/' + esc(e.id) + '">AI this week</a>' + sections().map(function(s){return '<a href="#weekly/' + esc(e.id) + '/' + esc(s.id) + '">' + esc(s.name) + '</a>';}).join('') + '</nav>' +
-      '<main class="weekly"><div class="weekly-cover-block"><a class="issue-cover" href="#a/' + esc(e.leadId) + '"><img src="' + esc(e.cover) + '" alt="Original illustration for ' + esc(e.title) + '"><span class="issue-cover__mast">Agentic<br>AI</span><span class="issue-cover__lines">' + issue.slice(1,4).map(function(a){return '<span>' + esc(a.title) + '</span>';}).join('') + '<span>' + esc(econDate(e.coverageStart,true)) + '–' + esc(econDate(e.coverageEnd,true)) + '</span></span><strong>' + esc(e.title) + '</strong></a><p class="weekly__date">' + esc(econDate(e.date,true)) + '</p><h2 class="weekly__title">' + esc(e.title) + '</h2></div>' +
+      '<main class="weekly"><div class="weekly-cover-block"><a class="issue-cover" href="#a/' + esc(e.leadId) + '"><img src="' + esc('/' + e.cover.replace(/^\/+/, '')) + '" alt="Original illustration for ' + esc(e.title) + '"><span class="issue-cover__mast">Agentic<br>AI</span><span class="issue-cover__lines">' + issue.slice(1,4).map(function(a){return '<span>' + esc(a.title) + '</span>';}).join('') + '<span>' + esc(econDate(e.coverageStart,true)) + '–' + esc(econDate(e.coverageEnd,true)) + '</span></span><strong>' + esc(e.title) + '</strong></a><p class="weekly__date">' + esc(econDate(e.date,true)) + '</p><h2 class="weekly__title">' + esc(e.title) + '</h2></div>' +
       '<div class="weekly-contents"><p class="issue-intro">' + esc(e.subtitle) + '</p><p class="issue-count">' + issue.length + ' articles · A Monday publication</p>' + sections().map(function(s){return '<section id="issue-' + esc(s.id) + '">' + block(s.name) + '<ul class="rows">' + issue.filter(function(a){return a.section===s.id;}).map(row).join('') + '</ul></section>';}).join('') + '<p class="edition-colophon">' + esc(e.notes) + '</p></div></main>';
   }
 
@@ -274,14 +274,14 @@
       '<h2 class="menu__title">Topics</h2><ul class="menu__list menu__list--topics">' + articles.map(function (x) {
         return '<li><a href="#a/' + esc(x.id) + '">' + esc(x.fly || x.title) + '</a></li>';
       }).join('') + '</ul>' +
-      '<h2 class="menu__title">Your reading</h2><ul class="menu__list"><li><a href="#weekly">Weekly issue</a></li><li><a href="#foryou">For you</a></li><li><a href="#saved">Saved articles</a></li><li><a href="#brief">In brief</a></li><li><a href="desk.html">Back to the desk</a></li></ul>' +
+      '<h2 class="menu__title">Your reading</h2><ul class="menu__list"><li><a href="#weekly">Weekly issue</a></li><li><a href="#foryou">For you</a></li><li><a href="#saved">Saved articles</a></li><li><a href="#brief">In brief</a></li><li><button type="button" class="install-link" data-install-agentic>Install Agentic AI</button></li><li><a href="/desk.html">Back to the desk</a></li></ul>' +
     '</div><button type="button" class="menu__shade" data-act="menu" aria-label="Close menu" tabindex="-1"></button></div>';
   }
 
   function privateNotice() {
     return '<header class="app-top"><div class="app-top__row"><span class="icon-btn icon-btn--ghost"></span><span class="wordmark"><span>Agentic</span> <span>AI</span></span><span class="icon-btn icon-btn--ghost"></span></div></header>' +
-      '<main class="app-main"><header class="sec-head"><h1>This publication is private</h1><p>Agentic AI is a personal reading room. Sign in on the desk to read it.</p>' +
-      '<a class="follow" href="desk.html#signin">Sign in on the desk</a></header></main>';
+      '<main class="app-main"><header class="sec-head"><h1>This publication is private</h1><p>Agentic AI is a personal reading room. ' + (navigator.onLine === false ? 'Reconnect to verify your desk sign-in and read the magazine.' : 'Sign in on the desk to read it.') + '</p>' +
+      '<a class="follow" href="/desk.html#signin">Sign in on the desk</a></header></main>';
   }
 
   /* ---------- reading aloud, with the device's own voice ---------- */
