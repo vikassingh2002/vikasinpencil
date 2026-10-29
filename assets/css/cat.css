@@ -47,6 +47,7 @@ body {
 a { color: inherit; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+[tabindex="-1"]:focus { outline: none; } /* headings get focus after each page change for screen readers; no ring needed */
 h1, h2, h3, h4, p { margin: 0; }
 .skip { position: absolute; left: -999px; top: 8px; padding: 8px 14px; background: var(--accent); color: var(--accent-ink); border-radius: 8px; z-index: 10; }
 .skip:focus { left: 12px; }
