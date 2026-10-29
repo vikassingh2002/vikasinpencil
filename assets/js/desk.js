@@ -481,8 +481,12 @@
     cur: { id: '', guess: -1, more: false, topic: 'all', kept: false } // the curiosity card on screen
   };
   function viewFromHash() {
-    var h = location.hash.replace('#', '');
+    var h = location.hash.replace('#', '').split('/')[0];
     return VIEWS.indexOf(h) !== -1 ? h : 'home';
+  }
+  function postFromHash() {
+    var id = ui.view === 'curiosity' ? location.hash.split('/')[1] || '' : '';
+    if (id !== ui.cur.id) openPost(cardById(decodeURIComponent(id)));
   }
   function resetEditing() {
     ui.stuck = false;
@@ -1169,11 +1173,14 @@
       '</section>';
   }
 
-  /* Curiosity: a page of its own, one card at a time. Guess first, then see why.
-     Cards you miss, or ask to see again, come back in about two weeks. No score. */
+  /* Curiosity: a feed of short posts, like a newsletter reader. Open one, guess first,
+     then read why. Missed posts, and ones you ask for, come back in about two weeks.
+     Hearts save favourites. No score. */
   var CARDS = list(NB.curiosity).filter(function (c) { return c && c.id && c.scene && list(c.options).length > 1; });
-  var TOPICS = [['all', 'Both'], ['agents', 'AI agents'], ['talk', 'Communication']];
+  var SERIES = { agents: 'Agent Notes', talk: 'Plain Talk' };
+  var FEEDS = [['all', 'For you'], ['agents', SERIES.agents], ['talk', SERIES.talk], ['saved', 'Saved']];
   var AGAIN = 14 * 86400000;
+  var HEART = '<svg class="curio__heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
   function curState() {
     var s = setting();
     var c = s && s.data.curiosity;
@@ -1190,51 +1197,78 @@
     for (var i = 0; i < CARDS.length; i++) if (CARDS[i].id === id) return CARDS[i];
     return null;
   }
-  function inTopic(c) { return ui.cur.topic === 'all' || c.topic === ui.cur.topic; }
-  // What comes next: a card that's due back, then a new one (taking turns between topics), then the one seen longest ago.
-  function nextCard(after) {
-    var seen = curState().cards;
-    var pool = CARDS.filter(function (c) { return inTopic(c) && c.id !== after; });
-    if (!pool.length) pool = CARDS.filter(inTopic);
-    if (!pool.length) return null;
-    var due = pool.filter(function (c) { return seen[c.id] && seen[c.id].again && seen[c.id].again <= now(); })
-      .sort(function (a, b) { return seen[a.id].again - seen[b.id].again; })[0];
-    if (due) return due;
-    var fresh = pool.filter(function (c) { return !seen[c.id]; });
-    if (fresh.length) {
-      var last = cardById(after);
-      var turn = ui.cur.topic === 'all' && last ? fresh.filter(function (c) { return c.topic !== last.topic; })[0] : null;
-      return turn || fresh[0];
-    }
-    return pool.slice().sort(function (a, b) { return (seen[a.id].when || 0) - (seen[b.id].when || 0); })[0];
+  function mineOf(c) { return curState().cards[c.id] || null; }
+  function isDue(m) { return !!(m && m.again && m.again <= now()); }
+  function readTime(c) {
+    var words = [c.scene, c.ask, c.why, c.more].join(' ').split(/\s+/).length;
+    return Math.max(1, Math.round(words / 200)) + ' min read';
   }
-  function showCard(c) {
+  // The feed's order: posts due back, then new ones (taking turns between the two series), then read ones, oldest first.
+  function feedCards(which) {
+    var st = curState().cards;
+    var pool = CARDS.filter(function (c) {
+      if (which === 'saved') return st[c.id] && st[c.id].saved;
+      return which === 'all' || c.topic === which;
+    });
+    var due = pool.filter(function (c) { return isDue(st[c.id]); }).sort(function (a, b) { return st[a.id].again - st[b.id].again; });
+    var fresh = pool.filter(function (c) { return !(st[c.id] && st[c.id].when); });
+    var mixed = [];
+    var byTopic = { agents: fresh.filter(function (c) { return c.topic === 'agents'; }), talk: fresh.filter(function (c) { return c.topic === 'talk'; }) };
+    for (var i = 0; mixed.length < fresh.length; i++) {
+      if (byTopic.agents[i]) mixed.push(byTopic.agents[i]);
+      if (byTopic.talk[i]) mixed.push(byTopic.talk[i]);
+    }
+    var read = pool.filter(function (c) { return st[c.id] && st[c.id].when && !isDue(st[c.id]); }).sort(function (a, b) { return (st[a.id].when || 0) - (st[b.id].when || 0); });
+    return due.concat(mixed, read);
+  }
+  function openPost(c) {
     ui.cur.id = c ? c.id : '';
     ui.cur.guess = -1;
     ui.cur.more = false;
     ui.cur.kept = false;
   }
-  function currentCard() {
-    var c = cardById(ui.cur.id);
-    if (c && inTopic(c)) return c;
-    var st = curState();
-    var at = cardById(st.at);
-    showCard(at && inTopic(at) && !st.cards[at.id] ? at : nextCard('')); // pick up where you stopped
-    return cardById(ui.cur.id);
+  function heartBtn(c, big) {
+    var on = !!(mineOf(c) && mineOf(c).saved);
+    return '<button type="button" class="curio__save' + (on ? ' is-on' : '') + (big ? ' curio__save--big' : '') + '" data-act="cur-save" data-id="' + esc(c.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved. Remove from saved' : 'Save this post') + '">' + HEART + (big ? '<span>' + (on ? 'Saved' : 'Save') + '</span>' : '') + '</button>';
   }
-  function curiosityHtml() {
-    var c = currentCard();
-    var top = '<header class="desk__top"><p class="desk__kicker">Desk · Curiosity</p>' +
-      '<p class="desk__right">' + syncHtml() + '<a class="desk__out ink-link" href="#">← Back to the desk</a></p></header>' +
-      '<div class="lib-chips curio__topics" role="group" aria-label="Topic">' + TOPICS.map(function (t) {
-        return '<button type="button" class="lib-chip" data-act="cur-topic" data-v="' + t[0] + '" aria-pressed="' + (ui.cur.topic === t[0]) + '">' + esc(t[1]) + '</button>';
-      }).join('') + '</div>';
-    if (!c) return '<div class="curio-page">' + top + '<p class="hand-m gap-l">No cards here yet.</p></div>';
+  function curTop(back) {
+    return '<header class="desk__top"><p class="desk__kicker">Desk · Curiosity</p>' +
+      '<p class="desk__right">' + syncHtml() + (back
+        ? '<a class="desk__out ink-link" href="#curiosity">← All posts</a>'
+        : '<a class="desk__out ink-link" href="#">← Back to the desk</a>') + '</p></header>';
+  }
+  function feedHtml() {
+    var which = ui.cur.topic;
+    var posts = feedCards(which);
+    var st = curState().cards;
+    return '<div class="curio-page">' + curTop(false) +
+      '<h1 class="curio__masthead">Curiosity</h1>' +
+      '<p class="curio__tagline">Short posts on AI agents and on saying things well. Open one, guess first, then read why.</p>' +
+      '<nav class="curio__feeds" aria-label="Show">' + FEEDS.map(function (f) {
+        return '<button type="button" class="curio__feed' + (which === f[0] ? ' is-on' : '') + '" data-act="cur-topic" data-v="' + f[0] + '" aria-pressed="' + (which === f[0]) + '">' + esc(f[1]) + '</button>';
+      }).join('') + '</nav>' +
+      (posts.length
+        ? '<ul class="curio__list">' + posts.map(function (c) {
+            var m = st[c.id];
+            var state = isDue(m) ? '<span class="curio__new">Back again</span>' : !(m && m.when) ? '<span class="curio__new">New</span>'
+              : '<span>' + (m.right ? 'You guessed it' : m.right === false ? 'Coming back' : 'Read') + '</span>';
+            return '<li class="curio__item' + (m && m.when && !isDue(m) ? ' is-read' : '') + '">' +
+              '<a class="curio__link" href="#curiosity/' + esc(c.id) + '">' +
+                '<span class="curio__series">' + esc(SERIES[c.topic] || 'Curiosity') + '</span>' +
+                '<span class="curio__title">' + esc(c.scene) + '</span>' +
+                '<span class="curio__subtitle">' + esc(c.ask) + '</span>' +
+                '<span class="curio__meta">' + esc(readTime(c)) + ' · ' + state + '</span>' +
+              '</a>' + heartBtn(c, false) + '</li>';
+          }).join('') + '</ul>'
+        : '<p class="curio__empty">' + (which === 'saved' ? 'Nothing saved yet. Tap the heart on a post you want to keep.' : 'No posts here yet.') + '</p>') +
+      '</div>';
+  }
+  function postHtml(c) {
     var g = ui.cur.guess;
     var answered = g !== -1;
     var right = g === c.answer;
-    var mine = curState().cards[c.id];
-    var comingBack = mine && mine.again && mine.again > now();
+    var m = mineOf(c);
+    var comingBack = m && m.again && m.again > now();
     var opts = '<div class="curio__opts">' + c.options.map(function (o, i) {
       var cls = 'curio__opt' + (answered && i === c.answer ? ' is-right' : '') + (answered && i === g && !right ? ' is-picked' : '');
       return '<button type="button" class="' + cls + '" data-act="cur-guess" data-i="' + i + '"' + (answered ? ' aria-disabled="true"' : '') + '>' + esc(o) + '</button>';
@@ -1248,23 +1282,29 @@
       ? '<p class="curio__hint">Guess first. There\'s no score.</p>'
       : '<div class="curio__reveal">' +
           '<p class="curio__verdict">' + (right ? 'Yes.' : 'Not quite. It\'s: ' + esc(c.options[c.answer]) + '.') + '</p>' +
-          '<p class="prose">' + esc(c.why) + '</p>' +
-          (ui.cur.more && c.more ? '<p class="prose curio__more">' + esc(c.more) + '</p>' : '') +
+          '<p class="curio__body">' + esc(c.why) + '</p>' +
+          (c.more ? (ui.cur.more ? '<p class="curio__body curio__more">' + esc(c.more) + '</p>'
+            : '<p><button type="button" class="btn btn--text" data-act="cur-more">Tell me more</button></p>') : '') +
           sayBox +
-          '<div class="actions">' +
-            '<button type="button" class="btn" data-act="cur-next">Next curiosity</button>' +
-            (!ui.cur.more && c.more ? '<button type="button" class="btn btn--line" data-act="cur-more">Tell me more</button>' : '') +
-            (comingBack ? '<span class="note-mono curio__back">Coming back in about two weeks</span>'
-              : '<button type="button" class="btn btn--text" data-act="cur-again">Show me this again later</button>') +
-          '</div>' +
         '</div>';
-    return '<div class="curio-page">' + top +
-      '<article class="curio" aria-labelledby="curio-scene">' +
-        '<p class="label">' + (c.topic === 'agents' ? 'AI agents' : 'Communication') + '</p>' +
-        '<p class="curio__scene" id="curio-scene">' + esc(c.scene) + '</p>' +
-        '<p class="curio__ask">' + esc(c.ask) + '</p>' + opts +
-        '<div aria-live="polite">' + reveal + '</div>' +
+    var next = feedCards('all').filter(function (x) { return x.id !== c.id; })[0];
+    return '<div class="curio-page">' + curTop(true) +
+      '<article class="curio__post" aria-labelledby="curio-title">' +
+        '<p class="curio__series">' + esc(SERIES[c.topic] || 'Curiosity') + '</p>' +
+        '<h1 class="curio__headline" id="curio-title">' + esc(c.scene) + '</h1>' +
+        '<p class="curio__dek">' + esc(c.ask) + '</p>' +
+        '<p class="curio__byline">Written for ' + esc(me) + ' · ' + esc(readTime(c)) + '</p>' +
+        opts + '<div aria-live="polite">' + reveal + '</div>' +
+        '<footer class="curio__end">' + heartBtn(c, true) +
+          (answered && !comingBack ? '<button type="button" class="btn btn--text" data-act="cur-again">Show me this again later</button>' : '') +
+          (comingBack ? '<span class="note-mono">Coming back in about two weeks</span>' : '') +
+          (next ? '<a class="btn curio__next" href="#curiosity/' + esc(next.id) + '">Next post →</a>' : '') +
+        '</footer>' +
       '</article></div>';
+  }
+  function curiosityHtml() {
+    var c = cardById(ui.cur.id);
+    return c ? postHtml(c) : feedHtml();
   }
 
   function slotHtml() {
@@ -1707,6 +1747,7 @@
     resetEditing();
     ui.stuck = keepStuck;
     ui.view = viewFromHash();
+    postFromHash();
     if (ui.view !== 'signin') ui.authError = '';
     render(pendingFocus || (ui.view === 'signin' ? '#si-email' : ''));
     pendingFocus = '';
@@ -1921,7 +1962,7 @@
       writeJSON(LEGACY_DONE, stamp());
       bringIn(incoming, 'The earlier desk is in. ' + plural(incoming.filter(function (r) { return r.kind !== 'setting'; }).length, 'item', 'items') + ' brought across.');
     },
-    'cur-topic': function (t) { ui.cur.topic = t.getAttribute('data-v'); showCard(null); render(); },
+    'cur-topic': function (t) { ui.cur.topic = t.getAttribute('data-v'); render(); },
     'cur-guess': function (t) {
       var c = cardById(ui.cur.id);
       if (!c || ui.cur.guess !== -1) return;
@@ -1945,12 +1986,18 @@
       render();
       say('It\'ll come back in about two weeks.');
     },
-    'cur-next': function () {
-      var n = nextCard(ui.cur.id);
-      showCard(n);
-      if (n) saveCur(function (st) { st.at = n.id; });
+    'cur-save': function (t) {
+      var c = cardById(t.getAttribute('data-id'));
+      if (!c) return;
+      var on = false;
+      saveCur(function (st) {
+        var mine = st.cards[c.id] || {};
+        mine.saved = !mine.saved;
+        on = mine.saved;
+        st.cards[c.id] = mine;
+      });
       render();
-      window.scrollTo(0, 0);
+      say(on ? 'Saved. Find it under Saved.' : 'Removed from saved.');
     },
     'skip-legacy': function () { writeJSON(LEGACY_DONE, 'skipped ' + stamp()); render(); }
   };
@@ -2159,6 +2206,7 @@
   }
 
   ui.view = viewFromHash();
+  postFromHash();
   start();
   if (mode === 'local' && ui.view !== 'home') slotIntoView();
 })();
