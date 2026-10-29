@@ -1,15 +1,31 @@
 {
-  "name": "Desk · Vikas in Pencil",
+  "name": "Desk \u00b7 Vikas in Pencil",
   "short_name": "Desk",
   "description": "A desk for choosing what to do next.",
-  "start_url": "desk.html",
-  "scope": "./",
+  "start_url": "/desk.html",
+  "scope": "/desk.html",
   "display": "standalone",
   "background_color": "#12304F",
   "theme_color": "#12304F",
   "icons": [
-    { "src": "assets/img/desk-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "assets/img/desk-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "assets/img/desk-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+    {
+      "src": "assets/img/desk-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/img/desk-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/img/desk-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "/desk.html"
 }

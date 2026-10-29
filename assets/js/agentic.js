@@ -1,14 +1,10 @@
-/* Agentic AI: a private reading app about AI, built like a news magazine's phone app (curiosity.html).
-   Articles: content/ai-articles.js · Pictures: agentic-art.js · Saving reads, saved and followed: cat-store.js
-   Routes: #/ Today · #s/<section> · #a/<article> · #weekly · #foryou · #saved · #brief
-   Only the desk's owner can read it; everyone else sees a short private notice.
-   The page's code and articles are still public in the site's repository. */
+/* Agentic AI: public magazine. Reading preferences stay in this browser, independently of Desk. */
 (function () {
   'use strict';
 
   var NB = window.NB || {};
   var A = NB.aiArticles || { sections: [], articles: [] };
-  var Store = window.CatStore;
+  var Store = window.AgenticStore;
   var Art = window.AgenticArt || { get: function () { return null; } };
   var app = document.getElementById('cat');
   if (!app || !Store) return;
@@ -98,7 +94,7 @@
     var here = route.name === 'section' ? route.id : '';
     return '<header class="app-top"><div class="app-top__row">' +
       '<button type="button" class="icon-btn" data-act="menu" aria-label="Menu" aria-expanded="' + menuOpen + '">' + icon('menu') + '</button>' +
-      '<a class="wordmark" href="#/" aria-label="Agentic AI home"><span>Agentic</span> <span>AI</span></a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="/desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
+      '<a class="wordmark" href="#/" aria-label="Agentic AI home"><span>Agentic</span> <span>AI</span></a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
       '<nav class="app-tabs" aria-label="Sections"><a href="#weekly">Weekly edition</a><a href="#brief">AI in brief</a><a href="#/"' + (route.name === 'today' ? ' aria-current="page"' : '') + '>Home</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
       '</nav></header>';
@@ -152,7 +148,7 @@
       var inS = articles.filter(function (a) { return a.section === s.id; });
       html += '<section class="newspaper-section">' + block(s.name) + '<div class="section-stories">' + inS.slice(0, 3).map(function (a) { return bigCard(a); }).join('') + '</div>' + (inS.length > 3 ? '<ul class="rows section-rest">' + inS.slice(3).map(row).join('') + '</ul>' : '') + '</section>';
     });
-    return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="/assets/img/editorial/credits.md">Image credits</a><button type="button" class="install-link" data-install-agentic>Install app</button><a href="/desk.html">Vikas in Pencil</a></nav></footer></main>';
+    return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="/assets/img/editorial/credits.md">Image credits</a><button type="button" class="install-link" data-install-agentic>Install app</button><a href="/">Vikas in Pencil</a></nav></footer></main>';
   }
 
   function sectionPage() {
@@ -274,14 +270,8 @@
       '<h2 class="menu__title">Topics</h2><ul class="menu__list menu__list--topics">' + articles.map(function (x) {
         return '<li><a href="#a/' + esc(x.id) + '">' + esc(x.fly || x.title) + '</a></li>';
       }).join('') + '</ul>' +
-      '<h2 class="menu__title">Your reading</h2><ul class="menu__list"><li><a href="#weekly">Weekly issue</a></li><li><a href="#foryou">For you</a></li><li><a href="#saved">Saved articles</a></li><li><a href="#brief">In brief</a></li><li><button type="button" class="install-link" data-install-agentic>Install Agentic AI</button></li><li><a href="/desk.html">Back to the desk</a></li></ul>' +
+      '<h2 class="menu__title">Your reading</h2><ul class="menu__list"><li><a href="#weekly">Weekly issue</a></li><li><a href="#foryou">For you</a></li><li><a href="#saved">Saved articles</a></li><li><a href="#brief">In brief</a></li><li><button type="button" class="install-link" data-install-agentic>Install Agentic AI</button></li></ul>' +
     '</div><button type="button" class="menu__shade" data-act="menu" aria-label="Close menu" tabindex="-1"></button></div>';
-  }
-
-  function privateNotice() {
-    return '<header class="app-top"><div class="app-top__row"><span class="icon-btn icon-btn--ghost"></span><span class="wordmark"><span>Agentic</span> <span>AI</span></span><span class="icon-btn icon-btn--ghost"></span></div></header>' +
-      '<main class="app-main"><header class="sec-head"><h1>This publication is private</h1><p>Agentic AI is a personal reading room. ' + (navigator.onLine === false ? 'Reconnect to verify your desk sign-in and read the magazine.' : 'Sign in on the desk to read it.') + '</p>' +
-      '<a class="follow" href="/desk.html#signin">Sign in on the desk</a></header></main>';
   }
 
   /* ---------- reading aloud, with the device's own voice ---------- */
@@ -318,10 +308,10 @@
   }
 
   /* ---------- drawing ---------- */
-  var owner = false;
+
   var listenNext = '';
   function render() {
-    if (!owner) { app.innerHTML = privateNotice(); return; }
+
     parseRoute();
     if (route.name === 'article') {
       Store.update(function (s) { var x = s.seen[route.id] || {}; x.stage = 'done'; x.at = Date.now(); s.seen[route.id] = x; });
@@ -389,7 +379,6 @@
 
   app.innerHTML = '<p class="loading">Loading…</p>';
   Store.init().then(function (mode) {
-    owner = mode === 'cloud';
     go();
   });
 })();

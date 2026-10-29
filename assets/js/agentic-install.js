@@ -20,7 +20,7 @@
     if (document.querySelector('.install-dialog')) return;
     var dialog = document.createElement('dialog'); dialog.className = 'install-dialog';
     var apple = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    dialog.innerHTML = '<h2>Install Agentic AI</h2><p>' + (apple ? 'In Safari, tap Share, then Add to Home Screen. Turn on Open as Web App if offered.' : 'Open your browser menu and choose Install Agentic AI or Install app. On a laptop, you can also use the install icon in the address bar. If installation is unavailable, try Chrome or Edge.') + '</p><p>Agentic AI opens separately from Desk. Your existing desk sign-in is still required to read.</p><button type="button">Close</button>';
+    dialog.innerHTML = '<h2>Install Agentic AI</h2><p>' + (apple ? 'In Safari, tap Share, then Add to Home Screen. Turn on Open as Web App if offered.' : 'Open your browser menu and choose Install Agentic AI or Install app. On a laptop, you can also use the install icon in the address bar. If installation is unavailable, try Chrome or Edge.') + '</p><p>If your browser offers Open Desk instead, its existing installation may still have the old website-wide scope. Open Desk once online so it can receive its updated install settings, then return here in your browser.</p><p>Agentic AI is free to read. No Desk account or sign-in is needed.</p><button type="button">Close</button>';
     document.body.appendChild(dialog); dialog.querySelector('button').onclick = function () { dialog.close(); };
     dialog.addEventListener('close', function () { dialog.remove(); }); dialog.showModal();
   }

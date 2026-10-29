@@ -1,22 +1,23 @@
-# Agentic AI app
+# Public Agentic AI
 
-Install entry: https://vikasinpencil.com/agentic/
-Manifest identity, scope and start URL are /agentic/. Keep Desk's manifest unchanged.
-The legacy /curiosity.html page shares this renderer and provides an Install app link.
-Keep curiosity.html and agentic/index.html in sync when changing scripts or metadata.
-The service worker only controls /agentic/ and only caches public static files, never
-Supabase authentication or API responses. Offline launch still requires reconnecting
-to verify owner access. Article availability offline is not promised.
-For future releases bump script/style query tokens and the worker cache version together.
+Canonical app: https://vikasinpencil.com/agentic/
+Legacy curiosity.html redirects while preserving query and hash article links.
+Agentic AI is public: no Desk sign-in, Supabase scripts, cloud credentials or owner check.
+Bookmarks, follows and reading history use agentic.reader.v1 in each browser, separately
+from Desk. No cross-device bookmark sync is offered. Desk authentication is unchanged.
 
-## Typography
+Agentic manifest identity/start/scope: /agentic/.
+Desk explicit identity and scope: /desk.html (same identity as its original inferred ID).
+Desk's old root scope overlapped Agentic and suppressed its installation prompt.
+Existing installed Desk metadata updates on the browser's own schedule. Readers with
+stale metadata may need to reopen Desk online and allow an update, or reinstall its
+shortcut without clearing website data. Never clear Desk storage as an install fix.
 
-The reference PDF embeds subsetted Economist Serif and Economist Sans. These are bespoke
-publisher fonts; no font software was extracted or republished from the reference PDFs.
-Current substitutes are self-hosted Newsreader (normal/italic variable) and Roboto Condensed
-(variable), distributed under the SIL Open Font License. Licence texts are alongside fonts
-in assets/fonts. Download sources:
-https://github.com/google/fonts/tree/main/ofl/newsreader
+Worker controls /agentic/ only; caches the public reader shell, content and fonts, plus
+images as visited. Offline article text works after the shell download. Unvisited images
+need a connection. Bump worker cache and script query versions together on future releases.
+
+Fonts: self-hosted Newsreader and Roboto Condensed, under the adjacent SIL OFL licences.
+No fonts were extracted from the reference PDFs. Exact Economist typefaces need licensed
+webfont files. Sources: https://github.com/google/fonts/tree/main/ofl/newsreader and
 https://github.com/google/fonts/tree/main/ofl/robotocondensed
-Typography reference: https://marber.economist.com/8e1dcf0b8/p/96e5d5
-An exact match requires appropriate licensed webfont files and @font-face configuration.
