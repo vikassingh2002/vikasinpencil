@@ -89,6 +89,16 @@ window.AgenticArt = (function () {
       return { svg: scene(stars + '<rect x="270" y="130" width="100" height="100" fill="#fff" stroke="' + INK + '" stroke-width="3"/>' +
         '<path d="M290 160 h60 M290 182 h60 M290 204 h40" stroke="' + INK + '" stroke-width="5"/>', '#1f3a8a'), caption: 'Illustration: a rulebook for AI' };
     },
+    brief: function () {
+      var sheets = '';
+      for (var i = 0; i < 3; i++) {
+        var x = 150 + i * 70, y = 70 + i * 26;
+        sheets += '<g transform="rotate(' + (i * 6 - 6) + ' ' + (x + 120) + ' ' + (y + 110) + ')"><rect x="' + x + '" y="' + y + '" width="240" height="220" fill="#fff" stroke="' + INK + '" stroke-width="2"/>' +
+          '<rect x="' + (x + 18) + '" y="' + (y + 20) + '" width="120" height="14" fill="' + RED + '"/>' +
+          '<path d="M' + (x + 18) + ' ' + (y + 58) + ' h200 M' + (x + 18) + ' ' + (y + 82) + ' h200 M' + (x + 18) + ' ' + (y + 106) + ' h160 M' + (x + 18) + ' ' + (y + 140) + ' h200 M' + (x + 18) + ' ' + (y + 164) + ' h120" stroke="' + PALE + '" stroke-width="8"/></g>';
+      }
+      return { svg: scene(sheets, '#cfe3ea'), caption: 'Illustration: the news in brief' };
+    },
     deploy: function () {
       var cells = '';
       for (var r = 0; r < 4; r++) for (var c = 0; c < 6; c++) {

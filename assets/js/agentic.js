@@ -48,21 +48,22 @@
     if (p[0] === 'a' && byId(p[1])) route = { name: 'article', id: p[1] };
     else if (p[0] === 's' && sections().some(function (s) { return s.id === p[1]; })) route = { name: 'section', id: p[1] };
     else if (p[0] === 'saved') route = { name: 'saved', id: '' };
+    else if (p[0] === 'brief') route = { name: 'brief', id: '' };
     else route = { name: 'front', id: '' }; // older links (#d/…, #curiosity/…) land on the front page
   }
 
   /* ---------- pieces ---------- */
+  // Header: the name on the left; Saved, Desk and Menu on the right. Then a full-width bar of sections.
   function masthead() {
     var here = route.name === 'section' ? route.id : route.name === 'article' ? (byId(route.id) || {}).section : route.name;
-    return '<header class="mast"><div class="mast__top">' +
-      '<button type="button" class="menu-btn" data-act="menu" aria-expanded="' + menuOpen + '" aria-controls="menu"><span class="menu-btn__icon" aria-hidden="true"></span>Menu</button>' +
-      '<a class="mast__name" href="#/">Agentic AI</a>' +
-      '<a class="mast__saved" href="#saved">Saved</a></div>' +
-      '<nav class="tabs" aria-label="Sections">' +
+    return '<header class="hdr"><div class="hdr__top">' +
+      '<a class="hdr__logo" href="#/" aria-label="Agentic AI, front page"><span>Agentic</span><span>AI</span></a>' +
+      '<div class="hdr__right"><a class="pill" href="#saved">Saved</a><a class="hdr__link" href="desk.html">Desk</a>' +
+      '<button type="button" class="menu-btn" data-act="menu" aria-expanded="' + menuOpen + '" aria-controls="menu"><span class="menu-btn__icon" aria-hidden="true"></span>Menu</button></div></div>' +
+      '<nav class="secbar" aria-label="Sections">' +
         '<a href="#/"' + (route.name === 'front' ? ' aria-current="page"' : '') + '>Latest</a>' +
+        '<a href="#brief"' + (route.name === 'brief' ? ' aria-current="page"' : '') + '>In brief</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
-        '<a href="#saved"' + (route.name === 'saved' ? ' aria-current="page"' : '') + '>Saved</a>' +
-        '<a class="tabs__out" href="desk.html">Desk</a>' +
       '</nav></header>';
   }
   function menu() {
@@ -92,23 +93,53 @@
       '<span class="story__meta">' + esc(sectionName(a.section)) + ' · ' + (a.minutes || 3) + ' min read' + (isRead(a) ? ' · Read' : '') + '</span></a></li>';
   }
 
+  function pic(a, cls) {
+    var x = Art.get(a.id);
+    return x ? '<span class="' + cls + '" aria-hidden="true">' + x.svg + '</span>' : '';
+  }
+  function meta(a) { return '<span class="meta">' + (a.minutes || 3) + ' min read' + (isRead(a) ? ' · Read' : '') + '</span>'; }
+  function head(a, cls) {
+    return '<span class="fly">' + esc(sectionName(a.section)) + '</span><span class="' + cls + '">' + esc(a.title) + '</span>';
+  }
+
+  // Three columns: the lead; two stories with pictures on the right; In brief and two columns. Then a row of four.
   function front() {
     var unread = articles.filter(function (a) { return !isRead(a); });
-    var lead = unread[0] || articles[0];
-    var rest = articles.filter(function (a) { return a !== lead; });
-    var html = masthead();
-    if (!lead) return html + '<p class="empty">No articles yet.</p>';
-    html += '<div class="front">' +
-      '<ul class="lead">' + teaser(lead, true) + '</ul>' +
-      '<aside class="brief" aria-labelledby="brief-title"><h2 class="brief__title" id="brief-title">In brief</h2><ul class="brief__list">' +
-        rest.slice(0, 5).map(function (a) { return '<li><a href="#a/' + esc(a.id) + '"><b>' + esc(a.title) + '.</b> ' + esc(a.rubric) + '</a></li>'; }).join('') +
-      '</ul></aside></div>';
-    sections().forEach(function (s) {
-      var inS = rest.filter(function (a) { return a.section === s.id; });
-      if (!inS.length) return;
-      html += '<section aria-labelledby="sec-' + esc(s.id) + '"><h2 class="sec" id="sec-' + esc(s.id) + '"><a href="#s/' + esc(s.id) + '">' + esc(s.name) + '</a></h2><ul class="stories">' + inS.map(function (a) { return teaser(a); }).join('') + '</ul></section>';
-    });
+    var order = unread.concat(articles.filter(function (a) { return isRead(a); }));
+    if (!order.length) return masthead() + '<p class="empty">No articles yet.</p>';
+    var lead = order[0];
+    var mid = order.slice(1, 3);
+    var cols = order.slice(3, 5);
+    var row = order.slice(5, 9);
+    var briefPic = Art.get('brief');
+    var html = masthead() + '<div class="fp">' +
+      '<article class="fp__lead"><a class="card" href="#a/' + esc(lead.id) + '">' + pic(lead, 'card__img card__img--lead') +
+        head(lead, 'card__title card__title--lead') + '<span class="card__rubric card__rubric--lead">' + esc(lead.rubric) + '</span>' + meta(lead) + '</a></article>' +
+      '<div class="fp__mid">' + mid.map(function (a) {
+        return '<article class="side"><a class="card card--side" href="#a/' + esc(a.id) + '"><span class="card__text">' + head(a, 'card__title card__title--mid') +
+          '<span class="card__rubric">' + esc(a.rubric) + '</span>' + meta(a) + '</span>' + pic(a, 'card__img card__img--side') + '</a></article>';
+      }).join('') + '</div>' +
+      '<aside class="fp__right">' +
+        '<a class="brief-card" href="#brief">' + (briefPic ? '<span class="card__img" aria-hidden="true">' + briefPic.svg + '</span>' : '') +
+          '<span class="brief-card__title">In brief: ' + esc(articles.slice(0, 2).map(function (a) { return a.title; }).join('; ')) + '</span></a>' +
+        '<a class="arrow-link" href="#brief"><span aria-hidden="true">→</span> Read every article in one line each</a>' +
+        '<h2 class="cols__title"><a href="#s/' + esc((cols[0] || lead).section) + '">More analysis <span aria-hidden="true">→</span></a></h2>' +
+        cols.map(function (a) {
+          return '<a class="card card--col" href="#a/' + esc(a.id) + '"><span class="card__text">' + head(a, 'card__title card__title--col') + meta(a) + '</span>' + pic(a, 'card__img card__img--thumb') + '</a>';
+        }).join('') +
+      '</aside></div>';
+    if (row.length) {
+      html += '<ul class="fp__row">' + row.map(function (a) {
+        return '<li><a class="card" href="#a/' + esc(a.id) + '">' + pic(a, 'card__img') + head(a, 'card__title card__title--row') + meta(a) + '</a></li>';
+      }).join('') + '</ul>';
+    }
     return html;
+  }
+
+  // Every article in a line: the headline in bold, then its rubric.
+  function brief() {
+    return masthead() + '<section class="page"><h1 class="page__title">In brief</h1><p class="page__lede">Every article, one line each.</p><ul class="brief__list brief__list--page">' +
+      articles.map(function (a) { return '<li><a href="#a/' + esc(a.id) + '"><b>' + esc(a.title) + '.</b> ' + esc(a.rubric) + '. <span class="meta">' + esc(sectionName(a.section)) + '</span></a></li>'; }).join('') + '</ul></section>';
   }
 
   function section() {
@@ -165,7 +196,7 @@
     if (route.name === 'article') {
       Store.update(function (s) { var x = s.seen[route.id] || {}; x.stage = 'done'; x.at = Date.now(); s.seen[route.id] = x; });
     }
-    var html = route.name === 'article' ? article() : route.name === 'section' ? section() : route.name === 'saved' ? saved() : front();
+    var html = route.name === 'article' ? article() : route.name === 'section' ? section() : route.name === 'saved' ? saved() : route.name === 'brief' ? brief() : front();
     app.innerHTML = html + footer() + menu();
     document.title = (route.name === 'article' ? byId(route.id).title + ' | ' : '') + 'Agentic AI';
   }
