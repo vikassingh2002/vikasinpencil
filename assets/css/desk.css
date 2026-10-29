@@ -310,3 +310,22 @@
   .way__name { font-size: 30px; }
   .way__sub { font-size: 14px; }
 }
+
+/* curiosity: a page of its own, one card at a time */
+.curio-page { max-width: 680px; margin: 0 auto; }
+.curio__topics { margin-top: 18px; }
+.curio { margin-top: 22px; padding: clamp(20px, 3.5vw, 32px); border: 1.5px solid var(--ink); border-radius: 6px; background: var(--paper); box-shadow: 5px 5px 0 var(--shadow-soft); }
+.curio__scene { margin-top: 10px; font-family: var(--hand); font-size: clamp(30px, 3.6vw, 40px); font-weight: 700; line-height: 1.12; text-wrap: balance; }
+.curio__ask { margin-top: 16px; font-size: 18px; font-style: italic; color: var(--ink-muted); }
+.curio__opts { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.curio__opt { min-height: 48px; padding: 10px 16px; border: 1.5px solid var(--rule-mid); border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; font-size: 18px; line-height: 1.35; text-align: left; cursor: pointer; transition: border-color var(--quick) var(--ease), background-color var(--quick) var(--ease); }
+.curio__opt:hover:not([aria-disabled="true"]) { border-color: var(--ink); background: var(--highlight-soft); }
+.curio__opt[aria-disabled="true"] { cursor: default; color: var(--ink-muted); }
+.curio__opt.is-right { border-color: var(--ink); color: var(--ink); background: var(--highlight-soft); }
+.curio__opt.is-picked { border-style: dashed; }
+.curio__hint { margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-muted); }
+.curio__reveal { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--rule-mid); }
+.curio__verdict { font-family: var(--hand); font-size: 28px; font-weight: 700; line-height: 1.15; }
+.curio__more { color: var(--graphite); }
+.curio__say { margin-top: 18px; }
+.curio__back { margin-top: 0; }

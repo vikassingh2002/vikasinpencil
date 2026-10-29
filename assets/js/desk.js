@@ -454,7 +454,7 @@
      What's on screen right now (not kept)
      ------------------------------------------------------------ */
 
-  var VIEWS = ['continue', 'choose', 'capture', 'unwind', 'library', 'doors', 'settings', 'signin'];
+  var VIEWS = ['continue', 'choose', 'capture', 'unwind', 'curiosity', 'library', 'doors', 'settings', 'signin'];
   var ui = {
     view: 'home',
     energy: 'some',
@@ -477,7 +477,8 @@
     open: {}, // which folded sections are open
     preview: false,
     authError: '',
-    busy: false
+    busy: false,
+    cur: { id: '', guess: -1, more: false, topic: 'all', kept: false } // the curiosity card on screen
   };
   function viewFromHash() {
     var h = location.hash.replace('#', '');
@@ -509,7 +510,7 @@
     { key: 'capture', name: 'Capture', sub: 'Save thoughts and ideas' },
     { key: 'unwind', name: 'Unwind', sub: 'Rest with intention' }
   ];
-  var MORE = [['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
+  var MORE = [['curiosity', 'Curiosity'], ['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
   var TYPES = ['Book', 'Article', 'Essay', 'Video', 'Podcast', 'Course', 'Film', 'Show', 'Music', 'Other'];
   var SHELVES = [['reading', 'To read or learn'], ['unwind', 'To unwind with']];
   var STATUS = [['queued', 'Up next'], ['doing', 'In progress'], ['done', 'Finished']];
@@ -1168,6 +1169,104 @@
       '</section>';
   }
 
+  /* Curiosity: a page of its own, one card at a time. Guess first, then see why.
+     Cards you miss, or ask to see again, come back in about two weeks. No score. */
+  var CARDS = list(NB.curiosity).filter(function (c) { return c && c.id && c.scene && list(c.options).length > 1; });
+  var TOPICS = [['all', 'Both'], ['agents', 'AI agents'], ['talk', 'Communication']];
+  var AGAIN = 14 * 86400000;
+  function curState() {
+    var s = setting();
+    var c = s && s.data.curiosity;
+    return c && c.cards ? c : { at: '', cards: {} };
+  }
+  function saveCur(fn) {
+    var s = setting() || make('setting', {});
+    var c = s.data.curiosity && s.data.curiosity.cards ? s.data.curiosity : { at: '', cards: {} };
+    fn(c);
+    s.data.curiosity = c;
+    put(s);
+  }
+  function cardById(id) {
+    for (var i = 0; i < CARDS.length; i++) if (CARDS[i].id === id) return CARDS[i];
+    return null;
+  }
+  function inTopic(c) { return ui.cur.topic === 'all' || c.topic === ui.cur.topic; }
+  // What comes next: a card that's due back, then a new one (taking turns between topics), then the one seen longest ago.
+  function nextCard(after) {
+    var seen = curState().cards;
+    var pool = CARDS.filter(function (c) { return inTopic(c) && c.id !== after; });
+    if (!pool.length) pool = CARDS.filter(inTopic);
+    if (!pool.length) return null;
+    var due = pool.filter(function (c) { return seen[c.id] && seen[c.id].again && seen[c.id].again <= now(); })
+      .sort(function (a, b) { return seen[a.id].again - seen[b.id].again; })[0];
+    if (due) return due;
+    var fresh = pool.filter(function (c) { return !seen[c.id]; });
+    if (fresh.length) {
+      var last = cardById(after);
+      var turn = ui.cur.topic === 'all' && last ? fresh.filter(function (c) { return c.topic !== last.topic; })[0] : null;
+      return turn || fresh[0];
+    }
+    return pool.slice().sort(function (a, b) { return (seen[a.id].when || 0) - (seen[b.id].when || 0); })[0];
+  }
+  function showCard(c) {
+    ui.cur.id = c ? c.id : '';
+    ui.cur.guess = -1;
+    ui.cur.more = false;
+    ui.cur.kept = false;
+  }
+  function currentCard() {
+    var c = cardById(ui.cur.id);
+    if (c && inTopic(c)) return c;
+    var st = curState();
+    var at = cardById(st.at);
+    showCard(at && inTopic(at) && !st.cards[at.id] ? at : nextCard('')); // pick up where you stopped
+    return cardById(ui.cur.id);
+  }
+  function curiosityHtml() {
+    var c = currentCard();
+    var top = '<header class="desk__top"><p class="desk__kicker">Desk · Curiosity</p>' +
+      '<p class="desk__right">' + syncHtml() + '<a class="desk__out ink-link" href="#">← Back to the desk</a></p></header>' +
+      '<div class="lib-chips curio__topics" role="group" aria-label="Topic">' + TOPICS.map(function (t) {
+        return '<button type="button" class="lib-chip" data-act="cur-topic" data-v="' + t[0] + '" aria-pressed="' + (ui.cur.topic === t[0]) + '">' + esc(t[1]) + '</button>';
+      }).join('') + '</div>';
+    if (!c) return '<div class="curio-page">' + top + '<p class="hand-m gap-l">No cards here yet.</p></div>';
+    var g = ui.cur.guess;
+    var answered = g !== -1;
+    var right = g === c.answer;
+    var mine = curState().cards[c.id];
+    var comingBack = mine && mine.again && mine.again > now();
+    var opts = '<div class="curio__opts">' + c.options.map(function (o, i) {
+      var cls = 'curio__opt' + (answered && i === c.answer ? ' is-right' : '') + (answered && i === g && !right ? ' is-picked' : '');
+      return '<button type="button" class="' + cls + '" data-act="cur-guess" data-i="' + i + '"' + (answered ? ' aria-disabled="true"' : '') + '>' + esc(o) + '</button>';
+    }).join('') + '</div>';
+    var sayBox = !c.say ? '' : ui.cur.kept
+      ? '<p class="note-mono">Your sentence is in Capture. Good ones can become field notes.</p>'
+      : '<form class="desk__form curio__say" data-form="cur-say"><label class="field-label" for="cur-say">If you like · ' + esc(c.say) + '</label>' +
+        '<textarea class="textarea textarea--hand" id="cur-say" name="text" rows="2" required></textarea>' +
+        '<button class="btn btn--line" type="submit">Keep it in Capture</button></form>';
+    var reveal = !answered
+      ? '<p class="curio__hint">Guess first. There\'s no score.</p>'
+      : '<div class="curio__reveal">' +
+          '<p class="curio__verdict">' + (right ? 'Yes.' : 'Not quite. It\'s: ' + esc(c.options[c.answer]) + '.') + '</p>' +
+          '<p class="prose">' + esc(c.why) + '</p>' +
+          (ui.cur.more && c.more ? '<p class="prose curio__more">' + esc(c.more) + '</p>' : '') +
+          sayBox +
+          '<div class="actions">' +
+            '<button type="button" class="btn" data-act="cur-next">Next curiosity</button>' +
+            (!ui.cur.more && c.more ? '<button type="button" class="btn btn--line" data-act="cur-more">Tell me more</button>' : '') +
+            (comingBack ? '<span class="note-mono curio__back">Coming back in about two weeks</span>'
+              : '<button type="button" class="btn btn--text" data-act="cur-again">Show me this again later</button>') +
+          '</div>' +
+        '</div>';
+    return '<div class="curio-page">' + top +
+      '<article class="curio" aria-labelledby="curio-scene">' +
+        '<p class="label">' + (c.topic === 'agents' ? 'AI agents' : 'Communication') + '</p>' +
+        '<p class="curio__scene" id="curio-scene">' + esc(c.scene) + '</p>' +
+        '<p class="curio__ask">' + esc(c.ask) + '</p>' + opts +
+        '<div aria-live="polite">' + reveal + '</div>' +
+      '</article></div>';
+  }
+
   function slotHtml() {
     if (ui.view === 'continue') return continueHtml();
     if (ui.view === 'choose') return chooseHtml();
@@ -1186,6 +1285,7 @@
     if (secretKey) html = '<section class="signin"><h1 class="hand-xl">The desk is switched off</h1><p class="desk__banner desk__banner--warn">assets/js/desk-config.js holds a secret key. Anyone can read that file, so the desk won\'t use it. Replace it with the publishable key, and in Supabase, create a new secret key and delete this one.</p></section>';
     else if (ui.view === 'signin' && client && mode !== 'owner') html = signinHtml();
     else if (!canEdit() || ui.preview) html = visitorHtml();
+    else if (ui.view === 'curiosity') html = curiosityHtml(); // a page of its own: nothing else on it
     else if (mode === 'owner' && !heard && !rows.length) html = '<header class="desk__top"><p class="desk__kicker">Desk</p></header><p class="muted gap-l">Opening the desk…</p>'; // a new device: wait for the cloud's copy
     else html = topHtml() + '<div class="desk__slot" id="slot">' + slotHtml() + '</div>' + (ui.view === 'doors' || ui.view === 'settings' ? '' : doorsStripHtml(false)) + footHtml();
     root.innerHTML = html;
@@ -1610,7 +1710,8 @@
     if (ui.view !== 'signin') ui.authError = '';
     render(pendingFocus || (ui.view === 'signin' ? '#si-email' : ''));
     pendingFocus = '';
-    slotIntoView();
+    if (ui.view === 'curiosity') window.scrollTo(0, 0);
+    else slotIntoView();
   });
 
   function begin(c) {
@@ -1820,6 +1921,37 @@
       writeJSON(LEGACY_DONE, stamp());
       bringIn(incoming, 'The earlier desk is in. ' + plural(incoming.filter(function (r) { return r.kind !== 'setting'; }).length, 'item', 'items') + ' brought across.');
     },
+    'cur-topic': function (t) { ui.cur.topic = t.getAttribute('data-v'); showCard(null); render(); },
+    'cur-guess': function (t) {
+      var c = cardById(ui.cur.id);
+      if (!c || ui.cur.guess !== -1) return;
+      var i = Number(t.getAttribute('data-i'));
+      ui.cur.guess = i;
+      saveCur(function (st) {
+        var mine = st.cards[c.id] || {};
+        mine.when = now();
+        mine.right = i === c.answer;
+        mine.again = mine.right ? 0 : now() + AGAIN; // missed ones come back
+        st.cards[c.id] = mine;
+        st.at = c.id;
+      });
+      render();
+    },
+    'cur-more': function () { ui.cur.more = true; render(); },
+    'cur-again': function () {
+      var c = cardById(ui.cur.id);
+      if (!c) return;
+      saveCur(function (st) { st.cards[c.id] = st.cards[c.id] || { when: now() }; st.cards[c.id].again = now() + AGAIN; });
+      render();
+      say('It\'ll come back in about two weeks.');
+    },
+    'cur-next': function () {
+      var n = nextCard(ui.cur.id);
+      showCard(n);
+      if (n) saveCur(function (st) { st.at = n.id; });
+      render();
+      window.scrollTo(0, 0);
+    },
     'skip-legacy': function () { writeJSON(LEGACY_DONE, 'skipped ' + stamp()); render(); }
   };
 
@@ -1969,6 +2101,15 @@
       if (id === 'new' && fold) ui.open[fold.getAttribute('data-keep')] = true; // ready for the next one
       render(id === 'new' ? '#lf-title-new' : '');
       if (id === 'new') say(r.data.shelf === 'unwind' ? 'Saved for an evening.' : 'Added to the Library.');
+    },
+    'cur-say': function (val) {
+      var c = cardById(ui.cur.id);
+      var text = val('text');
+      if (!c || !text) return;
+      put(make('idea', { text: text + '\n\n(From Curiosity: ' + c.scene + ')', kind: 'thought' }));
+      ui.cur.kept = true;
+      render();
+      say('Kept in Capture.');
     },
     offline: function (val) { var text = val('text'); if (text) { put(make('offline', { text: text })); render('#off-new'); } },
     link: function (val, form) {
