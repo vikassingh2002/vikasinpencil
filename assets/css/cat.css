@@ -275,3 +275,59 @@ h1, h2, h3, h4, p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- the reading app (agentic.js) ---------- */
+.mast { flex-direction: column; align-items: stretch; gap: 0; }
+.mast__name { padding: 4px 0 10px; }
+.mast .tabs { flex-wrap: nowrap; gap: 0 22px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid var(--line); }
+.mast .tabs::-webkit-scrollbar { display: none; }
+.mast .tabs a { flex: 0 0 auto; white-space: nowrap; }
+.sec a { text-decoration: none; }
+.sec a:hover { color: var(--red); }
+.lead, .stories { margin: 0; padding: 0; list-style: none; }
+.stories { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 32px; }
+.stories--one { grid-template-columns: minmax(0, 1fr); }
+.story a { display: grid; align-content: start; gap: 6px; height: 100%; padding: 16px 0 18px; border-bottom: 1px solid var(--line); text-decoration: none; }
+.story__title { font-family: var(--serif); font-weight: 700; font-size: 21px; line-height: 1.18; color: var(--ink); }
+.story a:hover .story__title { color: var(--red-dark); }
+.story__rubric { font-family: var(--serif); font-size: 17px; line-height: 1.4; color: var(--muted); }
+.story__meta { font-size: 12px; color: var(--muted); }
+.story.is-read .story__title { color: #3d3d3d; }
+.story--big a { padding-top: 0; border-bottom: 0; }
+.story--big .story__title { font-size: clamp(34px, 4.8vw, 48px); line-height: 1.06; letter-spacing: -0.015em; }
+.story--big .story__rubric { font-size: 21px; }
+.brief__list li a { display: block; }
+.art { max-width: 640px; margin: 28px auto 0; }
+.art__section { font-size: 14px; font-weight: 600; }
+.art__section a { color: var(--ink); text-decoration: none; }
+.art__section a:hover { color: var(--red); }
+.art .fly { margin-top: 18px; }
+.art__title { margin-top: 6px; font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 5.4vw, 48px); line-height: 1.06; letter-spacing: -0.015em; color: var(--ink); outline: none; }
+.art__rubric { margin-top: 12px; font-family: var(--serif); font-size: 22px; line-height: 1.35; color: var(--muted); }
+.art__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 20px; padding: 8px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.art__bar .dateline { margin: 0; }
+.save { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 2px; border: 0; background: none; color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; }
+.save.is-on span { color: var(--red); }
+.art__body { margin-top: 24px; }
+.art__body p { font-family: var(--serif); font-size: 20px; line-height: 1.6; color: var(--text); }
+.art__body p + p { margin-top: 18px; }
+.art__first::first-letter { float: left; margin: 6px 8px 0 0; font-size: 3.6em; line-height: 0.8; font-weight: 700; color: var(--ink); }
+.art__cross { margin: 30px 0 10px; font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--ink); }
+.art__sources { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--line); }
+.art__sources h2 { font-size: 13px; font-weight: 700; color: var(--ink); }
+.art__sources ul { margin: 8px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.art__sources li { margin: 4px 0; }
+.art__sources span { white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; background: var(--red); color: #fff; font-weight: 600; text-decoration: none; }
+.btn:hover { background: var(--red-dark); }
+.gap { margin-top: 20px; }
+@media (max-width: 860px) { .stories { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) {
+  .mast .tabs { width: auto; gap: 0 16px; }
+  .art__body p { font-size: 19px; }
+  .art__rubric, .story--big .story__rubric { font-size: 19px; }
+}
+.story__open { margin-top: 8px; font-family: var(--serif); font-size: 18px; line-height: 1.6; color: var(--text); }
+.story__open::first-letter { float: left; margin: 5px 7px 0 0; font-size: 3.3em; line-height: 0.8; font-weight: 700; color: var(--ink); }
+/* the tab row scrolls inside the screen instead of widening the page */
+.mast, .mast > * { min-width: 0; max-width: 100%; }
