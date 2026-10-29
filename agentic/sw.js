@@ -1,6 +1,6 @@
 /* Agentic-only worker. Never handles Desk or caches authentication/API responses. */
-const CACHE = 'agentic-static-public11';
-const SHELL = ['/agentic/','/agentic/manifest.webmanifest','/agentic/icon-192.png','/agentic/icon-512.png','/agentic/icon-maskable.png','/assets/css/cat.css?v=20261029-public11','/content/ai-articles.js?v=20261029-public11','/assets/js/agentic-store.js?v=20261029-public11','/assets/js/agentic-art.js?v=20261029-public11','/assets/js/agentic.js?v=20261029-public11','/assets/js/agentic-install.js?v=20261029-public11','/assets/fonts/newsreader.ttf','/assets/fonts/newsreader-italic.ttf','/assets/fonts/roboto-condensed.ttf'];
+const CACHE = 'agentic-static-public12';
+const SHELL = ['/agentic/','/agentic/manifest.webmanifest','/agentic/icon-192.png','/agentic/icon-512.png','/agentic/icon-maskable.png','/assets/css/cat.css?v=20261029-public12','/content/ai-articles.js?v=20261029-public12','/assets/js/agentic-store.js?v=20261029-public12','/assets/js/agentic-art.js?v=20261029-public12','/assets/js/agentic-charts.js?v=20261029-public12','/assets/js/agentic.js?v=20261029-public12','/assets/js/agentic-install.js?v=20261029-public12','/assets/fonts/newsreader.ttf','/assets/fonts/newsreader-italic.ttf','/assets/fonts/roboto-condensed.ttf'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });

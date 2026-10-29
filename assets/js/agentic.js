@@ -222,7 +222,10 @@
     var chart = Art.chart ? Art.chart(a.id) : null;
     var paras = 0;
     var body = list(a.body).map(function (b) {
-      if (b && typeof b === 'object') return '<h2 class="art__cross">' + esc(b.h) + '</h2>';
+      if (b && typeof b === 'object') {
+        if (b.chart) return window.AgenticCharts ? AgenticCharts.render(b.chart) : ''; // charts, maps and calculators sit between paragraphs
+        return '<h2 class="art__cross">' + esc(b.h) + '</h2>';
+      }
       var text = esc(b).replace(/ ■$/, ' <span class="fin" aria-hidden="true">■</span>');
       paras++;
       if (paras === 1) { // the opening words in small capitals
@@ -281,7 +284,7 @@
     var synth = window.speechSynthesis;
     if (!synth || !window.SpeechSynthesisUtterance) { toast('This device can’t read aloud.'); return; }
     stopSpeaking();
-    var text = [a.title + '.', a.rubric + '.'].concat(list(a.body).map(function (b) { return typeof b === 'string' ? b.replace(/ ■$/, '') : b.h + '.'; })).join('\n');
+    var text = [a.title + '.', a.rubric + '.'].concat(list(a.body).filter(function (b) { return typeof b === 'string' || (b && b.h); }).map(function (b) { return typeof b === 'string' ? b.replace(/ ■$/, '') : b.h + '.'; })).join('\n');
     var u = new SpeechSynthesisUtterance(text);
     var voices = synth.getVoices();
     var gb = voices.filter(function (v) { return /en-GB/i.test(v.lang); })[0] || voices.filter(function (v) { return /^en/i.test(v.lang); })[0];

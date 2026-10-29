@@ -3,6 +3,7 @@ const fs=require('fs'),path=require('path'),vm=require('vm'),crypto=require('cry
 const root=path.resolve(__dirname,'..');const ctx={};ctx.window=ctx;vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(root,'content/ai-articles.js'),'utf8'),ctx);
 vm.runInContext(fs.readFileSync(path.join(root,'assets/js/agentic-art.js'),'utf8'),ctx);
+const chartIds=new Set([...fs.readFileSync(path.join(root,'assets/js/agentic-charts.js'),'utf8').matchAll(/D\['([^']+)'\]\s*=/g)].map(m=>m[1]));
 const data=ctx.NB.aiArticles,media=ctx.AgenticArt.manifest,ids=new Set(),hashes=new Map();
 function check(ok,msg){if(!ok)throw Error(msg)}
 const issues=new Set();
@@ -22,6 +23,7 @@ for(const a of data.articles){
  const file=path.join(root,'assets/img/editorial',media[a.id][0]+'.jpg');check(fs.existsSync(file),'Missing image file '+file);
  const hash=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');check(!hashes.has(hash),'Image reused by '+a.id+' and '+hashes.get(hash));hashes.set(hash,a.id);
  check(a.body.filter(p=>typeof p==='string').join(' ').split(/\s+/).length>=(a.format==='long-read'?850:250),'Article too short for its format '+a.id);
+ for(const p of a.body)if(typeof p!=='string')check((p.h&&typeof p.h==='string')||chartIds.has(p.chart),'Unknown body item in '+a.id+': '+JSON.stringify(p));
 }
 for(const b of data.briefs){const a=data.articles.find(a=>a.id===b.articleId);check(a,'Orphan brief '+b.id);const e=data.editions.find(e=>e.id===a.editionId);check(b.date>=e.coverageStart&&b.date<=e.coverageEnd,'Brief outside issue '+b.id)}
 console.log('Valid: '+data.editions.length+' Monday issue(s), '+ids.size+' articles, '+hashes.size+' different image hashes.');
