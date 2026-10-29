@@ -1,4 +1,4 @@
-/* Curiosity Cat: the page (curiosity.html).
+/* Agentic AI: the page (curiosity.html; once called Curiosity Cat).
    Content: content/curiosity.js · What's next: cat-brain.js · Saving: cat-store.js · Simulations: cat-labs.js
    Routes: #/ home · #d/<id> a discovery · #d/<id>/<variant> a review · #explore · #notes · #tune · #recap
    Old links (desk.html#curiosity/<id>, #curiosity/<id>) are redirected here. */
@@ -54,7 +54,7 @@
   toast.className = 'toast';
   toast.setAttribute('role', 'status');
   toast.setAttribute('aria-live', 'polite');
-  toast.innerHTML = '<span class="toast__cat" aria-hidden="true">' + CAT + '</span><span class="toast__text"></span>';
+  toast.innerHTML = '<span class="toast__text"></span>';
   document.body.appendChild(toast);
   var moodTimer = null;
   function mood(m, line) {
@@ -65,7 +65,16 @@
     clearTimeout(moodTimer);
     moodTimer = setTimeout(function () { toast.classList.remove('is-on'); }, 3600);
   }
-  function avatar() { return '<span class="avatar" aria-hidden="true">' + CAT + '</span>'; }
+  // Dates the way a weekly prints them: Oct 29th 2026
+  function econDate(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ''));
+    if (!m) return '';
+    var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var n = Number(m[3]);
+    var th = n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th';
+    return M[Number(m[2]) - 1] + ' ' + n + th + ' ' + m[1];
+  }
+  function dateline(d) { return '<p class="dateline">' + esc(econDate(C.reviewed)) + ' <span>|</span> ' + (d.minutes || 3) + ' min read</p>'; }
 
   /* ---------- page state (not saved) ---------- */
   var ui = { route: 'home', id: '', variant: '', pick: null, order: null, many: {}, estimate: null, phase: 'predict', confidence: 0, open: {} };
@@ -88,21 +97,16 @@
   }
 
   /* ---------- pieces ---------- */
-  // Like a newsletter: a full masthead on the front page, a slim bar on posts.
+  // A red rule, the title, and a row of sections.
   function header() {
-    var tabs = [['', 'Home'], ['explore', 'Explore'], ['notes', 'Notes'], ['tune', 'Tune']];
+    var tabs = [['', 'Latest'], ['explore', 'All articles'], ['notes', 'Your notes'], ['tune', 'Preferences']];
     var here = ui.route === 'home' ? '' : ui.route;
-    var nav = '<nav class="tabs" aria-label="Curiosity Cat">' + tabs.map(function (t) {
-      return '<a href="#' + (t[0] || '/') + '"' + (here === t[0] ? ' aria-current="page"' : '') + '>' + t[1] + '</a>';
-    }).join('') + '<a class="tabs__out" href="desk.html">Desk</a></nav>';
-    if (ui.route === 'd' || ui.route === 'recap') {
-      return '<header class="bar"><a class="bar__home" href="#/">' + avatar() + '<span>Curiosity Cat</span></a>' + nav + '</header>';
-    }
     return '<header class="mast">' +
-      '<a class="mast__logo" href="#/" aria-label="Curiosity Cat, home">' + CAT + '</a>' +
-      '<p class="mast__name"><a href="#/">Curiosity Cat</a></p>' +
-      '<p class="mast__tag">Small discoveries about AI agents and how AI works</p>' +
-    '</header>' + nav;
+      '<a class="mast__name" href="#/">Agentic AI</a>' +
+      '<nav class="tabs" aria-label="Agentic AI">' + tabs.map(function (x) {
+        return '<a href="#' + (x[0] || '/') + '"' + (here === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</a>';
+      }).join('') + '<a class="tabs__out" href="desk.html">Desk</a></nav>' +
+    '</header>';
   }
   function footer() {
     var m = Store.mode();
@@ -138,48 +142,49 @@
       var stage = S().seen[u.id].stage === 'open' ? 'You hadn\'t made your prediction yet.' : 'You stopped after the reveal.';
       html += '<a class="resume" href="#d/' + esc(u.id) + '"><span class="resume__tag">Continue reading</span><b>' + esc(u.title) + '</b><span class="resume__note">' + stage + '</span></a>';
     }
+    var learned = Brain.ordered(C).filter(function (x) { return Brain.isDone(S(), x.id) && x.reveal && x.reveal.say; }).slice(0, 6);
+    html += '<div class="front">';
     if (d) {
       html += '<article class="feat" aria-labelledby="feat-title">' +
-        '<p class="kicker">' + esc(r.reason) + '</p>' +
+        '<p class="fly">' + esc(Brain.conceptName(C, d.concept)) + '</p>' +
         '<h1 class="feat__title" id="feat-title"><a href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">' + esc(item.title || d.title) + '</a></h1>' +
-        '<p class="feat__sub">' + esc(item.hook) + '</p>' +
-        '<p class="byline">' + avatar() + '<span><b>Curiosity Cat</b><span class="byline__meta">' + (d.minutes || 3) + ' min read · ' + esc(kindLabel(item.predict.type)) + '</span></span></p>' +
+        '<p class="rubric">' + esc(item.hook) + '</p>' +
+        '<p class="why">' + esc(r.reason) + '</p>' +
         '<p class="ask">' + esc(item.predict.prompt) + '</p>' +
         predictPreview(d, r) +
         '<div class="ways">' +
-          '<a class="cat-btn" href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">Read the discovery</a>' +
-          '<button type="button" class="cat-btn cat-btn--quiet" data-act="deep">Start a 3-part session</button>' +
+          '<a class="cat-btn" href="#d/' + esc(d.id) + (r.variant ? '/' + esc(r.variant.id) : '') + '" data-session="quick">Read the article</a>' +
+          '<button type="button" class="cat-btn cat-btn--quiet" data-act="deep">Read three in a row</button>' +
         '</div>' +
       '</article>';
     } else {
       html += '<article class="feat"><h1 class="feat__title">Nothing here yet.</h1></article>';
     }
+    html += '<aside class="brief" aria-labelledby="brief-title"><h2 class="brief__title" id="brief-title">In brief</h2>' +
+      (learned.length
+        ? '<ul class="brief__list">' + learned.map(function (x) { return '<li><a href="#d/' + esc(x.id) + '"><b>' + esc(Brain.conceptName(C, x.concept)) + '.</b> ' + esc(x.reveal.say) + '</a></li>'; }).join('') + '</ul>'
+        : '<p class="brief__empty">What you learn here gathers in this column, one line per article.</p>') +
+      '<p class="brief__sum">' + st.discovered + ' of ' + st.total + ' articles read · ' + st.labsDone + ' of ' + st.labsTotal + ' simulations · ' + st.notes + (st.notes === 1 ? ' note' : ' notes') + '</p>' +
+    '</aside></div>';
     var more = [];
     for (var i = 0; i < 4; i++) {
       var n = Brain.next(S(), C, now(), (d ? [d.id] : []).concat(more.map(function (x) { return x.id; })));
       if (!n || more.indexOf(n.d) !== -1) break;
       more.push(n.d);
     }
-    if (more.length) html += '<section aria-labelledby="more-title"><h2 class="sec" id="more-title">Up next</h2><ul class="posts">' + more.map(card).join('') + '</ul></section>';
+    if (more.length) html += '<section aria-labelledby="more-title"><h2 class="sec" id="more-title">More to read</h2><ul class="posts">' + more.map(card).join('') + '</ul></section>';
     if (saved.length) html += '<section aria-labelledby="saved-title"><h2 class="sec" id="saved-title">Saved</h2><ul class="posts">' + saved.map(card).join('') + '</ul></section>';
-    html += '<section class="map" aria-labelledby="map-title"><h2 class="sec" id="map-title">Your progress</h2>' +
-      '<p class="map__sum">' + st.discovered + ' of ' + st.total + ' discoveries · ' + st.labsDone + ' of ' + st.labsTotal + ' simulations · ' + st.notes + (st.notes === 1 ? ' note' : ' notes') + '</p>' +
-      '<ul class="map__list">' + st.concepts.map(function (c) {
-        var cls = c.done === c.total ? 'is-full' : c.done ? 'is-some' : '';
-        return '<li class="map__node ' + cls + '"><span class="map__dot" aria-hidden="true"></span>' + esc(c.name) + '<span class="map__n">' + c.done + '/' + c.total + '</span></li>';
-      }).join('') + '</ul></section>';
     return html;
   }
 
-  // A post in a list: headline, subtitle and a small meta line, with a lettered thumbnail.
+  // A story in a list: red fly title, headline, rubric and a small meta line.
   function card(d) {
     var s = S().seen[d.id];
     var state = !s ? 'New' : s.stage === 'done' ? (s.correct === false ? 'Surprised you' : 'Read') : 'In progress';
-    var name = Brain.conceptName(C, d.concept);
-    return '<li><a class="post" href="#d/' + esc(d.id) + '"><span class="post__text">' +
+    return '<li><a class="post" href="#d/' + esc(d.id) + '">' +
+      '<span class="fly">' + esc(Brain.conceptName(C, d.concept)) + '</span>' +
       '<span class="post__title">' + esc(d.title) + '</span><span class="post__sub">' + esc(d.hook) + '</span>' +
-      '<span class="post__meta">' + esc(name) + ' · ' + (d.minutes || 3) + ' min read · <span class="' + (!s ? 'is-new' : '') + '">' + state + '</span>' + (d.lab ? ' · simulation' : '') + '</span></span>' +
-      '<span class="post__thumb" aria-hidden="true">' + esc(name.charAt(0)) + '</span></a></li>';
+      '<span class="post__meta">' + (d.minutes || 3) + ' min read · <span class="' + (!s ? 'is-new' : '') + '">' + state + '</span>' + (d.lab ? ' · with a simulation' : '') + '</span></a></li>';
   }
 
   function explore() {
@@ -308,22 +313,22 @@
     var right = revealed ? grade(item) : null;
     var rv = item.reveal || {};
     var html = header() + '<article class="disc' + (revealed ? ' is-revealed' : '') + '" aria-labelledby="disc-title">' +
-      '<p class="kicker">' + esc(Brain.conceptName(C, d.concept)) +
+      '<p class="fly">' + esc(Brain.conceptName(C, d.concept)) +
         (v ? ' · Back with a new scenario' : '') +
         (inSession ? ' · Part ' + (session.ids.indexOf(d.id) + 1) + ' of ' + session.ids.length : '') + '</p>' +
       '<h1 class="disc__title" id="disc-title">' + esc(d.title) + '</h1>' +
-      '<p class="disc__hook">' + esc(item.hook) + '</p>' +
-      '<p class="byline">' + avatar() + '<span><b>Curiosity Cat</b><span class="byline__meta">' + (d.minutes || 3) + ' min read · ' + esc(kindLabel(item.predict.type)) + '</span></span></p>' +
+      '<p class="rubric">' + esc(item.hook) + '</p>' +
+      dateline(d) +
       '<div class="actions"><button type="button" class="heart' + (S().saved[d.id] ? ' is-on' : '') + '" data-act="save" aria-pressed="' + !!S().saved[d.id] + '">' +
         '<span aria-hidden="true">' + (S().saved[d.id] ? '♥' : '♡') + '</span>' + (S().saved[d.id] ? 'Saved' : 'Save') + '</button>' +
-        '<a class="actions__all" href="#explore">All discoveries</a></div>' +
+        '<a class="actions__all" href="#explore">All articles</a></div>' +
       '<p class="disc__ask">' + esc(item.predict.prompt) + '</p>' +
       predictHtml(d, item);
     if (ui.phase === 'sure') html += confidenceHtml();
     if (ui.phase === 'predict' && ready(item) && ['choice', 'conditional', 'spot'].indexOf(item.predict.type) !== -1) html += '<button type="button" class="cat-btn" data-act="lock">Lock it in</button>';
     if (revealed) {
       html += verdict(item, right) +
-        '<section class="reveal"><p class="reveal__say">' + esc(rv.say) + '</p><p class="reveal__text">' + esc(rv.text) + '</p></section>';
+        '<section class="reveal"><p class="reveal__say">' + esc(rv.say) + '</p><p class="reveal__text">' + esc(rv.text) + ' <span class="fin" aria-hidden="true">■</span></p></section>';
       if (rv.tempting) html += fold('tempting', 'Why the other answers were tempting', '<p>' + esc(rv.tempting) + '</p>');
       if (rv.limits) html += fold('limits', 'Where this explanation has limits', '<p>' + esc(rv.limits) + '</p>');
       if (!v && list(d.deeper).length) html += fold('deeper', 'Go deeper', list(d.deeper).map(function (sec) {
@@ -521,7 +526,7 @@
   });
 
   /* ---------- start ---------- */
-  app.innerHTML = '<p class="loading">Waking the cat…</p>';
+  app.innerHTML = '<p class="loading">Loading…</p>';
   Store.init().then(function () {
     Store.update(function (s) { s.visits = (s.visits || 0) + 1; });
     go();

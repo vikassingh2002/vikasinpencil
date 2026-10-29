@@ -11,7 +11,7 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `index.html` and the other `.html` files | Page shells | Rarely |
 | `desk.html`, `assets/js/desk.js`, `assets/css/desk.css` | Your desk (see "Your desk" below) | Only for new desk features |
 | `assets/js/desk-config.js` | Which Supabase project the desk uses | Once, when connecting Supabase |
-| `curiosity.html`, `content/curiosity.js`, `assets/js/cat*.js`, `assets/css/cat.css` | Curiosity Cat (see below) | Add discoveries in `content/curiosity.js` |
+| `curiosity.html`, `content/curiosity.js`, `assets/js/cat*.js`, `assets/css/cat.css` | Agentic AI, the learning app (see below) | Add discoveries in `content/curiosity.js` |
 | `supabase/schema.sql` | The desk's database and who may do what | Run once in Supabase; rarely edited |
 | `assets/css/notebook.css` | The look | Only for design changes |
 | `assets/js/notebook.js` | How the notebook behaves | Only for new features |
@@ -112,9 +112,9 @@ The References page is everything that's shaped how you think. The two pages hol
 
 Nothing is filled in for you. A new desk offers a few starting points (your notebook's experiments, some doors, some off-screen ideas), and you choose whether to use them.
 
-### Curiosity Cat
+### Agentic AI (once Curiosity Cat)
 
-`curiosity.html` (the Curiosity link on the desk) is a small learning app about AI agents, with its own look. Each discovery runs: a hook, your prediction (in one of several formats) and how sure you are, the reveal with optional depth, a simulation for some, a real experiment to try with a chatbot, and a next discovery with a reason.
+`curiosity.html` (the Agentic AI link on the desk) is a small learning app about AI agents, set like a weekly news magazine. Each discovery runs: a hook, your prediction (in one of several formats) and how sure you are, the reveal with optional depth, a simulation for some, a real experiment to try with a chatbot, and a next discovery with a reason.
 
 - **What comes next** is chosen in this order: ideas due back (as a new scenario, sooner if you were unsure or surprised), then more of what you asked for, then something related to what you just did, then the next step on the path. Tune explains this and lets you change it per topic.
 - **Progress** (answers, saved discoveries, notes, experiments) is kept with your desk in the cloud, in its own private settings row, so it syncs between devices. Visitors' progress stays in their own browser.

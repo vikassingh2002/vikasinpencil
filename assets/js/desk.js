@@ -514,7 +514,7 @@
     { key: 'capture', name: 'Capture', sub: 'Save thoughts and ideas' },
     { key: 'unwind', name: 'Unwind', sub: 'Rest with intention' }
   ];
-  var MORE = [['curiosity', 'Curiosity'], ['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
+  var MORE = [['curiosity', 'Agentic AI'], ['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
   var TYPES = ['Book', 'Article', 'Essay', 'Video', 'Podcast', 'Course', 'Film', 'Show', 'Music', 'Other'];
   var SHELVES = [['reading', 'To read or learn'], ['unwind', 'To unwind with']];
   var STATUS = [['queued', 'Up next'], ['doing', 'In progress'], ['done', 'Finished']];
