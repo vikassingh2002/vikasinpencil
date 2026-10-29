@@ -52,9 +52,14 @@
   }
   function tt() { return '<span class="tt" aria-hidden="true">T<small>T</small></span>'; }
 
-  var articles = list(A.articles).filter(function (a) { return a && a.id && a.title; });
+  var allArticles = list(A.articles).filter(function (a) { return a && a.id && a.title; });
+  var editions = list(A.editions).slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+  var selectedEdition = A.currentEdition;
+  function edition(id) { return editions.filter(function(e){ return e.id === (id || selectedEdition); })[0] || editions[0]; }
+  function issueArticles(e) { return list(e && e.articleIds).map(function(id){return allArticles.filter(function(a){return a.id===id;})[0];}).filter(Boolean); }
+  var articles = issueArticles(edition());
   articles.forEach(function (a) { a.minutes = Math.max(2, Math.ceil(words(a) / 220)); });
-  function byId(id) { for (var i = 0; i < articles.length; i++) if (articles[i].id === id) return articles[i]; return null; }
+  function byId(id) { for (var i = 0; i < allArticles.length; i++) if (allArticles[i].id === id) return allArticles[i]; return null; }
   var BLURB = {
     business: 'How companies are spending on, using and making money from AI',
     markets: 'The money behind the boom: investors, valuations and bubbles',
@@ -77,12 +82,14 @@
 
   var route = { name: 'today', id: '' };
   function parseRoute() {
-    var h = decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+    var h; try { h = decodeURIComponent(location.hash.replace(/^#\/?/, '')); } catch(e) { h = ''; }
     var p = h.split('/');
-    if (p[0] === 'a' && byId(p[1])) route = { name: 'article', id: p[1] };
+    if (p[0] === 'a' && byId(p[1])) { selectedEdition = byId(p[1]).editionId; articles = issueArticles(edition()); route = { name: 'article', id: p[1] }; }
     else if (p[0] === 's' && sections().some(function (s) { return s.id === p[1]; })) route = { name: 'section', id: p[1] };
-    else if (['weekly', 'foryou', 'saved', 'brief'].indexOf(p[0]) !== -1) route = { name: p[0], id: '' };
-    else route = { name: 'today', id: '' }; // older links (#d/…, #curiosity/…) land here
+    else if (['weekly','brief'].indexOf(p[0]) !== -1) { var e = edition(p[1]); selectedEdition = e.id; articles = issueArticles(e); route = {name:p[0],id:e.id}; }
+    else if (p[0] === 'editions') route = {name:'editions',id:''};
+    else if (['foryou','saved'].indexOf(p[0]) !== -1) route = {name:p[0],id:''};
+    else { selectedEdition = A.currentEdition; articles = issueArticles(edition()); route = { name: 'today', id: '' }; } // older links (#d/…, #curiosity/…) land here
   }
 
   /* ---------- shared pieces ---------- */
@@ -128,7 +135,7 @@
 
   /* ---------- pages ---------- */
   function today() {
-    var frontOrder = ['cost-of-correct', 'electricity-option', 'apprentice-economy', 'context-tax', 'integration-moat', 'open-weight-economics', 'benchmark-theatre', 'prediction-laboratory', 'audit-trail', 'reviewer-bottleneck'];
+    var frontOrder = list(edition().articleIds);
     var order = frontOrder.map(byId).filter(Boolean).concat(articles.filter(function (a) { return frontOrder.indexOf(a.id) < 0; }));
     if (!order.length) return topbar() + '<p class="empty">No articles yet.</p>';
     var lead = order[0];
@@ -136,10 +143,11 @@
     var html = topbar() + '<main class="app-main"><div class="edition-line"><span>Ideas, evidence and the business of intelligence</span><span>' + esc(econDate(A.reviewed)) + '</span></div>' +
       '<div class="news-front"><div class="news-front__lead">' + bigCard(lead, true) + '</div>' +
       '<div class="news-front__middle"><ul class="rows">' + rest.slice(0, 2).map(function (a) { return '<li class="news-secondary">' + bigCard(a) + '</li>'; }).join('') + '</ul></div>' +
-      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief →</h2><p class="rail-intro">What matters in AI, and why.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief">Every article in a sentence →</a></aside></div>' +
+      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief →</h2><p class="rail-intro">What matters in AI, and why.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief/' + esc(edition().id) + '">Read AI in Brief →</a></aside></div>' +
+      block('AI in brief') + '<ul class="carousel brief-carousel">' + list(A.briefs).filter(function(b){return edition().articleIds.indexOf(b.articleId)>=0;}).slice(0,5).map(function(b){return '<li class="slide"><a href="#brief/' + esc(edition().id) + '/' + esc(b.id) + '">' + picture(byId(b.articleId),'slide__img') + '<span class="slide__title">' + esc(b.headline) + '</span><span class="brief-card-date">' + esc(econDate(b.date)) + '</span></a></li>';}).join('') + '</ul>' +
       block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
 
-    html += '<a class="edition-feature" href="#a/prediction-laboratory">' + picture(byId('prediction-laboratory'), 'edition-feature__image') + '<span class="edition-feature__text"><span class="fly">The science of intelligence</span><strong>What happens after the prediction?</strong><span>How AI is changing the questions scientists can ask—and the experiments they still need to do.</span><b>Read the analysis →</b></span></a>';
+    html += '<a class="edition-feature" href="#weekly/' + esc(edition().id) + '"><span class="edition-feature__image"><img src="' + esc(edition().cover) + '" alt="" loading="lazy"></span><span class="edition-feature__text"><span class="fly">The weekly edition · ' + esc(econDate(edition().date)) + '</span><strong>' + esc(edition().title) + '</strong><span>' + esc(edition().subtitle) + '</span><b>Read the edition →</b></span></a>';
     sections().forEach(function (s) {
       var inS = articles.filter(function (a) { return a.section === s.id; });
       html += '<section class="newspaper-section">' + block(s.name) + '<div class="section-stories">' + inS.slice(0, 3).map(function (a) { return bigCard(a); }).join('') + '</div>' + (inS.length > 3 ? '<ul class="rows section-rest">' + inS.slice(3).map(row).join('') + '</ul>' : '') + '</section>';
@@ -166,32 +174,31 @@
   }
 
   function savedPage() {
-    var ss = articles.filter(isSaved);
+    var ss = allArticles.filter(isSaved);
     return topbar() + '<main class="app-main"><header class="sec-head"><h1>Saved</h1><p>Articles you bookmarked</p></header>' +
       (ss.length ? '<ul class="rows">' + ss.map(row).join('') + '</ul>' : '<p class="empty">Nothing saved yet. Tap the bookmark on any article.</p>') + '</main>';
   }
 
   function briefPage() {
-    return topbar() + '<main class="app-main"><header class="sec-head"><h1>In brief</h1><p>Every article, one line each</p></header><ul class="brief-lines">' +
-      articles.map(function (a) { return '<li><a href="#a/' + esc(a.id) + '"><b>' + esc(a.title) + '.</b> ' + esc(a.rubric) + '.</a></li>'; }).join('') + '</ul></main>';
+    var e = edition(route.id);
+    var briefs = list(A.briefs).filter(function(b){ return e.articleIds.indexOf(b.articleId) >= 0; });
+    return '<div class="desktop-article-header">' + topbar() + '</div><header class="art-top"><a class="icon-btn" href="#/" aria-label="Back to home">' + icon('back') + '</a><button class="icon-btn" type="button" data-act="size" aria-label="Text size">' + tt() + '</button></header>' +
+      '<main class="brief-reader art--size' + readSize() + '"><header><p class="fly">The week in artificial intelligence</p><h1>AI in brief</h1><p class="brief-reader__date">Monday, ' + esc(econDate(e.date)) + ' · Coverage: ' + esc(econDate(e.coverageStart)) + '–' + esc(econDate(e.coverageEnd)) + '</p><p class="brief-reader__intro">The developments that mattered, in a few paragraphs.</p></header>' +
+      briefs.map(function(b){ return '<section class="news-brief" id="' + esc(b.id) + '"><p><strong>' + esc(b.headline) + '.</strong> ' + esc(b.text) + '</p><div class="news-brief__links"><time datetime="' + esc(b.date) + '">' + esc(econDate(b.date)) + '</time><a href="#a/' + esc(b.articleId) + '">Read the analysis →</a><a href="' + esc(safeUrl(b.source.url)) + '" target="_blank" rel="noopener">Source ↗</a></div></section>'; }).join('') + '<p class="edition-colophon">' + esc(e.notes) + '</p></main>';
   }
-
-  // The weekly issue: a cover made from the lead article, then its contents by section.
+  function editionCard(e) {
+    return '<a class="edition-card" href="#weekly/' + esc(e.id) + '"><img src="' + esc(e.cover) + '" alt="Cover artwork for ' + esc(e.title) + '"><time>' + esc(econDate(e.date,true)) + '</time><h2>' + esc(e.title) + '</h2><p>' + e.articleIds.length + ' articles · ' + esc(e.coverageStart) + '–' + esc(e.coverageEnd) + '</p></a>';
+  }
+  function editionArchive() {
+    return topbar() + '<main class="app-main"><header class="sec-head"><h1>Browse editions</h1><p>A new issue every Monday. Each edition keeps its own cover, contents and links.</p></header><div class="edition-archive">' + editions.map(editionCard).join('') + '</div><p class="edition-colophon">New editions appear here after publication. Future dates are not published issues.</p></main>';
+  }
   function weekly() {
-    var lead = byId('cost-of-correct') || articles[0];
-    var pic = lead ? Art.get(lead.id, 'lead') : null;
-    return topbar() + '<header class="weekly-top"><h1>The weekly edition</h1><a href="#brief">Browse articles</a></header>' +
-      '<nav class="weekly-tabs" aria-label="Sections">' + sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '">' + esc(s.name) + '</a>'; }).join('') + '</nav>' +
-      '<main class="app-main weekly">' +
-        (lead ? '<a class="cover" href="#a/' + esc(lead.id) + '"><span class="cover__mast">Agentic AI</span>' +
-          '<span class="cover__lines">' + articles.slice(1, 5).map(function (a) { return '<span>' + esc(a.title) + '</span>'; }).join('') + '</span>' +
-          (pic ? '<span class="cover__art" aria-hidden="true">' + pic.svg + '</span>' : '') +
-          '<span class="cover__head">' + esc(lead.title) + '</span></a>' +
-          '<p class="weekly__date">' + esc(econDate(A.reviewed, true)) + '</p><p class="weekly__title">' + esc(lead.title) + '</p>' : '') +
-        sections().map(function (s) {
-          return block(s.name) + '<ul class="rows">' + articles.filter(function (a) { return a.section === s.id; }).map(row).join('') + '</ul>';
-        }).join('') +
-      '</main>';
+    var e = edition(route.id);
+    var issue = issueArticles(e);
+    return '<div class="weekly-desktop-mast">' + topbar() + '</div><header class="weekly-top"><h1>Weekly</h1><a href="#editions">Browse editions</a></header>' +
+      '<nav class="weekly-tabs" aria-label="In this edition"><a href="#brief/' + esc(e.id) + '">AI this week</a>' + sections().map(function(s){return '<a href="#weekly/' + esc(e.id) + '/' + esc(s.id) + '">' + esc(s.name) + '</a>';}).join('') + '</nav>' +
+      '<main class="weekly"><div class="weekly-cover-block"><a class="issue-cover" href="#a/' + esc(e.leadId) + '"><img src="' + esc(e.cover) + '" alt="Original illustration for ' + esc(e.title) + '"><span class="issue-cover__mast">Agentic<br>AI</span><span class="issue-cover__lines">' + issue.slice(1,4).map(function(a){return '<span>' + esc(a.title) + '</span>';}).join('') + '<span>' + esc(econDate(e.coverageStart,true)) + '–' + esc(econDate(e.coverageEnd,true)) + '</span></span><strong>' + esc(e.title) + '</strong></a><p class="weekly__date">' + esc(econDate(e.date,true)) + '</p><h2 class="weekly__title">' + esc(e.title) + '</h2></div>' +
+      '<div class="weekly-contents"><p class="issue-intro">' + esc(e.subtitle) + '</p><p class="issue-count">' + issue.length + ' articles · A Monday publication</p>' + sections().map(function(s){return '<section id="issue-' + esc(s.id) + '">' + block(s.name) + '<ul class="rows">' + issue.filter(function(a){return a.section===s.id;}).map(row).join('') + '</ul></section>';}).join('') + '<p class="edition-colophon">' + esc(e.notes) + '</p></div></main>';
   }
 
   function article() {
@@ -221,19 +228,19 @@
         '<p class="art__kicker"><a href="#s/' + esc(a.section) + '">' + esc(sectionName(a.section)) + '</a><span>|</span>' + esc(a.fly || '') + '</p>' +
         '<h1 class="art__title" id="art-title">' + esc(a.title) + '</h1>' +
         '<p class="art__rubric">' + esc(a.rubric) + '</p>' +
-        (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption) + (pic.creditUrl ? ' <a href="' + esc(pic.creditUrl) + '" target="_blank" rel="noopener">Source ↗</a>' : '') + '</figcaption></figure>' : '') +
+        (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption) + '<span class="caption-description">' + esc(pic.description || '') + '</span>' + (pic.creditUrl ? ' <a href="' + esc(pic.creditUrl) + '" target="_blank" rel="noopener">Source ↗</a>' : '') + '</figcaption></figure>' : '') +
         '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + (a.kind ? ' · ' + esc(a.kind) : '') + ' · ' + (a.minutes || 3) + ' min read</p>' +
         '<div class="listen"><button type="button" class="listen__btn" data-act="listen" aria-pressed="' + speaking + '">' + icon(speaking ? 'stop' : 'play') + '<b>' + (speaking ? 'Stop' : 'Listen') + '</b> <span>' + listenTime(a) + '</span></button>' +
           '<span class="listen__tag">DEVICE VOICE</span></div>' +
         '<div class="art__body">' + body + '</div>' +
-        '<p class="art__note">This article appears in the ' + esc(sectionName(a.section)) + ' section of Agentic AI under the headline “' + esc(a.title) + '”</p>' +
-        (list(a.sources).length ? '<aside class="art__sources"><h2>Sources</h2><ul>' + a.sources.map(function (x) {
+        '<p class="art__note">This article appears in the ' + esc(sectionName(a.section)) + ' section of the <a href="#weekly/' + esc(a.editionId) + '">' + esc(econDate(edition(a.editionId).date)) + ' edition</a> under the headline “' + esc(a.title) + '”.</p>' +
+        (list(a.sources).length ? '<details class="art__sources"><summary>Sources and reporting dates</summary><ul>' + a.sources.map(function (x) {
           var u = safeUrl(x.url);
           return '<li>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(x.title) + '</a>' : esc(x.title)) + (x.date ? ' <span>' + esc(econDate(x.date)) + '</span>' : '') + '</li>';
-        }).join('') + '</ul></aside>' : '') +
-        '<section class="explore"><h2>Explore more</h2><ul>' + [a.section].map(function (s) {
+        }).join('') + '</ul></details>' : '') +
+        '<section class="explore"><h2>Explore more</h2><ul>' + [a.section, 'all-ai'].map(function (s) {
           var f = follows(s);
-          return '<li><a href="#s/' + esc(s) + '">' + esc(sectionName(s)) + '</a><button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></li>';
+          return '<li><a href="' + (s === 'all-ai' ? '#/' : '#s/' + esc(s)) + '">' + esc(s === 'all-ai' ? 'Artificial intelligence' : sectionName(s)) + '</a><button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></li>';
         }).join('') + '</ul></section>' +
         (more.length ? '<section class="more"><h2>More from ' + esc(sectionName(a.section)) + '</h2><ul class="rows">' + more.map(row).join('') + '</ul></section>' : '') +
       '</article><aside class="reader-rail"><h2>More on artificial intelligence →</h2><ul class="rows">' + articles.filter(function (x) { return x.id !== a.id; }).slice(0, 4).map(row).join('') + '</ul><a class="rail-link" href="#weekly">Explore the complete edition →</a></aside></main>';
@@ -302,9 +309,9 @@
       Store.update(function (s) { var x = s.seen[route.id] || {}; x.stage = 'done'; x.at = Date.now(); s.seen[route.id] = x; });
     }
     var html = route.name === 'article' ? article() : route.name === 'section' ? sectionPage() : route.name === 'saved' ? savedPage()
-      : route.name === 'weekly' ? weekly() : route.name === 'foryou' ? forYou() : route.name === 'brief' ? briefPage() : today();
+      : route.name === 'weekly' ? weekly() : route.name === 'editions' ? editionArchive() : route.name === 'foryou' ? forYou() : route.name === 'brief' ? briefPage() : today();
     app.innerHTML = html + bottombar() + menu();
-    document.body.classList.toggle('is-article', route.name === 'article');
+    document.body.classList.toggle('is-article', route.name === 'article' || route.name === 'brief');
     document.title = (route.name === 'article' ? byId(route.id).title + ' | ' : '') + 'Agentic AI';
   }
   function go() {
@@ -316,6 +323,9 @@
     if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     if (listenNext && route.name === 'article' && route.id === listenNext) { speak(byId(listenNext)); render(); }
     listenNext = '';
+    var anchor = location.hash.split('/')[2];
+    if (anchor && route.name === 'weekly') { var target = document.getElementById('issue-' + anchor); if(target) target.scrollIntoView({block:'start'}); }
+    if (anchor && route.name === 'brief') { var target = document.getElementById(anchor); if(target) target.scrollIntoView({block:'start'}); }
   }
 
   var ACT = {
@@ -338,7 +348,7 @@
     'listen-card': function (t) { listenNext = t.getAttribute('data-id'); location.hash = 'a/' + listenNext; },
     size: function () { var n = readSize() % 3 + 1; setSize(n); render(); toast(['', 'Text: standard', 'Text: larger', 'Text: largest'][n]); },
     share: function () {
-      var a = byId(route.id);
+      var a = byId(route.id) || {title:'AI in brief',rubric:edition().title};
       if (navigator.share) navigator.share({ title: a.title, text: a.rubric, url: location.href }).catch(function () { /* cancelled */ });
       else if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(function () { toast('Link copied'); });
     },
