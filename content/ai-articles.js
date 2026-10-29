@@ -186,8 +186,8 @@ NB.aiArticles.articles.unshift.apply(NB.aiArticles.articles, [
     "fly": "The automation bargain",
     "date": "2026-10-29",
     "minutes": 3,
-    "title": "The case for a less ambitious machine",
-    "rubric": "A useful AI system may need fewer decisions to make, rather than a cleverer model",
+    "title": "The virtues of a dull machine",
+    "rubric": "Autonomy is useful when the route is uncertain. Routine work often rewards restraint",
     "body": [
       "Consider a hypothetical accounts department with an unglamorous ambition: to clear its invoice queue before Friday. The documents arrive in different formats, but the decisions are familiar. Identify the supplier, match the purchase order, check the amount and send exceptions to a person. An autonomous agent could choose how to tackle each invoice. The first question is why it should have to.",
       "The distinction is architectural. In its guide to building effective agents, published in December 2024, Anthropic separates workflows, whose paths are specified in code, from agents, which choose their next steps dynamically. It recommends starting with the simplest arrangement that works. Autonomy brings flexibility, but can add cost and delay. That is a trade, not an automatic improvement.",
@@ -217,7 +217,7 @@ NB.aiArticles.articles.unshift.apply(NB.aiArticles.articles, [
     "fly": "Designing for agents",
     "date": "2026-10-29",
     "minutes": 3,
-    "title": "The instruction manual is part of the machine",
+    "title": "Better tools, fewer mistakes",
     "rubric": "Before replacing a struggling model, examine the tools it has been given",
     "body": [
       "Imagine hiring an assistant and giving them two buttons labelled “Search” and “Lookup”. One searches the current customer list; the other searches an archive. Neither says which identifier it expects. When the assistant picks the wrong button, calling them incompetent would be a peculiar management technique. Yet software teams can create much the same confusion for an AI agent.",
@@ -248,7 +248,7 @@ NB.aiArticles.articles.unshift.apply(NB.aiArticles.articles, [
     "fly": "The limits of explanation",
     "date": "2026-10-29",
     "minutes": 3,
-    "title": "A convincing explanation is not a receipt",
+    "title": "Trust, but inspect",
     "rubric": "An AI’s account of its reasoning can be useful without being a faithful record of what influenced it",
     "body": [
       "A fluent explanation is comforting. Presented with a wrong answer and an orderly argument, a reader can at least see where to begin. Presented with a right answer and an orderly argument, the reader may stop checking altogether. That second response deserves more suspicion.",

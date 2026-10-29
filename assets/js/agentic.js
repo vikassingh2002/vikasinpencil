@@ -108,13 +108,13 @@
       '<span class="acts__right"><button type="button" class="icon-btn" data-act="listen-card" data-id="' + esc(a.id) + '" aria-label="Listen to ' + esc(a.title) + '">' + icon('play') + '</button>' +
       '<button type="button" class="icon-btn' + (on ? ' is-on' : '') + '" data-act="save" data-id="' + esc(a.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved' : 'Save') + '">' + icon('mark') + '</button></span></div>';
   }
-  function picture(a, cls) { var x = Art.get(a.id, 'thumbnail'); return x ? '<span class="' + cls + '" aria-hidden="true">' + x.svg + '</span>' : ''; }
+  function picture(a, cls, lead) { var x = Art.get(a.id, lead ? 'lead' : 'thumbnail'); return x ? '<span class="' + cls + '" aria-hidden="true">' + x.svg + '</span>' : ''; }
   function label(a) { return '<span class="lbl">' + esc(a.fly || sectionName(a.section)) + '</span>'; }
   function block(title) { return '<h2 class="block"><span>' + esc(title) + '</span></h2>'; }
 
   /* a big card, a carousel card, and a list row */
-  function bigCard(a) {
-    return '<article class="big"><a class="big__link" href="#a/' + esc(a.id) + '">' + picture(a, 'big__img') + label(a) +
+  function bigCard(a, lead) {
+    return '<article class="big"><a class="big__link" href="#a/' + esc(a.id) + '">' + picture(a, 'big__img', lead) + label(a) +
       '<span class="big__title">' + esc(a.title) + '</span><span class="big__rubric">' + esc(a.rubric) + '</span></a>' + actions(a) + '</article>';
   }
   function slide(a, small) {
@@ -127,14 +127,14 @@
 
   /* ---------- pages ---------- */
   function today() {
-    var order = articles.filter(function (a) { return !isRead(a); }).concat(articles.filter(isRead));
+    var order = articles.slice();
     if (!order.length) return topbar() + '<p class="empty">No articles yet.</p>';
     var lead = order[0];
     var rest = order.slice(1);
     var html = topbar() + '<main class="app-main"><div class="edition-line"><span>Ideas, evidence and the business of intelligence</span><span>' + esc(econDate(A.reviewed)) + '</span></div>' +
-      '<div class="news-front"><div class="news-front__lead">' + bigCard(lead) + '</div>' +
+      '<div class="news-front"><div class="news-front__lead">' + bigCard(lead, true) + '</div>' +
       '<div class="news-front__middle"><ul class="rows">' + rest.slice(0, 2).map(function (a) { return '<li class="news-secondary">' + bigCard(a) + '</li>'; }).join('') + '</ul></div>' +
-      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief</h2><p class="rail-intro">The ideas behind the headlines. Each explained in a few minutes.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief">Every article in a sentence →</a></aside></div>' +
+      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief →</h2><p class="rail-intro">What matters in AI, and why.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief">Every article in a sentence →</a></aside></div>' +
       block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
 
     sections().forEach(function (s) {
@@ -194,7 +194,8 @@
   function article() {
     var a = byId(route.id);
     var on = isSaved(a);
-    var pic = Art.get(a.id);
+    var pic = Art.get(a.id, 'lead');
+    var chart = Art.chart ? Art.chart(a.id) : null;
     var paras = 0;
     var body = list(a.body).map(function (b) {
       if (b && typeof b === 'object') return '<h2 class="art__cross">' + esc(b.h) + '</h2>';
@@ -204,7 +205,7 @@
         var m = /^(\S+(?:\s+\S+)?)(\s[\s\S]*)$/.exec(text);
         if (m) text = '<span class="smallcaps">' + m[1] + '</span>' + m[2];
       }
-      return '<p>' + text + '</p>';
+      return '<p>' + text + '</p>' + (paras === 2 && chart ? '<figure class="evidence-chart">' + chart.svg + '<figcaption>' + esc(chart.caption) + '</figcaption></figure>' : '');
     }).join('');
     var more = articles.filter(function (x) { return x.section === a.section && x !== a; });
     if (more.length < 2) more = more.concat(articles.filter(function (x) { return x.section !== a.section && !isRead(x); }).slice(0, 2 - more.length));
@@ -217,7 +218,7 @@
         '<p class="art__kicker"><a href="#s/' + esc(a.section) + '">' + esc(sectionName(a.section)) + '</a><span>|</span>' + esc(a.fly || '') + '</p>' +
         '<h1 class="art__title" id="art-title">' + esc(a.title) + '</h1>' +
         '<p class="art__rubric">' + esc(a.rubric) + '</p>' +
-        (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption.toUpperCase()) + '</figcaption></figure>' : '') +
+        (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption) + (pic.creditUrl ? ' <a href="' + esc(pic.creditUrl) + '" target="_blank" rel="noopener">Source ↗</a>' : '') + '</figcaption></figure>' : '') +
         '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + ' · ' + (a.minutes || 3) + ' min read</p>' +
         '<div class="listen"><button type="button" class="listen__btn" data-act="listen" aria-pressed="' + speaking + '">' + icon(speaking ? 'stop' : 'play') + '<b>' + (speaking ? 'Stop' : 'Listen') + '</b> <span>' + listenTime(a) + '</span></button>' +
           '<span class="listen__tag">DEVICE VOICE</span></div>' +

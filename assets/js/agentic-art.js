@@ -141,3 +141,18 @@ window.AgenticArt = (function () {
     return ART[id] ? ART[id]() : null;
   } };
 })();
+
+/* Licensed local photographs and original raster artwork. Charts remain separate. */
+(function () {
+ var original = window.AgenticArt;
+ var media = {"workflow-dividend": ["office", "An open-plan office. Photograph: Arlington Research / Unsplash. Illustrative photograph; not the hypothetical accounts department described.", "https://unsplash.com/photos/kN_kViDchA0"], "tool-contract": ["tools", "A key and a computer port. Original AI-generated editorial illustration.", ""], "reasoning-evidence": ["reasoning", "Examining an explanation. Original AI-generated editorial illustration.", ""], "pilots": ["servers", "Data-centre cabinets and cabling. Photograph: Taylor Vick / Unsplash. Illustrative photograph.", "https://unsplash.com/photos/aWslrFhs1w4"], "deepseek": ["markets", "A cryptocurrency trading chart. Photograph: Behnam Norouzi / Unsplash. Illustrative photograph; not Nvidia trading data.", "https://unsplash.com/photos/RDXcFY5g5O4"], "llm": ["circuits", "Arduino electronics on a blue surface. Photograph: Sahand Babali / Unsplash. Illustrative photograph; not a model-training chip.", "https://unsplash.com/photos/gavODTHG36Y"], "agents": ["tools", "Delegating control. Original AI-generated editorial illustration.", ""], "power": ["power", "Electricity transmission infrastructure. Photograph: Ilona Frey / Unsplash.", "https://unsplash.com/photos/4r7orhB4YWA"], "novices": ["office", "People at work in an open-plan office. Photograph: Arlington Research / Unsplash. Illustrative photograph; not study participants.", "https://unsplash.com/photos/kN_kViDchA0"], "alphafold": ["science", "A researcher at an electron microscope. Photograph: National Cancer Institute / Unsplash. Illustrative photograph; not the AlphaFold team.", "https://unsplash.com/photos/rAJHnQz5jHc"], "euaiact": ["reasoning", "Scrutinising the evidence. Original AI-generated editorial illustration.", ""], "deploy": ["servers", "Inside a data centre. Photograph: Taylor Vick / Unsplash. Illustrative photograph.", "https://unsplash.com/photos/aWslrFhs1w4"]};
+ var chartIds = ['pilots', 'deepseek', 'power', 'novices', 'agents'];
+ window.AgenticArt = {
+  get: function (id, context) {
+   var m = media[id];
+   if (!m) return original.get(id, context);
+   return { svg: '<img src="assets/img/editorial/' + m[0] + '.jpg" alt="" width="1200" height="800" decoding="async" loading="' + (context === 'lead' ? 'eager' : 'lazy') + '"' + (context === 'lead' ? ' fetchpriority="high"' : '') + '>', caption: m[1], creditUrl: m[2] };
+  },
+  chart: function (id) { return chartIds.indexOf(id) >= 0 ? original.get(id) : null; }
+ };
+})();
