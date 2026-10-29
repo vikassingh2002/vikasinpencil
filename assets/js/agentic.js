@@ -53,6 +53,7 @@
   function tt() { return '<span class="tt" aria-hidden="true">T<small>T</small></span>'; }
 
   var articles = list(A.articles).filter(function (a) { return a && a.id && a.title; });
+  articles.forEach(function (a) { a.minutes = Math.max(2, Math.ceil(words(a) / 220)); });
   function byId(id) { for (var i = 0; i < articles.length; i++) if (articles[i].id === id) return articles[i]; return null; }
   var BLURB = {
     business: 'How companies are spending on, using and making money from AI',
@@ -90,8 +91,8 @@
     var here = route.name === 'section' ? route.id : '';
     return '<header class="app-top"><div class="app-top__row">' +
       '<button type="button" class="icon-btn" data-act="menu" aria-label="Menu" aria-expanded="' + menuOpen + '">' + icon('menu') + '</button>' +
-      '<a class="wordmark" href="#/">Agentic AI</a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
-      '<nav class="app-tabs" aria-label="Sections"><a href="#/"' + (route.name === 'today' ? ' aria-current="page"' : '') + '>Home</a>' +
+      '<a class="wordmark" href="#/" aria-label="Agentic AI home"><span>Agentic</span> <span>AI</span></a><nav class="desktop-links" aria-label="Your reading"><a href="#weekly">Weekly edition</a><a href="#brief">In brief</a><a href="#foryou">For you</a><a href="#saved">Saved</a><a href="desk.html">The desk ↗</a></nav><span class="icon-btn icon-btn--ghost" aria-hidden="true"></span></div>' +
+      '<nav class="app-tabs" aria-label="Sections"><a href="#weekly">Weekly edition</a><a href="#brief">AI in brief</a><a href="#/"' + (route.name === 'today' ? ' aria-current="page"' : '') + '>Home</a>' +
         sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '"' + (here === s.id ? ' aria-current="page"' : '') + '>' + esc(s.name) + '</a>'; }).join('') +
       '</nav></header>';
   }
@@ -127,7 +128,8 @@
 
   /* ---------- pages ---------- */
   function today() {
-    var order = articles.slice();
+    var frontOrder = ['cost-of-correct', 'electricity-option', 'apprentice-economy', 'context-tax', 'integration-moat', 'open-weight-economics', 'benchmark-theatre', 'prediction-laboratory', 'audit-trail', 'reviewer-bottleneck'];
+    var order = frontOrder.map(byId).filter(Boolean).concat(articles.filter(function (a) { return frontOrder.indexOf(a.id) < 0; }));
     if (!order.length) return topbar() + '<p class="empty">No articles yet.</p>';
     var lead = order[0];
     var rest = order.slice(1);
@@ -137,11 +139,12 @@
       '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief →</h2><p class="rail-intro">What matters in AI, and why.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief">Every article in a sentence →</a></aside></div>' +
       block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
 
+    html += '<a class="edition-feature" href="#a/prediction-laboratory">' + picture(byId('prediction-laboratory'), 'edition-feature__image') + '<span class="edition-feature__text"><span class="fly">The science of intelligence</span><strong>What happens after the prediction?</strong><span>How AI is changing the questions scientists can ask—and the experiments they still need to do.</span><b>Read the analysis →</b></span></a>';
     sections().forEach(function (s) {
-      var inS = articles.filter(function (a) { return a.section === s.id && a !== lead; });
-      if (inS.length) html += block(s.name) + '<ul class="rows">' + inS.map(row).join('') + '</ul>';
+      var inS = articles.filter(function (a) { return a.section === s.id; });
+      html += '<section class="newspaper-section">' + block(s.name) + '<div class="section-stories">' + inS.slice(0, 3).map(function (a) { return bigCard(a); }).join('') + '</div>' + (inS.length > 3 ? '<ul class="rows section-rest">' + inS.slice(3).map(row).join('') + '</ul>' : '') + '</section>';
     });
-    return html + '</main>';
+    return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="assets/img/editorial/credits.md">Image credits</a><a href="desk.html">Vikas in Pencil</a></nav></footer></main>';
   }
 
   function sectionPage() {
@@ -149,7 +152,7 @@
     var f = follows(s);
     return topbar() + '<main class="app-main"><header class="sec-head"><h1>' + esc(sectionName(s)) + '</h1><p>' + esc(BLURB[s] || '') + '</p>' +
       '<button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></header>' +
-      '<ul class="rows">' + articles.filter(function (a) { return a.section === s; }).map(row).join('') + '</ul></main>';
+      '<div class="section-stories">' + articles.filter(function (a) { return a.section === s; }).map(function (a) { return bigCard(a); }).join('') + '</div></main>';
   }
 
   function forYou() {
@@ -175,9 +178,9 @@
 
   // The weekly issue: a cover made from the lead article, then its contents by section.
   function weekly() {
-    var lead = articles[0];
-    var pic = lead ? Art.get(lead.id) : null;
-    return '<header class="weekly-top"><h1>Weekly</h1><a href="#brief">Browse articles</a></header>' +
+    var lead = byId('cost-of-correct') || articles[0];
+    var pic = lead ? Art.get(lead.id, 'lead') : null;
+    return topbar() + '<header class="weekly-top"><h1>The weekly edition</h1><a href="#brief">Browse articles</a></header>' +
       '<nav class="weekly-tabs" aria-label="Sections">' + sections().map(function (s) { return '<a href="#s/' + esc(s.id) + '">' + esc(s.name) + '</a>'; }).join('') + '</nav>' +
       '<main class="app-main weekly">' +
         (lead ? '<a class="cover" href="#a/' + esc(lead.id) + '"><span class="cover__mast">Agentic AI</span>' +
@@ -214,12 +217,12 @@
       '<span class="art-top__right"><button type="button" class="icon-btn" data-act="size" aria-label="Text size">' + tt() + '</button>' +
       '<button type="button" class="icon-btn' + (on ? ' is-on' : '') + '" data-act="save" data-id="' + esc(a.id) + '" aria-pressed="' + on + '" aria-label="' + (on ? 'Saved' : 'Save') + '">' + icon('mark') + '</button>' +
       '<button type="button" class="icon-btn" data-act="share" aria-label="Share">' + icon('share') + '</button></span></header>' +
-      '<main class="app-main"><article class="art art--size' + size + '" aria-labelledby="art-title">' +
+      '<main class="app-main reader-layout"><article class="art art--size' + size + '" aria-labelledby="art-title">' +
         '<p class="art__kicker"><a href="#s/' + esc(a.section) + '">' + esc(sectionName(a.section)) + '</a><span>|</span>' + esc(a.fly || '') + '</p>' +
         '<h1 class="art__title" id="art-title">' + esc(a.title) + '</h1>' +
         '<p class="art__rubric">' + esc(a.rubric) + '</p>' +
         (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption) + (pic.creditUrl ? ' <a href="' + esc(pic.creditUrl) + '" target="_blank" rel="noopener">Source ↗</a>' : '') + '</figcaption></figure>' : '') +
-        '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + ' · ' + (a.minutes || 3) + ' min read</p>' +
+        '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + (a.kind ? ' · ' + esc(a.kind) : '') + ' · ' + (a.minutes || 3) + ' min read</p>' +
         '<div class="listen"><button type="button" class="listen__btn" data-act="listen" aria-pressed="' + speaking + '">' + icon(speaking ? 'stop' : 'play') + '<b>' + (speaking ? 'Stop' : 'Listen') + '</b> <span>' + listenTime(a) + '</span></button>' +
           '<span class="listen__tag">DEVICE VOICE</span></div>' +
         '<div class="art__body">' + body + '</div>' +
@@ -233,13 +236,13 @@
           return '<li><a href="#s/' + esc(s) + '">' + esc(sectionName(s)) + '</a><button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></li>';
         }).join('') + '</ul></section>' +
         (more.length ? '<section class="more"><h2>More from ' + esc(sectionName(a.section)) + '</h2><ul class="rows">' + more.map(row).join('') + '</ul></section>' : '') +
-      '</article></main>';
+      '</article><aside class="reader-rail"><h2>More on artificial intelligence →</h2><ul class="rows">' + articles.filter(function (x) { return x.id !== a.id; }).slice(0, 4).map(row).join('') + '</ul><a class="rail-link" href="#weekly">Explore the complete edition →</a></aside></main>';
   }
 
   function menu() {
     if (!menuOpen) return '';
     return '<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Menu"><div class="menu__panel">' +
-      '<div class="menu__head"><span class="wordmark">Agentic AI</span><button type="button" class="menu__close" data-act="menu" aria-label="Close menu">×</button></div>' +
+      '<div class="menu__head"><span class="wordmark"><span>Agentic</span> <span>AI</span></span><button type="button" class="menu__close" data-act="menu" aria-label="Close menu">×</button></div>' +
       '<h2 class="menu__title">Sections</h2><ul class="menu__list">' + sections().map(function (s) {
         return '<li><a href="#s/' + esc(s.id) + '">' + esc(s.name) + '</a></li>';
       }).join('') + '</ul>' +
@@ -251,7 +254,7 @@
   }
 
   function privateNotice() {
-    return '<header class="app-top"><div class="app-top__row"><span class="icon-btn icon-btn--ghost"></span><span class="wordmark">Agentic AI</span><span class="icon-btn icon-btn--ghost"></span></div></header>' +
+    return '<header class="app-top"><div class="app-top__row"><span class="icon-btn icon-btn--ghost"></span><span class="wordmark"><span>Agentic</span> <span>AI</span></span><span class="icon-btn icon-btn--ghost"></span></div></header>' +
       '<main class="app-main"><header class="sec-head"><h1>This publication is private</h1><p>Agentic AI is a personal reading room. Sign in on the desk to read it.</p>' +
       '<a class="follow" href="desk.html#signin">Sign in on the desk</a></header></main>';
   }
