@@ -61,14 +61,6 @@
   library.forEach(function (a) { a.minutes = Math.max(2, Math.ceil(words(a) / 200)); });
   function inSection(id) { return library.filter(function (a) { return a.section === id; }); }
   function byId(id) { for (var i = 0; i < allArticles.length; i++) if (allArticles[i].id === id) return allArticles[i]; return null; }
-  var BLURB = {
-    business: 'How companies are spending on, using and making money from AI',
-    markets: 'The money behind the boom: investors, valuations and bubbles',
-    technology: 'How the models, chips and agents actually work',
-    work: 'What AI does to jobs, skills and pay',
-    science: 'AI as a tool for discovery',
-    policy: 'Rules, regulators and the politics of AI'
-  };
   function sections() {
     var out = list(A.sections).slice();
     library.forEach(function (a) { if (!out.some(function (s) { return s.id === a.section; })) out.push({ id: a.section, name: a.section }); });
@@ -161,16 +153,17 @@
     return html + '<footer class="publication-foot"><a href="#/">Agentic AI</a><p>Independent analysis of artificial intelligence, business and the world it is changing.</p><nav><a href="#weekly">The edition</a><a href="#brief">AI in brief</a><a href="/assets/img/editorial/credits.md">Image credits</a><button type="button" class="install-link" data-install-agentic>Install app</button><a href="/">Vikas in Pencil</a></nav></footer></main>';
   }
 
+  // One list per section, every edition together, newest first: label, headline, standfirst and reading time beside a picture.
   function sectionPage() {
     var s = route.id;
     var f = follows(s);
-    return topbar() + '<main class="app-main"><header class="sec-head"><h1>' + esc(sectionName(s)) + '</h1><p>' + esc(BLURB[s] || '') + '</p>' +
+    return topbar() + '<main class="app-main sec-page"><header class="sec-page__head"><h1>' + esc(sectionName(s)) + '</h1>' +
       '<button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></header>' +
-      '<p class="sec-count">' + inSection(s).length + ' articles from ' + editions.filter(function (e) { return inSection(s).some(function (a) { return a.editionId === e.id; }); }).length + ' editions, newest first</p>' +
-      editions.map(function (e) {
-        var inE = inSection(s).filter(function (a) { return a.editionId === e.id; });
-        return inE.length ? '<section class="sec-week">' + block(econDate(e.date) + ' edition') + '<div class="section-stories">' + inE.map(function (a) { return bigCard(a); }).join('') + '</div></section>' : '';
-      }).join('') + '</main>';
+      '<ul class="sec-list">' + inSection(s).map(function (a) {
+        return '<li class="sec-item"><a href="#a/' + esc(a.id) + '"><span class="sec-item__text"><span class="lbl">' + esc(sectionName(a.section)) + '</span>' +
+          '<span class="sec-item__title">' + esc(a.title) + '</span><span class="sec-item__rubric">' + esc(a.rubric) + '</span>' +
+          '<span class="sec-item__meta">' + (isRead(a) ? 'Read · ' : '') + (a.minutes || 3) + ' min read</span></span>' + picture(a, 'sec-item__img') + '</a></li>';
+      }).join('') + '</ul></main>';
   }
 
   function forYou() {
