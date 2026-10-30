@@ -1290,3 +1290,14 @@ body { border-top: 0; }
   .chart__title { font-size: 21px; }
   .hbar__label, .dumb__label, .stack__label { font-size: 15px; }
 }
+
+/* ---------- every edition on the home page, section pages and menu ---------- */
+.acts__left { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.acts__left .acts__meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.section-all { display: inline-block; margin: 14px 0 6px; font: 600 15px/1.3 var(--sans); color: var(--red); text-decoration: none; }
+.section-all:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sec-count { margin: -6px 0 6px; text-align: center; font: 14px/1.4 var(--sans); color: var(--muted); }
+.sec-week .block { margin-top: 30px; }
+.menu__count { display: inline-block; min-width: 22px; margin-left: 6px; padding: 2px 6px; border-radius: 999px; background: #eef1f3; color: #3d3d3d; font: 600 12px/1.2 var(--sans); text-align: center; vertical-align: 2px; }
+.edition-carousel .slide__img--cover { aspect-ratio: 3 / 4; }
+.edition-carousel .slide__img--cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
