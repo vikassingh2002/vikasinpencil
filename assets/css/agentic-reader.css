@@ -11,3 +11,13 @@
 .reader-picks small{color:#b0140b;text-transform:uppercase;letter-spacing:.08em}
 .reader-dashboard pre,.reader-picks pre{white-space:pre-wrap;font-size:14px}
 .reader-dashboard li{overflow-wrap:anywhere}
+/* learning picks, recall and the profile tables */
+.reader-picks .pick{padding:16px 0;border-bottom:1px solid #ddd}.reader-picks .pick small{color:#e3120b;font-weight:600}
+.reader-picks .pick h3{margin:4px 0;font:400 24px/1.2 var(--serif)}.reader-picks .pick h3 a{color:#111;text-decoration:none}
+.pick__rubric{margin:4px 0;font:17px/1.4 var(--serif);color:#333}.pick__why{margin:8px 0;padding-left:10px;border-left:3px solid #e3120b}
+.pick--empty p{color:#666}.reader-picks details ul{list-style:none;padding:0;margin:8px 0}.reader-picks details li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid #eee;font-size:15px}
+.reader-picks details li.total{font-weight:700;border-bottom:0}.reader-picks button{border:1px solid #aaa;background:#fff;padding:7px 12px;margin:8px 8px 0 0;font:inherit;cursor:pointer}
+.recall{margin-top:24px;padding:16px;background:#f3f1ea}.recall h3{margin:0 0 6px;font:700 20px var(--sans)}.recall select{display:block;margin:6px 0;font:inherit;padding:6px}
+.recall textarea{display:block;width:100%;box-sizing:border-box;font:18px/1.5 var(--serif);padding:10px;border:1px solid #999}.recall__done{margin:10px 0 0;font:16px/1.4 var(--serif)}
+.reader-table{width:100%;border-collapse:collapse;font-size:15px}.reader-table th,.reader-table td{text-align:left;padding:6px 8px 6px 0;border-bottom:1px solid #ddd}.reader-table th{border-bottom:1px solid #111}
+.reader-table button{margin:0;padding:3px 8px;font-size:13px}
