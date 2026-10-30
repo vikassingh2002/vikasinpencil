@@ -60,6 +60,19 @@
   allArticles.forEach(function (a) { if (library.indexOf(a) < 0) library.push(a); });
   library.forEach(function (a) { a.minutes = Math.max(2, Math.ceil(words(a) / 200)); });
   function inSection(id) { return library.filter(function (a) { return a.section === id; }); }
+  var BLURB = {
+    business: 'How companies are spending on, using and making money from AI',
+    markets: 'The money behind the boom: investors, valuations and bubbles',
+    technology: 'How the models, chips and agents actually work',
+    work: 'What AI does to jobs, skills and pay',
+    science: 'AI as a tool for discovery',
+    policy: 'Rules, regulators and the politics of AI'
+  };
+  // A week's digest is titled by its first stories, the way a daily news brief is.
+  function digestTitle(e) {
+    var d = list(A.briefs).filter(function (b) { return list(e.briefIds).indexOf(b.id) >= 0; });
+    return 'AI in Brief: ' + d.slice(0, 2).map(function (b) { return b.headline; }).join('; ');
+  }
   function byId(id) { for (var i = 0; i < allArticles.length; i++) if (allArticles[i].id === id) return allArticles[i]; return null; }
   function sections() {
     var out = list(A.sections).slice();
@@ -133,11 +146,15 @@
     if (!order.length) return topbar() + '<p class="empty">No articles yet.</p>';
     var lead = order[0];
     var rest = order.slice(1);
+    var top3 = order.slice(0, 3).map(function (x) { return x.id; }); // the digest card shows a picture not already at the top of the page
+    var briefArt = byId(list(edition().chunkIds).filter(function (id) { return top3.indexOf(id) < 0; })[0]) || lead;
     var html = topbar() + '<main class="app-main"><div class="edition-line"><span>Ideas, evidence and the business of intelligence</span><span>' + esc(econDate(A.reviewed)) + '</span></div>' +
       '<div class="news-front"><div class="news-front__lead">' + bigCard(lead, true) + '</div>' +
       '<div class="news-front__middle"><ul class="rows">' + rest.slice(0, 2).map(function (a) { return '<li class="news-secondary">' + bigCard(a) + '</li>'; }).join('') + '</ul></div>' +
-      '<aside class="news-front__aside"><h2 class="rail-heading">The intelligence brief →</h2><p class="rail-intro">What matters in AI, and why.</p><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul><a class="rail-link" href="#brief/' + esc(edition().id) + '">Read AI in Brief →</a></aside></div>' +
-      block('AI in brief') + '<ul class="carousel brief-carousel">' + [edition().leadId].concat(list(edition().chunkIds)).map(function(id,i){var a=byId(id);return '<li class="slide"><a href="#brief/' + esc(edition().id) + '/' + i + '">' + picture(a,'slide__img') + '<span class="slide__title">' + esc(i?a.title:'AI’s week: capital, chips and control') + '</span><span class="brief-card-date">' + esc(econDate(edition().date)) + '</span></a></li>';}).join('') + '</ul>' +
+      '<aside class="news-front__aside news-rail"><a class="brief-card" href="#brief/' + esc(edition().id) + '">' + picture(briefArt, 'brief-card__img') + '<strong>' + esc(digestTitle(edition())) + '</strong></a>' +
+        '<a class="brief-more" href="#brief/' + esc(edition().id) + '"><span aria-hidden="true">→</span> Read the rest of this week’s news analysis</a>' +
+        '<h2 class="rail-title"><a href="#weekly/' + esc(edition().id) + '">Analysis <span aria-hidden="true">→</span></a></h2><ul class="rows">' + rest.slice(2, 5).map(row).join('') + '</ul></aside></div>' +
+      block('AI in brief') + '<ul class="carousel brief-carousel">' + [edition().leadId].concat(list(edition().chunkIds)).map(function(id,i){var a=byId(id);return '<li class="slide"><a href="#brief/' + esc(edition().id) + '/' + i + '">' + picture(a,'slide__img') + '<span class="slide__title">' + esc(i?a.title:digestTitle(edition())) + '</span><span class="brief-card-date">' + esc(econDate(edition().date)) + '</span></a></li>';}).join('') + '</ul>' +
       block('Recent highlights') + '<ul class="carousel highlights">' + rest.slice(5, 9).map(function (a) { return slide(a); }).join('') + '</ul>';
 
     html += '<a class="edition-feature" href="#weekly/' + esc(edition().id) + '"><span class="edition-feature__image"><img src="' + esc('/' + edition().cover.replace(/^\/+/, '')) + '" alt="" loading="lazy"></span><span class="edition-feature__text"><span class="fly">The weekly edition · ' + esc(econDate(edition().date)) + '</span><strong>' + esc(edition().title) + '</strong><span>' + esc(edition().subtitle) + '</span><b>Read the edition →</b></span></a>';
@@ -157,12 +174,12 @@
   function sectionPage() {
     var s = route.id;
     var f = follows(s);
-    return topbar() + '<main class="app-main sec-page"><header class="sec-page__head"><h1>' + esc(sectionName(s)) + '</h1>' +
+    return topbar() + '<main class="app-main sec-page"><header class="sec-page__head"><h1>' + esc(sectionName(s)) + '</h1><p class="sec-page__blurb">' + esc(BLURB[s] || '') + '</p>' +
       '<button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></header>' +
       '<ul class="sec-list">' + inSection(s).map(function (a) {
         return '<li class="sec-item"><a href="#a/' + esc(a.id) + '"><span class="sec-item__text"><span class="lbl">' + esc(sectionName(a.section)) + '</span>' +
           '<span class="sec-item__title">' + esc(a.title) + '</span><span class="sec-item__rubric">' + esc(a.rubric) + '</span>' +
-          '<span class="sec-item__meta">' + (isRead(a) ? 'Read · ' : '') + (a.minutes || 3) + ' min read</span></span>' + picture(a, 'sec-item__img') + '</a></li>';
+          '<span class="sec-item__meta">' + (isRead(a) ? 'Read · ' : '') + (a.minutes || 3) + ' min read</span></span>' + picture(a, 'sec-item__img') + '</a>' + actions(a) + '</li>';
       }).join('') + '</ul></main>';
   }
 
@@ -180,7 +197,7 @@
     var ss=allArticles.filter(isSaved), bs=Object.keys(S().saved).filter(function(id){return id.indexOf('brief:')===0;});
     return topbar() + '<main class="app-main"><header class="sec-head"><h1>Saved</h1><p>Articles and briefings you bookmarked</p></header>' +
       (ss.length?'<ul class="rows">'+ss.map(row).join('')+'</ul>':'') +
-      (bs.length?'<ul class="saved-briefs">'+bs.map(function(id){var p=id.split(':'),e=edition(p[1]),i=Number(p[2]),a=i?byId(list(e.chunkIds)[i-1]):null;return '<li><a href="#brief/'+esc(e.id)+'/'+i+'"><span class="fly">AI in brief · '+esc(econDate(e.date))+'</span><strong>'+esc(a?a.title:'AI’s week: capital, chips and control')+'</strong></a></li>';}).join('')+'</ul>':'') +
+      (bs.length?'<ul class="saved-briefs">'+bs.map(function(id){var p=id.split(':'),e=edition(p[1]),i=Number(p[2]),a=i?byId(list(e.chunkIds)[i-1]):null;return '<li><a href="#brief/'+esc(e.id)+'/'+i+'"><span class="fly">AI in brief · '+esc(econDate(e.date))+'</span><strong>'+esc(a?a.title:digestTitle(e))+'</strong></a></li>';}).join('')+'</ul>':'') +
       (!ss.length&&!bs.length?'<p class="empty">Nothing saved yet. Tap the bookmark on an article or brief.</p>':'')+'</main>';
   }
 
@@ -192,12 +209,13 @@
     var a = index ? byId(ids[index-1]) : byId(e.leadId);
     var digest = list(A.briefs).filter(function(b){return list(e.briefIds).indexOf(b.id)>=0;});
     var paras = index ? list(a.body).filter(function(b){return typeof b === 'string';}).slice(0,4) : digest.map(function(b){return b.text;});
-    return {edition:e,index:index,count:count,article:a,digest:digest,paras:paras,id:'brief:' + e.id + ':' + index,title:index ? a.title : 'AI’s week: capital, chips and control'};
+    return {edition:e,index:index,count:count,article:a,digest:digest,paras:paras,id:'brief:' + e.id + ':' + index,title:index ? a.title : digestTitle(e)};
   }
   function briefPage() {
     var b=briefContext(), e=b.edition, a=b.article, pic=Art.get(a.id,'lead'), saved=!!S().saved[b.id];
     var body=b.index ? b.paras.map(function(p){return '<p>' + esc(p) + '</p>';}).join('') + '<p class="brief-full-link"><a href="#a/' + esc(a.id) + '">Read the full ' + esc(a.kind.toLowerCase()) + ' →</a></p>'
-      : b.digest.map(function(x){var t=esc(x.text), lead=esc(x.lead || '');if(lead && t.indexOf(lead)>=0)t=t.replace(lead,'<a href="#a/' + esc(x.articleId) + '"><strong>' + lead + '</strong></a>');else t='<strong>' + esc(x.lead) + '.</strong> ' + t;return '<section class="news-brief" id="' + esc(x.id) + '"><p>' + t + ' <a class="brief-source" href="' + esc(safeUrl(x.source.url)) + '" target="_blank" rel="noopener" aria-label="Source for ' + esc(x.headline) + '">Source ↗</a></p></section>';}).join('');
+      : b.digest.map(function(x){var t=esc(x.text), lead=esc(x.lead || '');if(lead && t.indexOf(lead)>=0)t=t.replace(lead,'<a href="#a/' + esc(x.articleId) + '"><strong>' + lead + '</strong></a>');else t='<strong>' + esc(x.lead) + '.</strong> ' + t;return '<section class="news-brief" id="' + esc(x.id) + '"><p>' + t + ' <a class="brief-source" href="' + esc(safeUrl(x.source.url)) + '" target="_blank" rel="noopener" aria-label="Source for ' + esc(x.headline) + '">Source ↗</a></p></section>';}).join('') +
+        (e.figure ? '<section class="news-brief news-figure"><p><strong>Figure of the week:</strong> ' + esc(e.figure.value) + ', ' + esc(e.figure.text) + ' <a href="#a/' + esc(e.figure.articleId) + '">' + esc(e.figure.link) + '</a></p></section>' : '');
     var speech={title:b.title,rubric:'',body:b.paras};
     return '<div class="desktop-article-header">' + topbar() + '</div><header class="art-top"><a class="icon-btn" href="#/" aria-label="Back to home">' + icon('back') + '</a><span class="art-top__right"><button type="button" class="icon-btn" data-act="size" aria-label="Text size">' + tt() + '</button><button type="button" class="icon-btn' + (saved?' is-on':'') + '" data-act="save" data-id="' + esc(b.id) + '" aria-pressed="' + saved + '" aria-label="Save this brief">' + icon('mark') + '</button><button type="button" class="icon-btn" data-act="share" aria-label="Share">' + icon('share') + '</button></span></header>' +
       '<main class="brief-reader brief-package art--size' + readSize() + '"><header><p class="fly">AI in brief</p><h1>' + esc(b.title) + '</h1></header>' +
@@ -227,10 +245,10 @@
     var on = isSaved(a);
     var pic = Art.get(a.id, 'lead');
     var chart = Art.chart ? Art.chart(a.id) : null;
-    var paras = 0;
+    var paras = 0, charts = 0;
     var body = list(a.body).map(function (b) {
       if (b && typeof b === 'object') {
-        if (b.chart) return window.AgenticCharts ? AgenticCharts.render(b.chart) : ''; // charts, maps and calculators sit between paragraphs
+        if (b.chart) return window.AgenticCharts ? AgenticCharts.render(b.chart, null, ++charts) : ''; // charts, maps and calculators sit between paragraphs, numbered
         return '<h2 class="art__cross">' + esc(b.h) + '</h2>';
       }
       var text = esc(b).replace(/ ■$/, ' <span class="fin" aria-hidden="true">■</span>');
@@ -241,8 +259,6 @@
       }
       return '<p>' + text + '</p>' + (paras === 2 && chart ? '<figure class="evidence-chart">' + chart.svg + '<figcaption>' + esc(chart.caption) + '</figcaption></figure>' : '');
     }).join('');
-    var more = inSection(a.section).filter(function (x) { return x !== a; }).slice(0, 4);
-    if (more.length < 2) more = more.concat(library.filter(function (x) { return x.section !== a.section && !isRead(x); }).slice(0, 2 - more.length));
     var size = readSize();
     return '<div class="desktop-article-header">' + topbar() + '</div><header class="art-top"><a class="icon-btn" href="#/" data-act="back" aria-label="Back">' + icon('back') + '</a>' +
       '<span class="art-top__right"><button type="button" class="icon-btn" data-act="size" aria-label="Text size">' + tt() + '</button>' +
@@ -251,13 +267,16 @@
       '<main class="app-main reader-layout"><article class="art art--size' + size + '" aria-labelledby="art-title">' +
         '<p class="art__kicker"><a href="#s/' + esc(a.section) + '">' + esc(sectionName(a.section)) + '</a><span>|</span>' + esc(a.fly || '') + '</p>' +
         '<h1 class="art__title" id="art-title">' + esc(a.title) + '</h1>' +
-        '<p class="art__rubric">' + esc(a.rubric) + '</p>' +
+        '<p class="art__rubric">' + esc(a.rubric) + '</p>' + tools(a, on) +
         (pic ? '<figure class="art__fig">' + pic.svg + '<figcaption>' + esc(pic.caption) + '<span class="caption-description">' + esc(pic.description || '') + '</span>' + (pic.creditUrl ? ' <a href="' + esc(pic.creditUrl) + '" target="_blank" rel="noopener">Source ↗</a>' : '') + (pic.licenseUrl ? ' <a href="' + esc(pic.licenseUrl) + '" target="_blank" rel="noopener">Licence</a>' : '') + '</figcaption></figure>' : '') +
-        '<p class="art__date">' + esc(econDate(a.date || A.reviewed)) + (a.kind ? ' · ' + esc(a.kind) : '') + ' · ' + (a.minutes || 3) + ' min read</p>' +
+        '<p class="art__date"><time>' + esc(econDate(a.date || A.reviewed)) + '</time><span class="art__sep" aria-hidden="true">|</span>' + (a.minutes || 3) + ' min read</p>' +
         '<div class="listen"><button type="button" class="listen__btn" data-act="listen" aria-pressed="' + speaking + '">' + icon(speaking ? 'stop' : 'play') + '<b>' + (speaking ? 'Stop' : 'Listen') + '</b> <span>' + listenTime(a) + '</span></button>' +
           '<span class="listen__tag">DEVICE VOICE</span></div>' +
+        '<div class="listen2"><div class="listen2__head"><b>Listen to this story</b><span class="listen__tag" title="Read aloud by your device’s own voice">DEVICE VOICE <span class="listen__i" aria-hidden="true">i</span></span></div>' +
+          '<div class="player"><button type="button" class="player__btn" data-act="listen" aria-pressed="' + speaking + '" aria-label="' + (speaking ? 'Stop listening' : 'Listen to this story') + '">' + icon(speaking ? 'stop' : 'play') + '</button>' +
+          '<span class="player__time"><span data-elapsed>0:00</span> / ' + listenTime(a) + '</span><span class="player__bar" aria-hidden="true"><i></i></span></div></div>' +
         '<div class="art__body">' + body + '</div>' +
-        '<p class="art__note">This article appears in the ' + esc(sectionName(a.section)) + ' section of the <a href="#weekly/' + esc(a.editionId) + '">' + esc(econDate(edition(a.editionId).date)) + ' edition</a> under the headline “' + esc(a.title) + '”.</p>' +
+        '<p class="art__note">This article appeared in the ' + esc(sectionName(a.section)) + ' section of the <a href="#weekly/' + esc(a.editionId) + '">' + esc(econDate(edition(a.editionId).date)) + ' edition</a> under the headline “' + esc(a.printHeadline || a.title) + '”</p>' +
         (list(a.sources).length ? '<details class="art__sources"><summary>Sources and reporting dates</summary><ul>' + a.sources.map(function (x) {
           var u = safeUrl(x.url);
           return '<li>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(x.title) + '</a>' : esc(x.title)) + (x.date ? ' <span>' + esc(econDate(x.date)) + '</span>' : '') + '</li>';
@@ -265,9 +284,24 @@
         '<section class="explore"><h2>Explore more</h2><ul>' + [a.section, 'all-ai'].map(function (s) {
           var f = follows(s);
           return '<li><a href="' + (s === 'all-ai' ? '#/' : '#s/' + esc(s)) + '">' + esc(s === 'all-ai' ? 'Artificial intelligence' : sectionName(s)) + '</a><button type="button" class="follow' + (f ? ' is-on' : '') + '" data-act="follow" data-id="' + esc(s) + '" aria-pressed="' + f + '">' + icon(f ? 'check' : 'plus') + (f ? 'Following' : 'Follow') + '</button></li>';
-        }).join('') + '</ul></section>' +
-        (more.length ? '<section class="more"><h2>More from ' + esc(sectionName(a.section)) + '</h2><ul class="rows">' + more.map(row).join('') + '</ul></section>' : '') +
-      '</article><aside class="reader-rail"><h2>More on artificial intelligence →</h2><ul class="rows">' + library.filter(function (x) { return x.id !== a.id && x.section !== a.section; }).slice(0, 4).map(row).join('') + '</ul><a class="rail-link" href="#weekly/' + esc(a.editionId) + '">Explore the complete edition →</a></aside></main>';
+        }).join('') + '</ul><a class="explore__latest" href="#foryou"><span aria-hidden="true">→</span> See the latest from topics you follow</a></section>' + tools(a, on, true) +
+      '</article><aside class="reader-rail"><h2>More on artificial intelligence →</h2><ul class="rows">' + library.filter(function (x) { return x.id !== a.id && x.section !== a.section; }).slice(0, 4).map(row).join('') + '</ul><a class="rail-link" href="#weekly/' + esc(a.editionId) + '">Explore the complete edition →</a></aside>' + moreFrom(a) + '</main>';
+  }
+  function tools(a, on, end) {
+    return '<div class="art-tools' + (end ? ' art-tools--end' : '') + '"><button type="button" class="tool-btn' + (on ? ' is-on' : '') + '" data-act="save" data-id="' + esc(a.id) + '" aria-pressed="' + on + '">' + icon('mark') + (on ? 'Saved' : 'Save') + '</button>' +
+      '<button type="button" class="tool-btn" data-act="share">' + icon('share') + 'Share</button></div>';
+  }
+  // "More from" a section: a lead with a picture, two with standfirsts, three short ones; a plain list on phones.
+  function moreFrom(a) {
+    var pool = inSection(a.section).filter(function (x) { return x !== a; });
+    if (pool.length < 3) pool = pool.concat(library.filter(function (x) { return x !== a && pool.indexOf(x) < 0; }).slice(0, 3 - pool.length));
+    function item(x, kind) {
+      return '<article class="mf-item mf-item--' + kind + '"><a href="#a/' + esc(x.id) + '"><span class="mf-text"><span class="lbl">' + esc(x.fly || sectionName(x.section)) + '</span><span class="mf-title">' + esc(x.title) + '</span>' +
+        '<span class="mf-rubric">' + esc(x.rubric) + '</span><span class="mf-meta">' + (x.minutes || 3) + ' min read</span></span>' + picture(x, 'mf-img') + '</a>' + actions(x) + '</article>';
+    }
+    function col(cls, xs, kind) { return xs.length ? '<div class="mf-col mf-col--' + cls + '">' + xs.map(function (x) { return item(x, kind); }).join('') + '</div>' : ''; }
+    return '<section class="more-from"><h2><a href="#s/' + esc(a.section) + '">More from ' + esc(sectionName(a.section)) + ' <span aria-hidden="true">→</span></a></h2><div class="mf-grid">' +
+      col('lead', pool.slice(0, 1), 'lead') + col('mid', pool.slice(1, 3), 'mid') + col('side', pool.slice(3, 6), 'side') + '</div></section>';
   }
 
   function menu() {
@@ -301,6 +335,12 @@
     if (gb) u.voice = gb;
     u.lang = gb ? gb.lang : 'en-GB';
     u.rate = 1;
+    var total = Math.round(words(a) / 2.6);
+    u.onboundary = function (ev) {
+      var f = Math.min(1, (ev.charIndex || 0) / text.length), s = Math.round(total * f);
+      [].forEach.call(document.querySelectorAll('.player__bar i'), function (i) { i.style.width = (f * 100).toFixed(1) + '%'; });
+      [].forEach.call(document.querySelectorAll('[data-elapsed]'), function (el) { el.textContent = Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); });
+    };
     u.onend = u.onerror = function () { speaking = false; if (route.name === 'article' || route.name === 'brief') render(); };
     speaking = true;
     synth.speak(u);

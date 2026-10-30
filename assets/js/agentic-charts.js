@@ -444,7 +444,10 @@ window.AgenticCharts = (function () {
 
   /* ---------- rendering ---------- */
 
-  function render(id, key) {
+  // These need the full column; everything else floats beside the text on wide screens.
+  var WIDE = ['robo-table', 'review-table', 'skills-timeline', 'supply-timeline', 'aiact-timeline', 'cai-timeline', 'enzyme-crispr', 'yandex-map', 'ag-states', 'voice-lanes', 'guardrails-venn', 'pew-dumbbell'];
+
+  function render(id, key, num) {
     var d = D[id];
     if (!d) return '';
     key = key || (d.keys ? d.keys[0][0] : '');
@@ -455,11 +458,12 @@ window.AgenticCharts = (function () {
     var controls = d.keys ? '<div class="chart__toggle" role="group" aria-label="Show">' + d.keys.map(function (k) { return '<button type="button" data-chart-key="' + k[0] + '" aria-pressed="' + (k[0] === key) + '">' + esc(k[1]) + '</button>'; }).join('') + '</div>' : '';
     var legend = d.legend ? '<div class="chart__legend">' + d.legend.map(function (l) { return '<span><i style="background:' + l[1] + '"></i>' + esc(l[0]) + '</span>'; }).join('') + '</div>' : '';
     var reveal = d.reveal ? '<button type="button" class="chart__reveal" data-reveal-btn>' + esc(d.reveal) + '</button>' : '';
-    return '<figure class="chart' + (d.reveal ? ' is-concealed' : '') + (calc ? ' chart--calc' : '') + '" data-chart="' + esc(id) + '" data-key="' + esc(key) + '"' +
+    var wide = !!calc || WIDE.indexOf(id) >= 0;
+    return '<figure class="chart' + (wide ? '' : ' chart--float') + (d.reveal ? ' is-concealed' : '') + (calc ? ' chart--calc' : '') + '" data-chart="' + esc(id) + '" data-key="' + esc(key) + '" data-num="' + (num || '') + '"' +
       (calc ? ' data-calc="' + esc(d.calc) + '" data-state="' + esc(JSON.stringify(calc.state)) + '"' : '') + '>' +
-      '<div class="chart__head"><span class="chart__title">' + esc(d.title) + '</span>' + (d.sub ? '<span class="chart__sub">' + esc(d.sub) + '</span>' : '') + '</div>' +
+      '<div class="chart__head">' + (num ? '<span class="chart__num" aria-hidden="true">' + num + '</span>' : '') + '<span class="chart__title">' + esc(d.title) + '</span>' + (d.sub ? '<span class="chart__sub">' + esc(d.sub) + '</span>' : '') + '</div>' +
       controls + legend + reveal + '<div class="chart__body">' + body + '</div>' +
-      '<div class="chart__src">' + (d.source ? 'Source: ' + esc(d.source) : '') + '</div><div class="chart__tip" hidden></div></figure>';
+      '<div class="chart__src">' + (d.source ? 'Source: ' + esc(d.source) : '') + '</div><div class="chart__credit">' + (calc ? 'Interactive' : 'Chart') + ': Agentic AI</div><div class="chart__tip" hidden></div></figure>';
   }
 
   /* ---------- behaviour ---------- */
@@ -488,7 +492,7 @@ window.AgenticCharts = (function () {
     var k = within(e, '[data-chart-key]');
     if (k) {
       var fig = k.closest('.chart'), key = k.getAttribute('data-chart-key');
-      fig.outerHTML = render(fig.getAttribute('data-chart'), key);
+      fig.outerHTML = render(fig.getAttribute('data-chart'), key, +fig.getAttribute('data-num') || 0);
       schedule();
       return;
     }
