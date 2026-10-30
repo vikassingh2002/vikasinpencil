@@ -61,6 +61,7 @@
   library.forEach(function (a) { a.minutes = Math.max(2, Math.ceil(words(a) / 200)); });
   function inSection(id) { return library.filter(function (a) { return a.section === id; }); }
   var BLURB = {
+    leaders: 'Our view on the week in artificial intelligence',
     business: 'How companies are spending on, using and making money from AI',
     markets: 'The money behind the boom: investors, valuations and bubbles',
     technology: 'How the models, chips and agents actually work',

@@ -55,3 +55,7 @@ Covers (public-domain artworks via Wikimedia Commons, cropped to the cover shape
 - `cover-2026-10-05.jpg`: Jan Brueghel the Younger, Satire on Tulip Mania (c. 1640). Public domain. [Original source](https://commons.wikimedia.org/wiki/File:Jan_Brueghel_the_Younger,_Satire_on_Tulip_Mania,_c._1640.jpg).
 - `cover-2026-10-12.jpg`: Albrecht Dürer, Melencolia I (1514). Public domain. [Original source](https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer_-_Melencolia_I_-_Google_Art_Project_(427760).jpg).
 - `cover-2026-10-19.jpg`: Giovanni Domenico Tiepolo, The Procession of the Trojan Horse into Troy (c. 1760). Public domain. [Original source](https://commons.wikimedia.org/wiki/File:Giovanni_Domenico_Tiepolo_-_The_Procession_of_the_Trojan_Horse_in_Troy_-_WGA22382.jpg).
+
+## Leaders
+
+Each Leader has an original flat-colour illustration drawn in code for Agentic AI (`leader-*.jpg`). No third-party material.
