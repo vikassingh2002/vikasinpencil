@@ -1,6 +1,6 @@
 /* Agentic-only worker. Never handles Desk or caches authentication/API responses. */
-const CACHE = 'agentic-static-public16';
-const SHELL = ['/agentic/','/agentic/manifest.webmanifest','/agentic/icon-192.png','/agentic/icon-512.png','/agentic/icon-maskable.png','/assets/css/cat.css?v=20261029-public16','/content/ai-articles.js?v=20261029-public16','/assets/js/agentic-store.js?v=20261029-public16','/assets/js/agentic-art.js?v=20261029-public16','/assets/js/agentic-charts.js?v=20261029-public16','/assets/js/agentic.js?v=20261029-public16','/assets/js/agentic-install.js?v=20261029-public16','/assets/fonts/newsreader.ttf','/assets/fonts/newsreader-italic.ttf','/assets/fonts/roboto-condensed.ttf'];
+const CACHE = 'agentic-static-reader1';
+const SHELL = ['/assets/css/agentic-reader.css?v=20261030-reader1','/assets/js/agentic-reader-config.js?v=20261030-reader1','/assets/js/agentic-knowledge.js?v=20261030-reader1','/assets/js/agentic-reader.js?v=20261030-reader1','/agentic/','/agentic/manifest.webmanifest','/agentic/icon-192.png','/agentic/icon-512.png','/agentic/icon-maskable.png','/assets/css/cat.css?v=20261029-public16','/content/ai-articles.js?v=20261029-public16','/assets/js/agentic-store.js?v=20261029-public16','/assets/js/agentic-art.js?v=20261029-public16','/assets/js/agentic-charts.js?v=20261029-public16','/assets/js/agentic.js?v=20261029-public16','/assets/js/agentic-install.js?v=20261029-public16','/assets/fonts/newsreader.ttf','/assets/fonts/newsreader-italic.ttf','/assets/fonts/roboto-condensed.ttf'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });

@@ -1,0 +1,13 @@
+.reader-feedback,.reader-picks,.reader-dashboard{border-top:1px solid #111;margin-top:48px;padding:22px 0;font:18px/1.5 var(--sans)}
+.reader-feedback h2,.reader-picks h2{font:600 27px var(--sans)}
+.reader-feedback textarea{display:block;width:100%;font:20px/1.5 var(--serif);padding:12px;border:1px solid #999;margin:10px 0;box-sizing:border-box;background:#fff;color:#111}
+.reader-feedback button,.reader-dashboard button{border:1px solid #aaa;background:#fff;color:#111;padding:8px 12px;margin:5px 5px 5px 0;font:inherit;cursor:pointer}
+.reader-feedback button[aria-pressed=true]{background:#111;color:#fff}
+.reader-buttons{display:flex;flex-wrap:wrap;margin:16px 0}
+.reader-status,.reader-notes time{font-size:14px;color:#555}
+.reader-notes article,.reader-picks article{padding:20px 0;border-bottom:1px solid #ddd}
+.reader-notes p{white-space:pre-wrap;overflow-wrap:anywhere}
+.reader-picks h3{font:400 28px/1.2 var(--serif);margin:6px 0}
+.reader-picks small{color:#b0140b;text-transform:uppercase;letter-spacing:.08em}
+.reader-dashboard pre,.reader-picks pre{white-space:pre-wrap;font-size:14px}
+.reader-dashboard li{overflow-wrap:anywhere}
