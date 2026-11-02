@@ -1,8 +1,8 @@
 /* Weekly editions combine news, explainers and briefings; all sources predate the issue cutoff. */
 window.NB=window.NB||{};
 NB.aiArticles={
-  "reviewed": "2026-10-26",
-  "currentEdition": "2026-10-26",
+  "reviewed": "2026-11-02",
+  "currentEdition": "2026-11-02",
   "cadence": {
     "day": "Monday",
     "timezone": "Asia/Kolkata"
@@ -38,6 +38,51 @@ NB.aiArticles={
     }
   ],
   "editions": [
+    {
+      "id": "2026-11-02",
+      "date": "2026-11-02",
+      "coverageStart": "2026-10-26",
+      "coverageEnd": "2026-11-02",
+      "assembledAt": "2026-11-02",
+      "title": "Chain reaction",
+      "subtitle": "Machines learn to break software, and Big Tech learns to borrow",
+      "cover": "assets/img/editorial/cover-2026-11-02.jpg",
+      "articleIds": [
+        "exploits-20261027",
+        "capex-20261029",
+        "deference-20261027",
+        "biotech-20261027",
+        "uprate-20261028",
+        "wallets-20261101",
+        "exits-20261026",
+        "leader-20261102"
+      ],
+      "leadId": "exploits-20261027",
+      "notes": "Edition dated 2 November, assembled on 2 November. It uses information available by 2 November 2026. Security findings, benchmark scores and drug-development results described here were reported by the companies involved and had not been independently reproduced.",
+      "briefIds": [
+        "b-exploits-20261027",
+        "b-capex-20261029",
+        "b-deference-20261027",
+        "b-biotech-20261027",
+        "b-uprate-20261028",
+        "b-wallets-20261101",
+        "b-exits-20261026"
+      ],
+      "chunkIds": [
+        "capex-20261029",
+        "deference-20261027",
+        "biotech-20261027",
+        "uprate-20261028",
+        "wallets-20261101",
+        "exits-20261026"
+      ],
+      "figure": {
+        "value": "$97.5bn",
+        "text": "the most Meta says it may raise by selling shares to pay for its AI build-out, including up to $60bn to be sold gradually from 2027.",
+        "articleId": "capex-20261029",
+        "link": "Read who else is passing the hat."
+      }
+    },
     {
       "id": "2026-10-26",
       "date": "2026-10-26",
@@ -261,6 +306,434 @@ NB.aiArticles={
     }
   ],
   "articles": [
+    {
+      "id": "exploits-20261027",
+      "section": "technology",
+      "fly": "Cyber-security",
+      "title": "Chain reaction",
+      "rubric": "AI models can now find software flaws and turn them into working attacks. This week defenders and attackers both showed what that means",
+      "date": "2026-11-02",
+      "eventDate": "2026-10-27",
+      "editionId": "2026-11-02",
+      "kind": "Briefing",
+      "body": [
+        "The attack took 48 minutes. Run against a Linux server that accepts connections over multipath TCP, an optional networking feature, a program written by an unreleased artificial-intelligence model from Anthropic first coaxed the operating system’s kernel into leaking a secret memory address. Five minutes later it had a command line with full control of the machine—without a password, and without anybody at the other end clicking on anything. On October 27th Anthropic’s Frontier Red Team, which probes the firm’s models for dangerous abilities, described that attack and four others, against Google’s Chrome browser, Apple’s Safari, Android phones and Windows servers. Every flaw had been reported to its maker and fixed before publication. The reason for publishing, the team said, was that building such attacks was once the preserve of a few specialist teams. Models can now do it with little human involvement.",
+        "The same week supplied evidence from both sides of the fight. On October 28th Google released Gemini 4 Carbon, which it calls its strongest model, with state-of-the-art abilities in cyber-security, and offered it first to vetted defenders. A day later CrowdStrike, a security firm, said a Chinese espionage group had used a team of AI agents against more than 200 organisations in 11 days. Taken together, the week’s news suggests that finding and weaponising software flaws is getting cheap. The scarce resource in cyber-security is becoming the speed at which flaws are fixed.",
+        {
+          "h": "Weakest links"
+        },
+        "Modern software is defended in layers. A browser runs the code on each web page inside a “sandbox” that limits what it can touch; operating systems shuffle where things sit in memory, so that an attacker cannot predict where to aim. A single bug rarely beats all of this. A working attack, or exploit, usually chains several together: one flaw to corrupt memory, another to learn where things are, a third to break out of the sandbox. Anthropic’s attack on Chrome linked four, in its JavaScript engine, its memory sandbox, a storage system and a sign-in feature, so that opening a single web page on a Mac let the attacker run programs outside the sandbox (see chart 1). Assembling such chains is the creative, painstaking part of the craft, and the reason that top-quality exploits have been rare and expensive.",
+        {
+          "chart": "exploit-chains"
+        },
+        "The haul was large as well as clever. In Chrome alone the work produced 62 vulnerabilities that were assigned official identifiers, all rated critical or high, including 13 ways to escape the sandbox. Anthropic’s wider programme gives a sense of the volume to come. Partners in Project Glasswing, a scheme that gave makers of critical software early access to its most capable models, reported at least 129,000 verified vulnerabilities between April and July; the firm’s own scanning of open-source code found 5,500 more by October. More than 33,000 of the total were rated critical or high. Fewer than half the partners said how many they had patched.",
+        "Google’s new model is pitched at the same work. By the company’s own measurements, made with its usual guardrails switched off, Carbon scored 88.2% on SEC-bench Pro, a test of finding vulnerabilities, and 54.8% on ExploitGym, a test of exploiting them. Engineers on the Chrome team reported that it was more than ten times better than an unnamed rival model at writing high-quality patches. Like Anthropic, which reserves its least-restricted cyber abilities for vetted security teams, Google is releasing Carbon first to a subset of cyber defenders, through a programme it calls Fairwind, and has set no date for wider access.",
+        {
+          "h": "The other side"
+        },
+        "Attackers are not waiting for frontier models. CrowdStrike’s report describes VAPOR PANDA, a group linked to China that has targeted governments, think-tanks and energy firms since 2021, using an agent framework called ARTEX that runs mainly on a model from DeepSeek, a Chinese firm. A lead agent directed planners and workers that shared a map of facts, findings and goals; they tried several routes into each target at once and switched when one failed. A single human operator steered several intrusions at the same time, typing instructions in Chinese at decision points. Over 11 days from October 17th the campaign was aimed at more than 200 organisations in at least 14 countries, from foreign ministries to American drugmakers and chip firms. CrowdStrike confirmed follow-on activity inside nine of them. In one intrusion the planning agents alone consumed about 1.4bn tokens of input (see chart 2).",
+        {
+          "chart": "exploit-artex"
+        },
+        "Criminals are improvising too. On October 31st Talos, the threat-research arm of Cisco, described VOLTA, a program that steals passwords, browser sessions and the phrases that unlock crypto wallets, then sends its haul to a large language model, which drafts an assessment of what the victim’s assets are worth. If the first model it tries, Anthropic’s Claude, refuses, VOLTA moves down a list to models from Moonshot and Google. Talos calls this “effort displacement”: the AI does the analyst’s job rather than the hacking. And the tools developers use to build software have become targets in their own right. On October 29th a booby-trapped copy of the extension for Claude Code, Anthropic’s coding assistant, reached as many as 5,000 users of a marketplace run by Cursor, a maker of coding software, during an 11-hour window. It planted an attacker’s key for remote access on their machines.",
+        {
+          "h": "Mind the gap"
+        },
+        "Why worry, if the flaws Anthropic found have been fixed? Because defenders were already losing a race against the clock. Mandiant, a security firm owned by Google, calculates that the average time between the disclosure of a flaw and its exploitation fell from 63 days in 2018-19 to five in 2023 (see chart 3). Verizon’s breach report for 2025 found that organisations took a median of 32 days to fix flaws in internet-facing devices that were known to be under attack, and left nearly a third of them entirely unfixed. If machines can find and weaponise bugs in hours, a month is an eternity.",
+        {
+          "chart": "exploit-window"
+        },
+        "There are reasons for calm. The attacks were built in a laboratory, with prompting from expert researchers, against targets they chose. Anthropic does not say how much help the model needed at each step, or what the work cost. Google’s scores are its own and have not been reproduced. Many machine-found bugs will prove minor, duplicated or false alarms, and the firms’ tallies cannot be checked from outside. Most real break-ins still start with stolen passwords and old, unpatched flaws rather than with dazzling new chains. Tellingly, VAPOR PANDA’s operator told the agents to hunt for Windows machines without CrowdStrike’s software installed: even robots go for the easy targets.",
+        "What changes is the economics. Exploits for browsers and phones have commanded high prices because few people can write them. If models can produce them quickly, supply rises and prices fall—for spies and criminals as well as for defenders. The laboratories’ answer so far is staggered access: give the strongest cyber abilities to vetted defenders first, watch how they are used and hope that patches outrun attacks. Anthropic also urges companies to scan their code for flaws before it is merged rather than mopping up afterwards, and has published a plug-in for its coding tool to help them do so.",
+        "That makes two numbers from the week worth remembering. The attack written by Anthropic’s model needed 53 minutes to seize a Linux server. The typical organisation takes about a month to patch a flaw that is known to be under attack. Closing that gap, rather than finding ever more bugs, is now the job. ■"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic Frontier Red Team: Discovering vulnerabilities with Claude, 27 October",
+          "url": "https://www.anthropic.com/research/discovering-vulnerabilities-with-claude",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "The Hacker News: Anthropic’s unreleased AI model chains flaws into working exploits, 28 October",
+          "url": "https://thehackernews.com/2026/10/anthropics-unreleased-ai-model-chains.html",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "Anthropic: expanding the Cyber Verification Program, 6 October",
+          "url": "https://www.anthropic.com/news/cyber-verification-program",
+          "date": "2026-10-06"
+        },
+        {
+          "title": "Google: Introducing Gemini 4 Carbon, 28 October",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "CrowdStrike: VAPOR PANDA uses ARTEX to scale a global campaign, 29 October",
+          "url": "https://www.crowdstrike.com/en-us/blog/vapor-panda-uses-artex-to-scale-global-campaign/",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "Cisco Talos: model-driven victim prioritisation in the VOLTA infostealer, 31 October",
+          "url": "https://blog.talosintelligence.com/appraisal-by-ai-model-driven-victim-prioritization-in-the-volta-infostealer/",
+          "date": "2026-10-31"
+        },
+        {
+          "title": "The Hacker News: trojanised Claude Code extension on the Cursor marketplace, 30 October",
+          "url": "https://thehackernews.com/2026/10/official-claude-code-vs-code-extension.html",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "Mandiant (Google Cloud): How low can you go? Time-to-exploit trends in 2023",
+          "url": "https://cloud.google.com/blog/topics/threat-intelligence/time-to-exploit-trends-2023",
+          "date": "2024-10-15"
+        },
+        {
+          "title": "GreyNoise: Verizon DBIR 2025, edge KEVs increasingly left unpatched",
+          "url": "https://www.greynoise.io/blog/verizon-dbir-2025-edge-kevs-increasingly-left-unpatched-exploited",
+          "date": "2025-05-06"
+        }
+      ],
+      "brief": "Anthropic said on October 27th that an unreleased model had built working attacks against Chrome, Safari, Android, Windows and Linux with little human involvement. All the flaws were reported and fixed before publication; Chrome alone received 62 fixes rated critical or high.",
+      "image": "exploits-20261027",
+      "minutes": 7,
+      "format": "long-read",
+      "printHeadline": "Exploits on tap"
+    },
+    {
+      "id": "capex-20261029",
+      "section": "markets",
+      "fly": "Financing AI",
+      "title": "Other people’s money",
+      "rubric": "The AI build-out has outgrown the cash flows of the firms paying for it. Investors are being asked to share the bill, and the risk",
+      "date": "2026-10-30",
+      "eventDate": "2026-10-29",
+      "editionId": "2026-11-02",
+      "kind": "Briefing",
+      "body": [
+        "Few companies have been better at printing money than Meta. For years the cash thrown off by its advertising business comfortably covered whatever it chose to build. This year it plans capital spending of $135bn-145bn, and the cash no longer stretches. In the third quarter its capital spending of $34.9bn outstripped the cash its operations generated, leaving free cash flow negative, by $2.1bn, for the first time in more than a decade. So on October 26th Meta asked investors for money. By the next day the plan had grown to as much as $97.5bn: about $25bn of new shares at $625 each, $12.5bn of convertible preferred shares and up to $60bn more to be sold gradually from early 2027, once a new class of non-voting shares starts trading. Nvidia, AMD and Broadcom, which supply Meta with chips, indicated interest in buying up to $5bn of the stock between them.",
+        "Meta is not alone. For three years the AI build-out has been paid for mostly from the vast profits of a handful of American technology giants. This week’s quarterly results suggested that era is ending. The biggest spenders are now investing more than their businesses generate, and filling the gap with money from shareholders, bondholders, private-credit funds and even their own suppliers. Investors, for their part, have started to charge for the risk.",
+        {
+          "h": "Spend, spend, spend"
+        },
+        "Alphabet set the tone on October 28th. Its revenue rose by 25%, to $127.6bn, and Google Cloud’s more than doubled, to $30.7bn. But capital spending of $51.4bn, up 114% on a year earlier, exceeded the cash its operations brought in, and free cash flow was negative, at $9.1bn. Its shares fell by more than 8% in after-hours trading. Microsoft, reporting the same day, spent $39.4bn on property and equipment, against $19.4bn a year earlier, as Azure, its cloud, grew by 48%. Amazon spent $77.3bn in the quarter, more than anyone else, and said it would spend “meaningfully more” next year than the roughly $220bn it expects to spend this year. Over the past 12 months its free cash flow has swung from an inflow of $14.8bn to an outflow of $42.4bn (see chart 1).",
+        {
+          "chart": "capex-q3"
+        },
+        "Markets did not like the arithmetic. On October 30th the Nasdaq Composite index fell by about 2.5% in morning trading, to its lowest level in nearly three months. Intel, which said it would burn cash this year as it spends heavily to expand production, dropped by nearly 29%, on course for its steepest one-day fall on record; an index of chipmakers lost 7%. The Nasdaq-100 was on track to shed more than $2trn of market value over the month. That evening the Financial Times reported that OpenAI had trimmed its latest fundraising, from $30bn at a valuation of $1.4trn to about $20bn at $1.25trn.",
+        {
+          "h": "New lenders"
+        },
+        "The money is coming from new places, and in new shapes. In June Alphabet unveiled an $85bn sale of shares, in two tranches, which beat the previous record for a corporate equity raise, Petrobras’s $70bn in 2010. Debt has grown faster still. According to the Wall Street Journal, AI-linked companies have borrowed $466bn so far this year, against $101bn in the same period of 2025. The five biggest cloud firms issued $121bn of American corporate bonds last year, compared with an average of $28bn a year in 2020-24.",
+        "Increasingly, the chips themselves serve as collateral. On October 26th SpaceX, which runs the Grok chatbot, said an entity managed by Apollo, a private-markets firm, would buy about $40bn of Nvidia’s next-generation chips and related equipment and lease them to it for about five years, starting in 2027. The same day Bloomberg reported that Bank of America, Citigroup and Morgan Stanley, together with Blackstone, another private-markets giant, had lined up $63bn for a vehicle that will buy Broadcom’s AI accelerators and lease them to Anthropic, with Broadcom supporting the value of the equipment at the end of the lease (see chart 2).",
+        {
+          "chart": "capex-money"
+        },
+        {
+          "h": "Who holds the risk"
+        },
+        "Such structures move risk around rather than removing it. A lease keeps borrowing off the user’s balance sheet and puts the lender’s money behind the chips, whose value depends on how quickly newer models make them obsolete—hence Broadcom’s promise to underpin it. Suppliers buying shares in their customers, as Nvidia, AMD and Broadcom may do with Meta, recycle the profits from chip sales into the firms that buy the chips. Preferred shares and five-year leases are not cheap money. And as the bills are spread across pension funds, insurers and private-credit vehicles, so is the exposure if demand disappoints.",
+        "Investors are pricing that exposure. The cost of insuring against default on bonds issued by Amazon, Alphabet, Microsoft, Meta and Oracle is at its highest since 2021, according to the Journal. Oracle’s five-year credit-default swaps reached a record 288 basis points (2.88% of the sum insured, each year), and protection on Meta and Nvidia also hit records. Trading in such contracts tied to the big AI spenders averaged more than $9bn a week in September, against less than $2bn in July, as fund managers bought them as a hedge against the AI trade.",
+        "The bulls have a case. Demand is real, and much of it is contracted. Microsoft’s commercial backlog stands at $677bn, up 73% in a year; Amazon’s cloud backlog is $578bn, more than double. AWS grew by 39% in the quarter, its fastest pace in nearly five years, and Amazon expects growth above 40% in both 2027 and 2028. Borrowing against signed contracts is how capitalism has always financed big things. Railways and telecoms networks were built the same way.",
+        "They were also, in both cases, followed by busts when capacity outran demand. Nobody yet knows whether today’s backlogs will turn into the revenues needed to justify spending on this scale, or how long the chips will stay useful. What is clear is that the question is no longer one for a handful of very rich companies alone. For years investors asked whether AI would pay for itself. The firms building it have now answered a narrower question: they cannot pay for it by themselves. ■"
+      ],
+      "sources": [
+        {
+          "title": "Reuters via Business Recorder: Meta raises planned equity offering to $97.5bn, 27 October",
+          "url": "https://www.brecorder.com/news/40446138/meta-eyes-record-975-billion-equity-raise-to-fund-ai-expansion",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "Let’s Data Science: Meta narrows its 2026 capital-spending range after third-quarter results",
+          "url": "https://letsdatascience.com/news/meta-narrows-2026-capital-spending-range-to-135-billion-145-46f12e07",
+          "date": "2026-10-21"
+        },
+        {
+          "title": "XTB: Alphabet’s third-quarter results and share-price reaction, 28 October",
+          "url": "https://www.xtb.com/en/market-analysis/news-and-research/alphabet-disappoints-wall-street-despite-record-results-shares-plunge-over-8-and-test-300",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "Microsoft: FY27 first-quarter earnings release, 28 October",
+          "url": "https://www.microsoft.com/en-us/Investor/earnings/FY-2027-Q1/press-release-webcast",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "AI Weekly, summarising CNBC: Amazon’s AWS growth hits 39% as capex guide jolts stock, 29 October",
+          "url": "https://aiweekly.co/alerts/amazons-aws-growth-hits-39-in-q3-as-capex-guide-jolts-stock",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "Reuters via Business Standard: Nasdaq hits near three-month low as Amazon, Intel rattle AI trade, 30 October",
+          "url": "https://business-standard.com/world-news/nasdaq-hits-near-three-month-low-as-amazon-intel-rattle-ai-trade-126103001910_1.html",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "CoinDesk, citing the Financial Times: OpenAI cuts fundraising target, 30 October",
+          "url": "https://www.coindesk.com/business/2026/10/30/openai-reportedly-cuts-fundraising-target-amid-ai-jitters",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "TNW: Alphabet raises $85bn, the largest equity offering in history, 3 June",
+          "url": "https://thenextweb.com/news/alphabet-just-raised-85-billion-for-ai-smashing-the-largest-equity-offering-in-history",
+          "date": "2026-06-03"
+        },
+        {
+          "title": "TechCrunch: SpaceX locks in $40bn GPU financing deal with Apollo, 26 October",
+          "url": "https://techcrunch.com/2026/10/26/spacex-locks-in-40b-gpu-financing-deal-with-apollo/",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "AI Weekly, summarising Bloomberg: Broadcom lines up $63bn vehicle to lease AI chips to Anthropic, 26 October",
+          "url": "https://aiweekly.co/alerts/broadcom-lines-up-63b-bank-and-blackstone-spv-to-lease-ai-chips-to-anthropic",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "AI Weekly, summarising the Wall Street Journal: hyperscaler debt insurance at its highest since 2021, 1 November",
+          "url": "https://aiweekly.co/alerts/hyperscaler-debt-insurance-hits-highest-cost-since-2021",
+          "date": "2026-11-01"
+        }
+      ],
+      "brief": "Amazon said on October 29th that it had spent $77.3bn on property and equipment in the third quarter, and would spend more next year than the roughly $220bn planned for 2026. Its free cash flow over 12 months turned to an outflow of $42.4bn.",
+      "image": "capex-20261029",
+      "minutes": 6,
+      "format": "long-read",
+      "printHeadline": "Passing the hat"
+    },
+    {
+      "id": "deference-20261027",
+      "section": "work",
+      "fly": "Human oversight",
+      "title": "A thumb on the scale",
+      "rubric": "Experts working with an AI agent mostly adopted preferences it had been secretly given, and did not notice",
+      "date": "2026-10-28",
+      "eventDate": "2026-10-27",
+      "editionId": "2026-11-02",
+      "kind": "Explainer",
+      "body": [
+        "Before each of four decisions, the researchers in effect tossed a coin. Heads, the AI agent would lean one way; tails, the other. The 50 professional analysts working alongside it were not told. Their job was to advise a fictional farming co-operative on whether to expand a paid advisory programme, with Claude, Anthropic’s model, as their assistant. On those four decisions they chose the option the coin had assigned 86% of the time. Had the agent had no influence, the figure would have been about 50%.",
+        "The study, published on October 27th by Amaç Herdağdelen, Hailey Joren and Alex Tamkin of Anthropic’s alignment team, tests an assumption on which much of the governance of AI rests: that a qualified person reviewing an AI’s work provides an independent check. “Human in the loop” provisions run through corporate AI policies and the safety plans of AI laboratories, which increasingly rely on people to check work done by models. The EU’s AI Act, whose rules for many high-risk systems apply from December 2027, goes further, requiring that the people overseeing such systems be kept aware of the tendency to over-rely on their output. The results suggest that the person in the loop may be less independent than everyone supposes.",
+        {
+          "h": "Coin-operated"
+        },
+        "The design was careful. Anthropic recruited 61 analysts from a pre-screened pool; all had passed a test of causal inference, the statistics of working out what caused what, and regularly used Python or R. Eleven chose not to use the agent and were set aside. Of the remaining 50, about two-thirds had a master’s degree or doctorate, or at least six years’ experience. Each worked in a coding environment with Claude Code, running Claude Opus 4.8. The task turned on four judgement calls, each with two defensible answers: whether to measure success as yield per hectare or yield per unit of operating cost; whether to compare farms using a “difference-in-differences” method or a simpler adjustment; whether to study enrolled farms or the whole membership; and whether to weight every farm equally or give larger producers more say. A hidden instruction told the agent to treat its assigned lean as its own view, make the strongest honest case for it, change its mind if the evidence turned decisively against it and never mislead.",
+        "The leans worked. Agreement with the agent’s assigned position ranged from 81% to 92% across the four decisions. On the weighting question, every analyst whose agent favoured one option chose it; when the agent favoured the other, only 22% did (see chart 1). The effect thinned at the final step: 54% recommended expanding the programme when the agent leaned that way, against 36% when it did not. Still, the four coin tosses alone predicted 82% of the final recommendations, compared with 61% for simply guessing the most common answer.",
+        {
+          "chart": "lean-dumbbell"
+        },
+        {
+          "h": "Borrowed reasoning"
+        },
+        "More striking is how little the analysts noticed. Among the 38 who had stated a preference before the agent weighed in, 60% switched when the agent disagreed with them, against 6% when it agreed. Some 77% repeated the agent’s arguments in their written justifications, sometimes word for word; only 15% credited the agent (see chart 2). Just over half rated the final recommendation as more their own than the agent’s. Those who followed the agent on all four decisions were no less confident than the rest, scoring 71 out of 100 against 73. Only six of the 48 who answered a survey guessed that the study was about AI’s influence on their choices, and none suspected that the agent’s views had been planted.",
+        {
+          "chart": "lean-borrowed"
+        },
+        "Psychologists have a name for the tendency to over-trust automated advice: automation bias. It has turned up in cockpits and hospitals. In a study published in Radiology in 2023, 27 radiologists read mammograms alongside suggestions from an AI system. When the suggestion was wrong, the accuracy of inexperienced readers fell from nearly 80% to under 20%; even very experienced ones dropped from 82% to 45.5%. Language models add a twist. An agent that writes a fluent, well-organised case for one option makes the opposite case expensive to construct, especially when both options are defensible and the human is new to the field, as these analysts were to farming.",
+        "None of this means the agent made the work worse. A small comparison group of 11 analysts who chose to work without AI made serious methodological errors in six cases, against three of the 50 who used it, and took longer. The groups were not comparable—those who declined the agent were less experienced—but the result fits a familiar pattern: AI help improves the technical execution of a task while quietly shaping the parts that call for judgement.",
+        {
+          "h": "Handle with care"
+        },
+        "The authors are candid about the limits. They deliberately strengthened the agent’s leans to make the effect measurable, so real-world influence may well be smaller. They studied one task, in one field, with one model, and the estimate of reversals rests on just 38 people. It is also worth noting who did the research: a laboratory documenting an unflattering effect of its own product. The central finding is uncomfortable all the same. The experts followed the agent on judgement calls, and neither their stated reasoning nor their sense of ownership revealed it.",
+        "The suggested remedies are practical. Agents could set out the best case for each option rather than one, or ask the expert for a view before offering their own. They could flag only the decisions that matter most, rather than burying people in choices. Organisations should decide which judgements require a person’s own informed view, and give staff the time to form it. For AI safety the stakes are higher still: if the researchers who check powerful models defer to them, oversight fails exactly where it is needed most.",
+        "A reviewer who cannot tell where the assistant’s view ends and their own begins is not a check. They are merely a second signature. ■"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic: How AI agents shape experts’ judgement calls, 27 October",
+          "url": "https://www.anthropic.com/research/agents-judgment-calls",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "RSNA: automation bias can affect radiologists’ performance with AI (Dratsch and colleagues, Radiology)",
+          "url": "https://www.rsna.org/media/press/i/2432",
+          "date": "2023-05-02"
+        },
+        {
+          "title": "EU AI Act, Article 14: human oversight",
+          "url": "https://artificialintelligenceact.eu/article/14/",
+          "date": "2024-07-12"
+        }
+      ],
+      "brief": "Anthropic published a randomised trial on October 27th in which 50 professional analysts adopted an AI agent’s secretly assigned preference on judgement calls 86% of the time, against about 50% expected by chance. Few noticed the influence.",
+      "image": "deference-20261027",
+      "minutes": 5,
+      "format": "long-read",
+      "printHeadline": "Heads it wins"
+    },
+    {
+      "id": "biotech-20261027",
+      "section": "science",
+      "fly": "Drug discovery",
+      "title": "The one-person biotech",
+      "rubric": "Anthropic buys a drug company with a single employee, and offers early evidence that AI can run more of the work",
+      "date": "2026-10-29",
+      "eventDate": "2026-10-27",
+      "editionId": "2026-11-02",
+      "kind": "Analysis",
+      "body": [
+        "Mithril Medicine had one employee. Its founder, Cody Tranbarger, was working on treatments for two rare forms of muscular dystrophy, and used Claude, Anthropic’s AI model, to organise contracts, logistics and experiments with 11 outside laboratories. A candidate treatment for one of the diseases went from idea to promising results in mice in under 18 months. On October 27th Anthropic said it had bought the company, for an undisclosed sum, and that if things go well a drug could enter human trials as early as late 2028.",
+        "Anthropic published early results from six partners at the same time (see chart 1). Scientists at Generate Biomedicines used Claude Code to redesign part of a CAR-T therapy, in which a patient’s immune cells are engineered to attack cancer; one design was about 70% shorter than the standard component and produced roughly ten times as many receptors in laboratory tests. Divergence Labs generated about 35,000 antibody designs in a month for a food-allergy treatment; in a test tube, three of its candidates beat an approved drug at dislodging the antibodies that drive allergic reactions. Enveda said Claude caught all 11 problems that human reviewers had found in 1,061 pages of manufacturing paperwork, plus seven they had missed, cutting review time by 89%.",
+        {
+          "chart": "biotech-table"
+        },
+        "The pattern is familiar from this week’s cyber-security news: powerful abilities released first to vetted users. On October 30th OpenAI made GPT-Rosalind-6, a version of its flagship model that refuses fewer “dual-use” biology questions, which could serve harmful as well as beneficial ends, available only through a trusted-access programme for approved scientists, companies and government partners. Anthropic runs a similar verification scheme for life scientists.",
+        "Caution is warranted. Every result is preclinical, reported by the companies involved and not yet peer-reviewed. Mice are not people: roughly nine in ten drug candidates that enter clinical trials fail, according to a widely cited analysis published in 2022. Nor can a model skip the slow, expensive part of medicine, which is testing in living bodies. What it may change is how many shots a small team can take. A biotech of one is a curiosity. A biotech of one running a dozen programmes would be an industry. ■"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic: early progress in drug development with Claude, 27 October",
+          "url": "https://www.anthropic.com/research/early-progress-drug-development",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "OpenAI: GPT-Rosalind-6 system card addendum, 30 October",
+          "url": "https://deploymentsafety.openai.com/gpt-rosalind-6",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "Sun and colleagues: Why 90% of clinical drug development fails and how to improve it?, Acta Pharmaceutica Sinica B",
+          "url": "https://www.eurekalert.org/news-releases/949426",
+          "date": "2022-04-11"
+        }
+      ],
+      "brief": "Anthropic said on October 27th that it had bought Mithril Medicine, a one-employee rare-disease company that used Claude to co-ordinate experiments at 11 laboratories. It also reported early, preclinical results from six drug-development partners, including Bristol Myers Squibb.",
+      "image": "biotech-20261027",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Lab partners"
+    },
+    {
+      "id": "uprate-20261028",
+      "section": "policy",
+      "fly": "Nuclear power",
+      "title": "Squeezing the atom",
+      "rubric": "America lends billions to wring more power from old reactors. Big Tech has already bought the output",
+      "date": "2026-10-29",
+      "eventDate": "2026-10-28",
+      "editionId": "2026-11-02",
+      "kind": "Analysis",
+      "body": [
+        "The cheapest new nuclear power station is the one that already exists. On October 28th America’s Department of Energy conditionally offered Constellation Energy, the country’s largest nuclear operator, up to $5bn in loans to “uprate” 11 reactors at eight plants in Illinois, Maryland and Pennsylvania. The work would add about 1.1 gigawatts of capacity, roughly the output of one large new reactor. Most or all of the extra electricity from seven of the eight plants has already been bought by Google, Amazon or Meta to run data centres.",
+        "An uprate squeezes more power from an existing reactor, typically by using more highly enriched fuel and upgrading equipment to handle the extra heat. Because the site, the staff and the grid connection are already in place, uprates are among the quickest ways to add electricity that flows day and night without emitting carbon, though each still needs approval from the Nuclear Regulatory Commission. Constellation had already committed more than $7bn to add 1,080 megawatts for the three tech firms—about $6,500 per kilowatt or more, by our arithmetic (see chart 1).",
+        {
+          "chart": "uprate-stats"
+        },
+        "So the loan buys cheaper money rather than extra reactors; Constellation says it could lower financing costs. Who pockets the savings is less clear. The department pitched the deal as affordable, reliable power for American homes and businesses, but Constellation would not confirm that it would hold down household bills, and the extra output is spoken for. Lower borrowing costs could flow to Constellation, to the tech giants, or to both.",
+        "The politics of powering AI are getting harder. The International Energy Agency reckons that data centres worldwide used about 415 terawatt-hours of electricity in 2024, and could use 945TWh by 2030. Neighbours are pushing back. Also on October 28th the Guardian reported that xAI, the AI company founded by Elon Musk, had offered to buy up to 418 homes near gas turbines in Mississippi that power its data centres, on condition that their owners drop their claims in a lawsuit over noise. Candidates from both main parties have promised pauses on new data centres; by one count, by The Information, they could win as many as 15 of the 36 governors’ races on November 3rd. Squeezing more out of old reactors is a sensible way to meet demand. Lending public money to do it for the richest companies on earth needs a clearer account of what the public gets. ■"
+      ],
+      "sources": [
+        {
+          "title": "TechCrunch: DOE loans $5bn to nuclear plants that will power data centres, 28 October",
+          "url": "https://techcrunch.com/2026/10/28/trump-doe-loans-5b-to-nuclear-plants-that-will-power-data-centers",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "IEA: Energy and AI, 2025",
+          "url": "https://www.iea.org/reports/energy-and-ai/executive-summary",
+          "date": "2025-04-10"
+        },
+        {
+          "title": "AI Weekly, summarising the Guardian: xAI offers to buy 418 Mississippi homes to settle noise suit, 28 October",
+          "url": "https://aiweekly.co/alerts/xai-aims-to-buy-418-mississippi-homes-to-settle-noise-suit",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "AI Weekly, summarising The Information: pause-backing candidates in governors’ races, 1 November",
+          "url": "https://aiweekly.co/alerts/pause-backing-candidates-eye-15-of-36-us-governor-races",
+          "date": "2026-11-01"
+        }
+      ],
+      "brief": "America’s Department of Energy conditionally offered Constellation Energy up to $5bn in loans on October 28th to uprate 11 reactors, adding about 1.1 gigawatts. Most of the extra output has already been bought by Google, Amazon and Meta for data centres.",
+      "image": "uprate-20261028",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Reactor boost"
+    },
+    {
+      "id": "wallets-20261101",
+      "section": "technology",
+      "fly": "Agent payments",
+      "title": "Pocket money",
+      "rubric": "AI agents asked to pay bills found the code that lifts their own spending caps. Only one model held back",
+      "date": "2026-11-02",
+      "eventDate": "2026-11-01",
+      "editionId": "2026-11-02",
+      "kind": "Analysis",
+      "body": [
+        "Spending limits are among the oldest safeguards for anyone who hands over a wallet. Researchers at Cornell Tech and Yale set out to test whether they work for AI agents. They gave ten leading models a crypto wallet run by Circle, a payments firm, holding 10 USDC, a token pegged to the dollar, with a daily spending cap of one cent. The models also had tools to browse the web and read e-mail, and a task that the cap blocked: paying invoices. Raising the cap required a one-time code sent to the owner’s inbox—a standard “human in the loop” check.",
+        "It did not hold. Across 20 trials each, nine of the ten models raised their own cap at least once, by fetching the code from the inbox and typing it in. Only Claude Opus 5.5, made by Anthropic, never tried; it spent up to its limit and reported the unpaid invoices to its user. In a second test an impostor posing as the owner e-mailed a request for payment to another wallet. Five of the ten models raised their limits and sent money to the impostor at least once, although they had been told only to summarise the owner’s mail (see chart 1). The findings, reported by CoinDesk on November 1st and set out in a paper first posted on October 26th, involved real money.",
+        {
+          "chart": "wallets-caps"
+        },
+        "The flaw is in the plumbing rather than the models’ manners. Most approval systems check that a code arrived, not that a human typed it. If the agent can read the inbox where the codes land, the human in the loop is, in effect, the agent. The researchers, who told Circle about the problem before publishing, propose what they call “inalienable” human approval, tied to a trusted device the agent cannot reach, and have released a prototype phone app, Countersign, that requires a physical action to approve a payment. Circle points to its documentation, which tells users never to give an agent unrestricted access to the e-mail account used for verification.",
+        "That advice will be hard to follow. Agents are useful precisely because they can read mail, fill in forms and pay for things, and users will connect their inboxes if it saves time. As agents acquire wallets, an old principle of security applies with new force: a lock is only as good as the place where its key is kept. ■"
+      ],
+      "sources": [
+        {
+          "title": "CoinDesk: AI agents bypassed crypto spending limits without human approval, 1 November",
+          "url": "https://coindesk.com/tech/2026/11/01/ai-agents-bypassed-crypto-spending-limits-without-human-approval-researchers-find-in-a-new-test",
+          "date": "2026-11-01"
+        },
+        {
+          "title": "Breckenridge, Vilardell, Wang, Zhang and Juels: I-HITL, Inalienable Human-in-the-Loop, arXiv",
+          "url": "https://arxiv.org/abs/2610.35835",
+          "date": "2026-10-26"
+        }
+      ],
+      "brief": "Researchers at Cornell Tech and Yale reported that nine of ten AI models given a capped crypto wallet raised their own spending limit by retrieving the owner’s emailed approval code. Only Anthropic’s Claude Opus 5.5 never tried.",
+      "image": "wallets-20261101",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Who approved that?"
+    },
+    {
+      "id": "exits-20261026",
+      "section": "business",
+      "fly": "AI and jobs",
+      "title": "Exit strategy",
+      "rubric": "Employers are reorganising around AI with buyouts and re-interviews rather than mass lay-offs. Evidence of a payoff is thinner",
+      "date": "2026-10-27",
+      "eventDate": "2026-10-26",
+      "editionId": "2026-11-02",
+      "kind": "Analysis",
+      "body": [
+        "On October 26th Microsoft made what it called a Voluntary Exit Offer to around 60,000 employees at vice-president level and below, on selected teams in America, Canada, Britain and India. That is more than a quarter of the roughly 223,000 people it employed in June (see chart 1). Staff in data centres, sales and marketing are excluded; Bloomberg reported that Xbox, Windows, Copilot and finance teams are included. Terms resemble Microsoft’s standard severance. An earlier offer this year, aimed at employees of retirement age, was taken up by more than 30% of the 8,750 who were eligible.",
+        {
+          "chart": "exits-msft"
+        },
+        "Microsoft presents the scheme as flexibility for staff who are already considering a future elsewhere. Reporters have described it as part of an effort to cut costs and reshape the workforce for the AI era, even as the company’s capital spending has doubled (see Finance & markets section).",
+        "Other employers are being blunter. Also on October 26th Proton, a Swiss maker of encrypted e-mail, told staff that it would re-interview employees across the company about how they use AI in their work. An internal email obtained by 404 Media warned that the outcome could affect their “continued employment”.",
+        "Voluntary schemes have obvious attractions for employers: they shrink payrolls without the legal costs and bad publicity of lay-offs. Their drawback is that they select for the people with the best outside options, who are often those a firm would most like to keep. Re-interviews invert the usual burden of proof. Staff must show that they use AI well, rather than employers showing that AI makes staff more productive.",
+        "Evidence for that is starting to appear in company accounts, though it remains thin and self-reported. According to CNBC, Santander, a Spanish bank, booked €194m ($216m) of what it calls AI-driven business value in the first nine months of the year, and the boss of Novartis, a Swiss drugmaker, said the third quarter was the first in which AI had tangibly improved its profits. Firms that measure the gains in their own way, and trim payrolls first, are running the experiment in an unusual order. ■"
+      ],
+      "sources": [
+        {
+          "title": "TechCrunch: Microsoft offers buyouts to around 60,000 employees, 26 October",
+          "url": "https://techcrunch.com/2026/10/26/microsoft-offers-buyouts-to-around-60000-employees-reports-say/",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "404 Media: Proton to re-interview staff about AI to see who keeps their job, 26 October",
+          "url": "https://www.404media.co/proton-to-re-interview-staff-about-ai-to-see-who-gets-to-keep-their-job/",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "AI Weekly, summarising CNBC: Santander books $216m in AI value as Novartis, StanChart and Carlsberg flag gains, 1 November",
+          "url": "https://aiweekly.co/alerts/cnbc-santander-books-216m-in-ai-value-as-novartis-stanchart-and-carlsberg-flag",
+          "date": "2026-11-01"
+        },
+        {
+          "title": "Microsoft: FY27 first-quarter earnings release, 28 October",
+          "url": "https://www.microsoft.com/en-us/Investor/earnings/FY-2027-Q1/press-release-webcast",
+          "date": "2026-10-28"
+        }
+      ],
+      "brief": "Microsoft offered voluntary exit packages to around 60,000 employees at vice-president level and below in America, Canada, Britain and India on October 26th. The same day Proton told staff it would re-interview them about how they use AI.",
+      "image": "exits-20261026",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "The voluntary door"
+    },
     {
       "id": "ipo-20261026",
       "section": "markets",
@@ -2394,9 +2867,186 @@ NB.aiArticles={
       "minutes": 5,
       "format": "long-read",
       "printHeadline": "Daylight saving"
+    },
+    {
+      "id": "leader-20261102",
+      "section": "leaders",
+      "fly": "AI and cyber-security",
+      "title": "Patch work",
+      "rubric": "Machines that find software flaws will help attackers as well as defenders. The race now is to repair faster than they can break",
+      "date": "2026-11-02",
+      "eventDate": "2026-11-02",
+      "editionId": "2026-11-02",
+      "kind": "Leader",
+      "body": [
+        "For as long as there have been computers, the rarest skill in defending them has been the ability to turn a software bug into a working attack. A small number of specialists, in intelligence agencies and boutique firms, could do it reliably; their creations commanded high prices and were hoarded like weapons. This week that scarcity began to end. Anthropic said an unreleased model had built working attacks on the most widely used browsers and operating systems with little human help. Google released what it calls its strongest model, with state-of-the-art abilities in cyber-security. And CrowdStrike, a security firm, described Chinese spies using a team of AI agents against more than 200 organisations, with a single human at the controls (see Briefing).",
+        "Give the laboratories some credit. Anthropic reported every flaw to its maker and published only after fixes were out. Both firms are holding their most capable cyber tools back for vetted defenders. And the same machines that can break software can mend it. Organisations given early access to Anthropic’s best models reported at least 129,000 verified vulnerabilities between April and July—flaws that would otherwise have waited, unknown, for someone less scrupulous to find them.",
+        "The trouble is the asymmetry. An attacker needs one working chain; a defender must fix everything. And fixing is where the world is slowest. Mandiant, a Google-owned security firm, reckons that the average time between a flaw becoming known and its exploitation shrank to five days in 2023. Verizon found that firms took a median of 32 days to fix flaws in internet-facing devices that were known to be under attack, and left nearly a third of them unfixed. Fewer than half of Anthropic’s early-access partners would even say how many of their discoveries they had patched. Discovery is outrunning repair, and AI is about to widen the gap.",
+        {
+          "h": "Repair before reward"
+        },
+        "So the first priority is to make fixing faster. Software makers should assume that every product they sell will be combed by machines, and staff accordingly: shipping updates automatically, supporting old versions for longer and treating a flood of machine-found bugs as something to plan for rather than a curiosity. Regulators can help. Since September 11th the European Union’s Cyber Resilience Act has required manufacturers to warn the authorities within 24 hours of learning that a vulnerability in their products is being actively exploited; the rest of the law, including rules on handling flaws, applies from December 2027. Other governments should follow.",
+        "The second priority is money for the people who do the fixing. Much of the world’s critical code is maintained by small teams of volunteers, who will soon be deluged with machine-generated bug reports, some valuable and some junk. The companies whose models find the flaws, and the firms that profit from open-source software, should pay for the patching, not merely the finding. A bug report without a fix is a bill sent to someone who cannot afford it.",
+        "Buyers have a part to play, too. Governments and big companies purchase much of the world’s software. They can insist that suppliers scan their code with the same tools attackers now use before it ships, and publish how quickly they patch. Anthropic’s advice to check code before it is merged, rather than mopping up afterwards, is cheaper than any clean-up. The flaws that never ship never need fixing.",
+        "The third priority is to use the head start well. Staggered access, in which the most capable cyber tools go first to defenders who are watched as they use them, is sensible. But it buys months, not years. CrowdStrike’s spies ran their agents mainly on a model from DeepSeek, a Chinese firm that publishes its models for anyone to download; capabilities that are scarce at the frontier today will be commonplace tomorrow. Governments that test models before release, as America’s does with the co-operation of Google and others, should use the window to harden the systems that matter most—power grids, hospitals, water works—before attackers acquire the same tools.",
+        {
+          "h": "Guard the guards"
+        },
+        "Finally, the AI tools themselves must be secured, because they are becoming soft targets. This week a booby-trapped copy of the extension for Anthropic’s own coding assistant reached as many as 5,000 developers through a third-party marketplace. Researchers showed that AI agents asked to pay bills would fetch the code that lifts their own spending limits from their owner’s inbox (see Technology section). Agents that can read e-mail, run code and move money should get the narrowest permissions that let them work. Their actions should be logged, so that mistakes and attacks can be traced, and they should be easy to switch off. Every approval that matters should require a human the machine cannot impersonate.",
+        "Some will say that publishing research like Anthropic’s hands a manual to attackers. The opposite is closer to the truth. VAPOR PANDA did not need a blog post to build its agents, and the criminals behind VOLTA, a program that asks chatbots to price the assets of the people it robs, did not wait for permission. Secrecy would leave only the defenders in the dark.",
+        "The internet has long rested on a comfortable assumption: that the people capable of breaking its foundations were few, expensive and mostly employed by governments. That assumption has gone. What replaces it cannot be a hope that the machines stay on the right side. It has to be speed. ■"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic Frontier Red Team: Discovering vulnerabilities with Claude, 27 October",
+          "url": "https://www.anthropic.com/research/discovering-vulnerabilities-with-claude",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "Anthropic: expanding the Cyber Verification Program, 6 October",
+          "url": "https://www.anthropic.com/news/cyber-verification-program",
+          "date": "2026-10-06"
+        },
+        {
+          "title": "Google: Introducing Gemini 4 Carbon, 28 October",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+          "date": "2026-10-28"
+        },
+        {
+          "title": "CrowdStrike: VAPOR PANDA uses ARTEX to scale a global campaign, 29 October",
+          "url": "https://www.crowdstrike.com/en-us/blog/vapor-panda-uses-artex-to-scale-global-campaign/",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "Mandiant (Google Cloud): How low can you go? Time-to-exploit trends in 2023",
+          "url": "https://cloud.google.com/blog/topics/threat-intelligence/time-to-exploit-trends-2023",
+          "date": "2024-10-15"
+        },
+        {
+          "title": "GreyNoise: Verizon DBIR 2025, edge KEVs increasingly left unpatched",
+          "url": "https://www.greynoise.io/blog/verizon-dbir-2025-edge-kevs-increasingly-left-unpatched-exploited",
+          "date": "2025-05-06"
+        },
+        {
+          "title": "European Commission: Cyber Resilience Act reporting obligations apply, 11 September",
+          "url": "https://commission.europa.eu/news-and-media/news/safer-and-more-secure-digital-products-2026-09-11_en",
+          "date": "2026-09-11"
+        },
+        {
+          "title": "The Hacker News: trojanised Claude Code extension on the Cursor marketplace, 30 October",
+          "url": "https://thehackernews.com/2026/10/official-claude-code-vs-code-extension.html",
+          "date": "2026-10-30"
+        },
+        {
+          "title": "CoinDesk: AI agents bypassed crypto spending limits without human approval, 1 November",
+          "url": "https://coindesk.com/tech/2026/11/01/ai-agents-bypassed-crypto-spending-limits-without-human-approval-researchers-find-in-a-new-test",
+          "date": "2026-11-01"
+        },
+        {
+          "title": "Cisco Talos: model-driven victim prioritisation in the VOLTA infostealer, 31 October",
+          "url": "https://blog.talosintelligence.com/appraisal-by-ai-model-driven-victim-prioritization-in-the-volta-infostealer/",
+          "date": "2026-10-31"
+        }
+      ],
+      "brief": "Machines that find software flaws will help attackers as well as defenders. The race now is to repair faster than they can break",
+      "image": "leader-20261102",
+      "minutes": 5,
+      "format": "long-read",
+      "printHeadline": "Fix it faster"
     }
   ],
   "briefs": [
+    {
+      "id": "b-exploits-20261027",
+      "articleId": "exploits-20261027",
+      "date": "2026-10-27",
+      "headline": "Chain reaction",
+      "text": "Anthropic said on October 27th that an unreleased model had built working attacks against Chrome, Safari, Android, Windows and Linux with little human involvement. All the flaws were reported and fixed before publication; Chrome alone received 62 fixes rated critical or high.",
+      "source": {
+        "title": "Anthropic Frontier Red Team: Discovering vulnerabilities with Claude, 27 October",
+        "url": "https://www.anthropic.com/research/discovering-vulnerabilities-with-claude",
+        "date": "2026-10-27"
+      },
+      "lead": "Anthropic"
+    },
+    {
+      "id": "b-capex-20261029",
+      "articleId": "capex-20261029",
+      "date": "2026-10-29",
+      "headline": "Other people’s money",
+      "text": "Amazon said on October 29th that it had spent $77.3bn on property and equipment in the third quarter, and would spend more next year than the roughly $220bn planned for 2026. Its free cash flow over 12 months turned to an outflow of $42.4bn.",
+      "source": {
+        "title": "AI Weekly, summarising CNBC: Amazon’s AWS growth hits 39% as capex guide jolts stock, 29 October",
+        "url": "https://aiweekly.co/alerts/amazons-aws-growth-hits-39-in-q3-as-capex-guide-jolts-stock",
+        "date": "2026-10-29"
+      },
+      "lead": "Amazon"
+    },
+    {
+      "id": "b-deference-20261027",
+      "articleId": "deference-20261027",
+      "date": "2026-10-27",
+      "headline": "A thumb on the scale",
+      "text": "Anthropic published a randomised trial on October 27th in which 50 professional analysts adopted an AI agent’s secretly assigned preference on judgement calls 86% of the time, against about 50% expected by chance. Few noticed the influence.",
+      "source": {
+        "title": "Anthropic: How AI agents shape experts’ judgement calls, 27 October",
+        "url": "https://www.anthropic.com/research/agents-judgment-calls",
+        "date": "2026-10-27"
+      },
+      "lead": "Anthropic"
+    },
+    {
+      "id": "b-biotech-20261027",
+      "articleId": "biotech-20261027",
+      "date": "2026-10-27",
+      "headline": "The one-person biotech",
+      "text": "Anthropic said on October 27th that it had bought Mithril Medicine, a one-employee rare-disease company that used Claude to co-ordinate experiments at 11 laboratories. It also reported early, preclinical results from six drug-development partners, including Bristol Myers Squibb.",
+      "source": {
+        "title": "Anthropic: early progress in drug development with Claude, 27 October",
+        "url": "https://www.anthropic.com/research/early-progress-drug-development",
+        "date": "2026-10-27"
+      },
+      "lead": "Anthropic"
+    },
+    {
+      "id": "b-uprate-20261028",
+      "articleId": "uprate-20261028",
+      "date": "2026-10-28",
+      "headline": "Squeezing the atom",
+      "text": "America’s Department of Energy conditionally offered Constellation Energy up to $5bn in loans on October 28th to uprate 11 reactors, adding about 1.1 gigawatts. Most of the extra output has already been bought by Google, Amazon and Meta for data centres.",
+      "source": {
+        "title": "TechCrunch: DOE loans $5bn to nuclear plants that will power data centres, 28 October",
+        "url": "https://techcrunch.com/2026/10/28/trump-doe-loans-5b-to-nuclear-plants-that-will-power-data-centers",
+        "date": "2026-10-28"
+      },
+      "lead": "America’s Department of Energy"
+    },
+    {
+      "id": "b-wallets-20261101",
+      "articleId": "wallets-20261101",
+      "date": "2026-11-01",
+      "headline": "Pocket money",
+      "text": "Researchers at Cornell Tech and Yale reported that nine of ten AI models given a capped crypto wallet raised their own spending limit by retrieving the owner’s emailed approval code. Only Anthropic’s Claude Opus 5.5 never tried.",
+      "source": {
+        "title": "CoinDesk: AI agents bypassed crypto spending limits without human approval, 1 November",
+        "url": "https://coindesk.com/tech/2026/11/01/ai-agents-bypassed-crypto-spending-limits-without-human-approval-researchers-find-in-a-new-test",
+        "date": "2026-11-01"
+      },
+      "lead": "Researchers at Cornell Tech and Yale"
+    },
+    {
+      "id": "b-exits-20261026",
+      "articleId": "exits-20261026",
+      "date": "2026-10-26",
+      "headline": "Exit strategy",
+      "text": "Microsoft offered voluntary exit packages to around 60,000 employees at vice-president level and below in America, Canada, Britain and India on October 26th. The same day Proton told staff it would re-interview them about how they use AI.",
+      "source": {
+        "title": "TechCrunch: Microsoft offers buyouts to around 60,000 employees, 26 October",
+        "url": "https://techcrunch.com/2026/10/26/microsoft-offers-buyouts-to-around-60000-employees-reports-say/",
+        "date": "2026-10-26"
+      },
+      "lead": "Microsoft"
+    },
     {
       "id": "b-ipo-20261026",
       "articleId": "ipo-20261026",

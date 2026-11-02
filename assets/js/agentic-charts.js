@@ -305,6 +305,31 @@ window.AgenticCharts = (function () {
 
   var D = {};
 
+  // 2 November edition
+  D['exploit-chains'] = { title: 'Five ways in', sub: 'Attacks built by an unreleased Anthropic model, described October 27th 2026', source: 'Anthropic Frontier Red Team; The Hacker News. All flaws were reported to their makers and fixed before publication',
+    html: function () { return table({ head: ['Target', 'Way in', 'What the attacker gets', 'Fix'], rows: [[['Chrome, on a Mac', 'Open one web page', 'Runs programs outside the sandbox (four bugs chained)', 'Chrome 156'], true], [['Safari', 'Open one web page', 'Reads history, cookies and sessions from other sites', 'Fixed by Apple']], [['Android (Pixel 9)', 'USB cable to a locked phone', 'Copies photos and personal data', 'Fixed by Google']], [['Windows servers', 'A few network packets', 'Crashes the machine, again and again', 'CVE-2026-33096']], [['Linux servers', 'Network connection, no login', 'Full control of the machine', 'CVE-2026-98432'], true]] }); } };
+  D['exploit-artex'] = { title: 'One operator, many targets', sub: 'VAPOR PANDA’s campaign with the ARTEX agent framework, from October 17th 2026', source: 'CrowdStrike, October 29th 2026',
+    html: function () { return stats({ items: [['1', 'human operator, steering several intrusions at once'], ['200+', 'organisations targeted'], ['14+', 'countries'], ['11', 'days of activity'], ['9', 'organisations with confirmed follow-on activity'], ['1.4bn', 'input tokens used by planning agents in a single intrusion']] }); } };
+  D['exploit-window'] = { title: 'Closing time', sub: 'Average time from disclosure of a vulnerability to its exploitation, days', source: 'Mandiant (Google Cloud), October 2024. The 2020 period runs to early 2021. *Excludes 15 outliers; including them, 47 days',
+    svg: function (W) { return columns({ aria: 'Average time to exploit: 63 days in 2018–19, 44 in 2020, 32 in 2021–22 and 5 in 2023', max: 70, ticks: [0, 20, 40, 60], bars: [['2018–19', 63, C.grey], ['2020', 44, C.blue], ['2021–22', 32, C.blue], ['2023*', 5, C.red]] }, W); } };
+  D['capex-q3'] = { title: 'Big spenders', sub: 'Capital spending, quarter to September 2026, $bn', source: 'Company results. *Includes principal payments on finance leases. Microsoft: additions to property and equipment',
+    html: function () { return hbar({ rows: [['Amazon', 77.3, C.red, '77.3'], ['Alphabet', 51.4, C.blue, '51.4'], ['Microsoft', 39.4, C.blue, '39.4'], ['Meta*', 34.9, C.blue, '34.9']] }); } };
+  D['capex-money'] = { title: 'Passing the hat', sub: 'Selected financing for AI infrastructure announced in 2026, $bn', source: 'Meta via Reuters; TNW; Bloomberg; SpaceX via TechCrunch; Financial Times. *Up to; includes as much as $60bn to be sold from 2027. †Revised target',
+    html: function () { return hbar({ rows: [['Meta share sales*', 97.5, C.red, '97.5'], ['Alphabet share sale, June', 85, C.blue, '85'], ['Lease vehicle for Anthropic’s chips', 63, C.blue, '63'], ['SpaceX chip lease from Apollo', 40, C.blue, '40'], ['OpenAI funding round†', 20, C.sky, '20']] }); } };
+  D['lean-dumbbell'] = { title: 'Leaning in', sub: 'Analysts choosing the first of two options, by the AI agent’s randomly assigned lean, %', source: 'Anthropic, October 27th 2026. 50 analysts; every decision had two defensible options',
+    legend: [['Agent leaned the other way', C.blue], ['Agent leaned this way', C.red]],
+    html: function () { return dumbbell({ names: ['Agent leaned the other way', 'Agent leaned this way'], suffix: '%', gapLabel: 'gap, pts', rows: [['Outcome measure', 0, 82], ['Comparison method', 28, 92], ['Which farms to study', 38, 100], ['How to weight farms', 22, 100], ['Final advice: expand', 36, 54]] }); } };
+  D['lean-borrowed'] = { title: 'Borrowed, not credited', sub: 'Analysts working with an AI agent, %', source: 'Anthropic, October 27th 2026. Switching rates are among the 38 analysts who stated a prior preference',
+    html: function () { return hbar({ max: 100, suffix: '%', rows: [['Switched view when the agent disagreed', 60, C.red, '60%'], ['Switched view when the agent agreed', 6, C.grey, '6%'], ['Repeated the agent’s arguments', 77, C.blue, '77%'], ['Credited the agent', 15, C.sky, '15%']] }); } };
+  D['biotech-table'] = { title: 'Work experience', sub: 'Drug-development projects using Claude, as reported by Anthropic', source: 'Anthropic, October 27th 2026. Partner-reported and preclinical; not peer-reviewed',
+    html: function () { return table({ head: ['Who', 'Task', 'Reported result'], rows: [[['Mithril Medicine', 'Run a rare-disease programme across 11 labs', 'Idea to promising mouse data in under 18 months'], true], [['Generate Biomedicines', 'Redesign part of a CAR-T therapy', 'Component about 70% shorter; roughly ten times as many receptors']], [['Divergence Labs', 'Design food-allergy antibodies', 'About 35,000 designs in a month; three beat an approved drug in vitro']], [['BigHat Biosciences', 'Improve two antibody fragments', 'About 1,010 variants in ten weeks; binding over ten times tighter']], [['Enveda', 'Check manufacturing paperwork', 'All 11 issues humans found, plus seven more; review time down 89%']], [['Bristol Myers Squibb', 'Assess early clinical-trial plans', 'Early stage; to expand in 2027']]] }); } };
+  D['uprate-stats'] = { title: 'Uprate in numbers', sub: 'Constellation Energy’s plan to boost existing reactors', source: 'Department of Energy and Constellation, via TechCrunch, October 28th 2026. *Agentic AI calculation: $7bn ÷ 1,080MW; commitments exceed $7bn',
+    html: function () { return stats({ items: [['$5bn', 'maximum conditional loan from the Department of Energy'], ['11', 'reactors at eight plants in three states'], ['1.1GW', 'of capacity to be added'], ['$7bn+', 'already committed by Constellation for 1,080MW'], ['~$6,500', 'per kilowatt, or more*'], ['7 of 8', 'plants whose extra output is mostly or wholly bought by Google, Amazon or Meta']] }); } };
+  D['wallets-caps'] = { title: 'Self-service', sub: 'Ten AI models given a crypto wallet with a one-cent daily cap, number that…', source: 'Breckenridge, Vilardell, Wang, Zhang and Juels (Cornell Tech and Yale), via CoinDesk, November 1st 2026. At least once in 20 trials',
+    html: function () { return hbar({ max: 10, rows: [['Raised their own cap', 9, C.red, '9'], ['Paid an impostor after a fake e-mail', 5, C.blue, '5'], ['Never tried to get round the cap', 1, C.grey, '1']] }); } };
+  D['exits-msft'] = { title: 'Mind the exit', sub: 'Microsoft employees, ’000', source: 'Microsoft, via TechCrunch, October 26th 2026. *More than 30% of those eligible; Agentic AI calculation',
+    html: function () { return hbar({ rows: [['All employees, June 2026', 223, C.grey, '223'], ['Offered a voluntary exit, October', 60, C.red, '~60'], ['Eligible for retirement-age offer', 8.75, C.blue, '8.75'], ['…of whom accepted*', 2.6, C.sky, '2.6+']] }); } };
+
   // 26 October edition
   D['ipo-revenue'] = { title: 'One quarter beats a year', sub: 'Anthropic’s revenue, $bn', source: 'Anthropic S-1, October 2026, via Tomasz Tunguz',
     svg: function (W) { return columns({ aria: 'Revenue: 2025 full year $4.6bn; first quarter 2026 $4.7bn; second quarter 2026 $11.6bn', max: 12, ticks: [0, 4, 8, 12], fmt: function (v) { return num(v, v % 1 ? 1 : 0); },
@@ -445,7 +470,7 @@ window.AgenticCharts = (function () {
   /* ---------- rendering ---------- */
 
   // These need the full column; everything else floats beside the text on wide screens.
-  var WIDE = ['robo-table', 'review-table', 'skills-timeline', 'supply-timeline', 'aiact-timeline', 'cai-timeline', 'enzyme-crispr', 'yandex-map', 'ag-states', 'voice-lanes', 'guardrails-venn', 'pew-dumbbell'];
+  var WIDE = ['exploit-chains', 'biotech-table', 'lean-dumbbell', 'robo-table', 'review-table', 'skills-timeline', 'supply-timeline', 'aiact-timeline', 'cai-timeline', 'enzyme-crispr', 'yandex-map', 'ag-states', 'voice-lanes', 'guardrails-venn', 'pew-dumbbell'];
 
   function render(id, key, num) {
     var d = D[id];

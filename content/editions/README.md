@@ -1,6 +1,8 @@
 # Publishing the Monday edition
 
-The current issue is dated **26 October 2026**, with a news window of **19–26 October** and a knowledge cutoff of **26 October**. It is a retrospective issue assembled on 29 October; that distinction is recorded in its colophon. The next issue date is 2 November. Publication is manual: dates do not automatically create or publish content.
+The current issue is dated **2 November 2026**, with a news window of **26 October–2 November** and a knowledge cutoff of **2 November**. It was assembled on its issue date. The next issue date is 9 November. Publication is manual: dates do not automatically create or publish content.
+
+The 2 November issue has eight articles: a lead Briefing (cyber-security), a Leader on the same story, a markets Briefing, a work Explainer and four short analyses, with seven digest updates and six short reads. Its article images and cover are original illustrations drawn in code; licensed photographs can replace any of them by changing the article's entry in `agentic-art.js` (one distinct file per article still applies). It passed `node tools/validate-editions.cjs` before publishing.
 
 `content/ai-articles.js` contains the edition catalogue, articles and separate news briefs. `assets/js/agentic-art.js` maps each article to one distinct local source image. Each article uses its own image consistently on cards and in the reader. A cover has its own asset and is not borrowed from an article.
 
@@ -15,15 +17,15 @@ The current issue is dated **26 October 2026**, with a news window of **19–26 
 
 Stable routes:
 
-- `curiosity.html#weekly/2026-10-26` — fixed issue
-- `curiosity.html#weekly/2026-10-26/science` — issue section
-- `curiosity.html#brief/2026-10-26` — issue news digest
+- `curiosity.html#weekly/2026-11-02` — fixed issue
+- `curiosity.html#weekly/2026-11-02/science` — issue section
+- `curiosity.html#brief/2026-11-02` — issue news digest
 - `curiosity.html#editions` — published edition archive
-- `curiosity.html#a/ipo-20261026` — individual article
+- `curiosity.html#a/exploits-20261027` — individual article
 
 The earlier undated/evergreen draft collection is preserved in `content/archive/ai-background-2026-10-29.js`. It is not loaded as the October 26 issue. Browser and cloud reading data are retained.
 
-Editorial mix: the current edition contains eight 5–6 minute briefings/explainers and four shorter news analyses. Reading time is calculated from the actual body at 200 words per minute. Do not lengthen read-time labels without adding substantive content.
+Editorial mix: the current edition contains four long reads of five to seven minutes (two Briefings, an Explainer and the Leader) and four shorter news analyses; the 26 October issue had eight briefings/explainers and four analyses. Reading time is calculated from the actual body at 200 words per minute. Do not lengthen read-time labels without adding substantive content.
 
 Back issues dated 28 September, 5 October, 12 October and 19 October 2026 were assembled retrospectively on 29 October, each with its own news window, digest, short reads and public-domain cover painting. Their article photographs come from Wikimedia Commons; credits are in `assets/img/editorial/credits.md`. There is no Node on the author's laptop, so the same checks as `tools/validate-editions.cjs` were run with a Python port before publishing.
 

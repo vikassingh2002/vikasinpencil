@@ -31,10 +31,12 @@ window.AgenticLearn = (function () {
     'ai-revenue': ['AI company revenue', 'markets', ['unit-economics']], 'compute-commitments': ['Compute commitments', 'markets', ['cloud', 'ai-revenue']],
     ipo: ['IPOs and public markets', 'markets', ['ai-revenue']], 'm-and-a': ['Mergers and talent deals', 'markets', []],
     venture: ['Venture funding', 'markets', []], platforms: ['Platform strategy', 'business', ['cloud']],
+    'ai-financing': ['Financing the AI build-out', 'markets', ['compute-commitments']],
     'defence-tech': ['Defence technology', 'markets', ['venture']],
     'prompt-injection': ['Prompt injection', 'technology', ['agents']], 'least-privilege': ['Permissions and least privilege', 'technology', ['agents']],
     sandboxing: ['Sandboxing and monitoring', 'technology', ['least-privilege']], 'supply-chain-attacks': ['Software supply-chain attacks', 'technology', []],
     'self-replication': ['Self-replicating AI', 'technology', ['open-weights', 'agents']], deception: ['Deceptive model behaviour', 'technology', ['agents', 'benchmarks']],
+    'vulnerability-discovery': ['AI that finds and exploits software flaws', 'technology', ['agents']], 'agent-payments': ['Agent payments and spending limits', 'technology', ['agents', 'least-privilege']],
     'red-teaming': ['Red-teaming and safety tests', 'technology', ['benchmarks']], 'iot-security': ['Device security', 'technology', []],
     'incident-reporting': ['Incident reporting', 'policy', []], 'breach-law': ['Data-breach rules', 'policy', []],
     'eu-ai-act': ['The EU AI Act', 'policy', []], 'us-state-law': ['American state AI laws', 'policy', []],
@@ -42,6 +44,7 @@ window.AgenticLearn = (function () {
     'infrastructure-security': ['Infrastructure as a target', 'policy', ['data-centres']], 'web-commons': ['The open web and crawlers', 'policy', ['agents']],
     'coding-agents': ['Coding agents', 'work', ['agents']], 'code-review': ['Code review and verification', 'work', ['coding-agents']],
     productivity: ['AI and productivity', 'work', []], 'customer-service': ['AI in customer service', 'work', ['agents']],
+    'human-oversight': ['Human oversight of AI', 'work', ['agents']],
     'jobs-skills': ['Jobs and skills', 'work', []], education: ['AI in education', 'work', ['llm']],
     'formal-proof': ['Formal proof', 'science', []], 'ai-maths': ['AI in mathematics', 'science', ['reasoning-models']],
     'ai-biology': ['AI in biology', 'science', ['agents']], 'weather-ai': ['AI weather forecasting', 'science', ['training']],
@@ -50,6 +53,13 @@ window.AgenticLearn = (function () {
   };
   // article: [concepts covered, concepts assumed, depth 1 primer – 3 expert]. Hand-tagged; review as the archive grows.
   var A = {
+    'exploits-20261027': [['vulnerability-discovery', 'red-teaming', 'supply-chain-attacks'], ['agents', 'sandboxing'], 2],
+    'capex-20261029': [['ai-financing', 'compute-commitments', 'data-centres'], ['ai-revenue', 'cloud'], 2],
+    'deference-20261027': [['human-oversight', 'productivity'], ['agents'], 1],
+    'biotech-20261027': [['ai-biology', 'agents'], ['llm'], 1],
+    'uprate-20261028': [['power', 'data-centres'], [], 1],
+    'wallets-20261101': [['agent-payments', 'least-privilege'], ['agents', 'tools'], 2],
+    'exits-20261026': [['jobs-skills', 'productivity'], [], 1],
     'ipo-20261026': [['ai-revenue', 'ipo', 'compute-commitments'], ['unit-economics', 'cloud'], 3],
     'pods-20261021': [['data-centres', 'cooling', 'power'], ['gpus'], 2],
     'skills-20261022': [['skills', 'protocols'], ['agents', 'context'], 2],
@@ -91,7 +101,8 @@ window.AgenticLearn = (function () {
     'leader-20261005': [['unit-economics', 'token-pricing'], ['ai-revenue'], 2],
     'leader-20261012': [['formal-proof', 'code-review'], ['ai-maths'], 2],
     'leader-20261019': [['incident-reporting', 'eu-ai-act', 'iot-security'], [], 2],
-    'leader-20261026': [['ipo', 'compute-commitments'], ['ai-revenue'], 2]
+    'leader-20261026': [['ipo', 'compute-commitments'], ['ai-revenue'], 2],
+    'leader-20261102': [['vulnerability-discovery', 'least-privilege'], ['agents'], 2]
   };
 
   function meta(a) {

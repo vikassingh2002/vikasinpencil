@@ -1,4 +1,188 @@
 window.AgenticKnowledge={
+  "exploits-20261027": {
+    "tags": [
+      "security",
+      "agents"
+    ],
+    "prerequisites": [
+      "models",
+      "agents"
+    ],
+    "explains": [
+      "security",
+      "agents"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "guardrails-20261021",
+      "astra-20260928",
+      "worm-20261012",
+      "nxdirection-20261014"
+    ]
+  },
+  "capex-20261029": {
+    "tags": [
+      "economics",
+      "infrastructure"
+    ],
+    "prerequisites": [
+      "capital",
+      "hardware"
+    ],
+    "explains": [
+      "economics",
+      "infrastructure"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "ipo-20261026",
+      "prospectus-20260930",
+      "pods-20261021",
+      "supply-20261021"
+    ]
+  },
+  "deference-20261027": {
+    "tags": [
+      "work",
+      "agents"
+    ],
+    "prerequisites": [
+      "models",
+      "evidence"
+    ],
+    "explains": [
+      "work",
+      "agents"
+    ],
+    "difficulty": 1,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "review-20261026",
+      "teachers-20261019",
+      "contact-20261023",
+      "incidents-20261012"
+    ]
+  },
+  "biotech-20261027": {
+    "tags": [
+      "science",
+      "agents"
+    ],
+    "prerequisites": [
+      "models",
+      "evidence"
+    ],
+    "explains": [
+      "science",
+      "agents"
+    ],
+    "difficulty": 1,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "enzyme-20260923",
+      "maths-20261007",
+      "weather-20261021",
+      "mentalhealth-20260924"
+    ]
+  },
+  "uprate-20261028": {
+    "tags": [
+      "infrastructure",
+      "institutions"
+    ],
+    "prerequisites": [
+      "hardware",
+      "economics"
+    ],
+    "explains": [
+      "infrastructure",
+      "institutions"
+    ],
+    "difficulty": 1,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "pods-20261021",
+      "supply-20261021",
+      "yandex-20261011",
+      "capex-20261029"
+    ]
+  },
+  "wallets-20261101": {
+    "tags": [
+      "agents",
+      "security"
+    ],
+    "prerequisites": [
+      "models",
+      "security"
+    ],
+    "explains": [
+      "agents",
+      "security"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "guardrails-20261021",
+      "seller-20260923",
+      "medicare-20260924",
+      "exploits-20261027"
+    ]
+  },
+  "exits-20261026": {
+    "tags": [
+      "work",
+      "economics"
+    ],
+    "prerequisites": [
+      "agents",
+      "economics"
+    ],
+    "explains": [
+      "work",
+      "economics"
+    ],
+    "difficulty": 1,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "robobosses-20260930",
+      "cyberjobs-20261019",
+      "contact-20261023",
+      "deference-20261027"
+    ]
+  },
+  "leader-20261102": {
+    "tags": [
+      "security",
+      "institutions"
+    ],
+    "prerequisites": [
+      "security",
+      "evidence"
+    ],
+    "explains": [
+      "security",
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "exploits-20261027",
+      "leader-20261019",
+      "guardrails-20261021",
+      "wallets-20261101"
+    ]
+  },
   "ipo-20261026": {
     "tags": [
       "economics",

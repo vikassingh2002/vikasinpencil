@@ -1,5 +1,22 @@
 # Image credits
 
+## 2 November 2026
+
+Every article in this issue has its own original flat-colour illustration, drawn in code for Agentic AI (SVG rendered to JPEG). No third-party material is used. Licensed photographs can replace any of them later by changing that article's entry in `assets/js/agentic-art.js`.
+
+- **exploits-20261027**, `exploits-20261027.jpg`: Illustration: Agentic AI. A chain whose middle link has become an open padlock, with a bug crawling on it.
+- **capex-20261029**, `capex-20261029.jpg`: Illustration: Agentic AI. Coins falling into an upturned top hat with a chip on its band.
+- **deference-20261027**, `deference-20261027.jpg`: Illustration: Agentic AI. A robotic thumb pressing down one side of a balance.
+- **biotech-20261027**, `biotech-20261027.jpg`: Illustration: Agentic AI. A flask linked to eleven laboratories.
+- **uprate-20261028**, `uprate-20261028.jpg`: Illustration: Agentic AI. A cooling tower squeezed in a clamp, wired to a server rack.
+- **wallets-20261101**, `wallets-20261101.jpg`: Illustration: Agentic AI. A robot arm reaching for the key to a padlocked wallet.
+- **exits-20261026**, `exits-20261026.jpg`: Illustration: Agentic AI. An open door under an exit sign, beside a box of desk belongings.
+- **leader-20261102**, `leader-20261102.jpg`: Illustration: Agentic AI. A shield sewn from patches, with a needle and thread.
+
+Cover: `cover-2026-11-02.jpg`, original illustration drawn in code for Agentic AI: a hanging chain breaking apart in sparks, with figures prying at it on one side and welding it on the other.
+
+## 26 October 2026
+
 Each of the twelve articles has a different source image; cards, short reads and the full reader retain the image belonging to that article. The cover is a separate illustration.
 
 - **ipo-20261026**, `nasdaq-marketsite.jpg`: Photograph: Ajay Suresh / Wikimedia Commons (CC BY 2.0). Nasdaq MarketSite, photographed in 2021; illustrative, not Anthropic’s IPO event. Display is cropped. [Original source](https://commons.wikimedia.org/wiki/File:Nasdaq_MarketSite_(51494550508).jpg). [Licence / usage terms](https://creativecommons.org/licenses/by/2.0/).
