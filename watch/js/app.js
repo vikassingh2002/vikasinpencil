@@ -358,7 +358,7 @@ function render(force = true) {
   main.dataset.page = r.page;
   if (!samePage) { main.classList.remove('enter'); void main.offsetWidth; main.classList.add('enter'); }
   const navPage = { path: 'deep', playlist: 'deep' }[r.page] || r.page;
-  $$('.nav a').forEach(a => { const h = a.getAttribute('href'); a.classList.toggle('active', h === `#/${navPage === 'home' ? '' : navPage}` || h === `#/${r.parts.join('/')}`); });
+  $$('.nav a, .mobile-nav a').forEach(a => { const h = a.getAttribute('href'); const active = h === `#/${navPage === 'home' ? '' : navPage}` || h === `#/${r.parts.join('/')}`; a.classList.toggle('active', active); if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   r.fn.after?.(r.args, r.q);
   initRows(main);
   const saved = scrollMem.get(location.hash || '#/');
