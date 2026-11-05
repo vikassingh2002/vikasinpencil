@@ -1,5 +1,5 @@
 // Only public app files are cached. API and authentication requests pass through.
-const CACHE = "watch-static-v1";
+const CACHE = "watch-static-v2";
 const FILES = ["/watch/", "/watch/manifest.webmanifest", "/watch/css/style.css", "/watch/css/pencil.css", "/watch/js/app.js", "/watch/js/store.js", "/watch/js/rec.js", "/watch/js/data.js", "/watch/js/compass.js", "/watch/icon-192.png", "/watch/icon-512.png", "/assets/js/app-install.js?v=20261105"];
 const allowed = new Set(FILES.map(p => new URL(p, self.location.origin).pathname));
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));

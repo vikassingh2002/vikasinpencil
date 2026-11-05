@@ -256,3 +256,18 @@ Installation does not enable new cloud synchronization or erase browser data.
 If an older app claims links for the whole website, open it online and allow
 its manifest to update, then retry the direct install URL in the browser. Export
 local data before considering removing an old installation or clearing site data.
+
+
+### Android same-domain installation workaround
+
+Watch now installs from https://vikassingh2002.github.io/watch-in-pencil/ .
+The published copy is in https://github.com/vikassingh2002/watch-in-pencil .
+Android Chrome can incorrectly report a second PWA on the same origin as already
+installed. A separate origin isolates Watch from the main-site Agentic and Desk
+installations. Keep this deployment in sync when updating Watch; adapt its
+absolute manifest, worker, helper and cross-app links to `/watch-in-pencil/`.
+The main `/watch/` address forwards browser visits there. Already installed
+standalone Watch windows keep the legacy copy; `/watch/?legacy=1` also opens it.
+The two origins have separate browser storage. Export at
+`/watch/?legacy=1#/settings` and import in the new app's Settings to move existing
+notes/history. No data is cleared or sent automatically.

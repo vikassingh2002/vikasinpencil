@@ -4,6 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Watch in Pencil · Vikas</title>
+  <link rel="canonical" href="https://vikassingh2002.github.io/watch-in-pencil/">
+  <script>
+    // Give Android Watch its own origin. Keep the old copy available for
+    // existing installed users and for exporting locally stored notes.
+    if ((location.hostname === 'vikasinpencil.com' || location.hostname === 'www.vikasinpencil.com')
+        && !new URLSearchParams(location.search).has('legacy')
+        && !window.matchMedia('(display-mode: standalone)').matches && !navigator.standalone) {
+      location.replace('https://vikassingh2002.github.io/watch-in-pencil/' + location.search + location.hash);
+    }
+  </script>
   <link rel="manifest" href="/watch/manifest.webmanifest">
   <meta name="theme-color" content="#f5f1e8">
   <meta name="apple-mobile-web-app-capable" content="yes">
