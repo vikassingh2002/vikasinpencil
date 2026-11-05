@@ -1,0 +1,14 @@
+/* Notebook palette layered over the original Deepwatch layout. */
+:root[data-theme="light"] {
+  --bg:#f5f1e8; --surface:#fffdf7; --surface-2:#eee9dd; --hover:#e8e1d2;
+  --text:#23374b; --muted:#596574; --faint:#6b716e;
+  --accent:#295d67; --accent-ink:#ffffff; --accent-soft:rgba(41,93,103,.09);
+  --line:rgba(35,55,75,.12); --line-2:rgba(35,55,75,.22);
+}
+.logo {font-family:Georgia,serif; letter-spacing:-.035em;}
+.skip-link {position:fixed;top:-5rem;left:1rem;z-index:1000;background:var(--surface);padding:.75rem;}
+.skip-link:focus {top:1rem;}
+.nav-foot a {font-size:.75rem;}
+@media(max-width:480px){.logo{font-size:.95rem;}.top-l{gap:.4rem;}}
+
+.pencil-compass{margin:0 0 1.5rem;max-width:70rem}.pencil-compass h2{font-family:Georgia,serif;font-size:1.5rem}.pencil-compass p{max-width:60rem}

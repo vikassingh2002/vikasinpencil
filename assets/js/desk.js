@@ -514,7 +514,7 @@
     { key: 'capture', name: 'Capture', sub: 'Save thoughts and ideas' },
     { key: 'unwind', name: 'Unwind', sub: 'Rest with intention' }
   ];
-  var MORE = [['curiosity', 'Agentic AI'], ['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
+  var MORE = [['curiosity', 'Agentic AI'], ['watch', 'Watch in Pencil'], ['library', 'Library'], ['doors', 'Doors'], ['settings', 'Settings']];
   var TYPES = ['Book', 'Article', 'Essay', 'Video', 'Podcast', 'Course', 'Film', 'Show', 'Music', 'Other'];
   var SHELVES = [['reading', 'To read or learn'], ['unwind', 'To unwind with']];
   var STATUS = [['queued', 'Up next'], ['doing', 'In progress'], ['done', 'Finished']];
@@ -566,7 +566,7 @@
       '<div class="desk__under">' +
         '<nav class="desk__more" aria-label="More of the desk">' + MORE.map(function (m) {
           var on = ui.view === m[0];
-          return '<a class="desk__morelink' + (on ? ' is-on' : '') + '" href="' + (m[0] === 'curiosity' ? 'curiosity.html' : '#' + m[0]) + '"' + (on ? ' aria-current="page"' : '') + '>' + esc(m[1]) + '</a>';
+          return '<a class="desk__morelink' + (on ? ' is-on' : '') + '" href="' + (m[0] === 'curiosity' ? 'curiosity.html' : m[0] === 'watch' ? 'watch/' : '#' + m[0]) + '"' + (on ? ' aria-current="page"' : '') + '>' + esc(m[1]) + '</a>';
         }).join('') + '</nav>' +
         '<button type="button" class="btn btn--text desk__leave" data-act="leave">Or leave the screen for a while →</button>' +
       '</div>';
