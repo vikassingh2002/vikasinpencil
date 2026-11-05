@@ -24,8 +24,8 @@ const fmtDur = sec => {
 };
 const fmtMin = sec => { const m = Math.round(sec / 60); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; };
 const hue = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
-// Middle frame: YouTube auto-captures frames at 25/50/75% of every video. "2" is the midpoint.
-const thumb = (id, q = 'sd2') => `https://i.ytimg.com/vi/${id}/${q}.jpg`;
+// Use the creator's original YouTube thumbnail, with smaller originals as fallbacks.
+const thumb = (id, q = 'maxresdefault') => `https://i.ytimg.com/vi/${id}/${q}.jpg`;
 const parseId = s => (s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([\w-]{11})/) || s.trim().match(/^([\w-]{11})$/) || [])[1];
 
 const I = {
@@ -76,15 +76,15 @@ const HUE = { ai: 265, cs: 215, math: 38, physics: 195, biology: 140, science: 1
 const topicIcon = c => `<span class="t-ic" style="--h:${HUE[c] ?? 200}">${icon('t_' + c)}</span>`;
 const icon = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n] || ''}</svg>`;
 
-// Fallback chain for middle-frame thumbnails: sd2 (640x480) -> hq2 (480x360) -> mq2
+// Fall back through YouTube's original thumbnail sizes if a larger size is unavailable.
 // YouTube answers a missing frame with a 120x90 grey placeholder, so check size on load too.
 function nextThumb(img) {
-  const order = ['sd2', 'hq2', 'mq2'];
-  const next = order[order.indexOf(img.dataset.q || 'sd2') + 1];
+  const order = ['maxresdefault', 'sddefault', 'hqdefault', 'mqdefault'];
+  const next = order[order.indexOf(img.dataset.q || 'maxresdefault') + 1];
   if (next) { img.dataset.q = next; img.src = thumb(img.dataset.vid, next); }
 }
 document.addEventListener('error', e => { if (e.target.tagName === 'IMG' && e.target.dataset.vid) nextThumb(e.target); }, true);
-document.addEventListener('load', e => { const img = e.target; if (img.tagName === 'IMG' && img.dataset.vid && img.naturalWidth <= 120 && img.dataset.q !== 'mq2') nextThumb(img); }, true);
+document.addEventListener('load', e => { const img = e.target; if (img.tagName === 'IMG' && img.dataset.vid && img.naturalWidth <= 120 && img.dataset.q !== 'mqdefault') nextThumb(img); }, true);
 
 /* ---------- toast & modal ---------- */
 function toast(msg, opts = {}) {
@@ -769,7 +769,7 @@ function pathStats(pa) {
 function pathCard(pa) {
   const s = pathStats(pa);
   return `<a class="path-card" href="#/path/${pa.id}" data-area="${pa.area || ''}">
-    <span class="path-cover">${s.steps.slice(0, 3).map(x => `<img loading="lazy" data-vid="${x.p.first}" src="${thumb(x.p.first, 'mq2')}" data-q="mq2" alt="">`).join('')}</span>
+    <span class="path-cover">${s.steps.slice(0, 3).map(x => `<img loading="lazy" data-vid="${x.p.first}" src="${thumb(x.p.first, 'mqdefault')}" data-q="mqdefault" alt="">`).join('')}</span>
     <span class="path-body">
       <b>${esc(pa.title)}</b><span class="sub">${esc(pa.desc)}</span>
       <span class="segbar" title="${s.doneN} of ${s.steps.length} courses done">${s.steps.map(x => `<i class="${x.state}"></i>`).join('')}</span>
@@ -833,7 +833,7 @@ function renderLessons(pArg) {
   const items = st.items?.length ? st.items : (LESSONS[p.id] || []).map(x => x[0]);
   const cur = st.index ?? 0;
   el.innerHTML = items.map((id, i) => `<button class="lesson ${i === cur ? 'cur' : ''} ${st.done.includes(id) ? 'done' : ''}" data-act="lesson" data-i="${i}">
-    <span class="li-n">${st.done.includes(id) ? icon('check') : i + 1}</span><span class="thumb"><img loading="lazy" data-vid="${id}" src="${thumb(id, 'mq2')}" data-q="mq2" alt=""></span>
+    <span class="li-n">${st.done.includes(id) ? icon('check') : i + 1}</span><span class="thumb"><img loading="lazy" data-vid="${id}" src="${thumb(id, 'mqdefault')}" data-q="mqdefault" alt=""></span>
     <span class="li-t">${esc(LESSON_TITLE.get(id) || st.titles?.[id] || `Lesson ${i + 1}`)}</span></button>`).join('');
   const c = el.querySelector('.cur'); if (c) el.scrollTop = c.offsetTop - el.offsetTop - 60;
   const pp = $('#pl-prog'); if (pp) pp.textContent = `${st.done.length}/${items.length || p.count}`;
