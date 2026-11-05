@@ -1199,7 +1199,7 @@ $('#nav').innerHTML = `
   <a href="#/algorithm">${icon('tune')}<span>Your algorithm</span></a>
   <div class="nav-label">Topics</div>
   ${CATEGORIES.map(c => `<a class="topic" href="#/c/${c.id}"><span>${c.name}</span></a>`).join('')}
-  <div class="nav-foot"><a href="#/settings">${icon('gear')}<span>Settings</span></a><a href="../desk.html"><span>← Back to the Desk</span></a><a href="../curiosity.html"><span>Agentic AI →</span></a></div>`;
+  <div class="nav-foot"><a href="/watch/?install=1"><span>Install Watch</span></a><a href="#/settings">${icon('gear')}<span>Settings</span></a><a href="../desk.html"><span>← Back to the Desk</span></a><a href="../curiosity.html"><span>Agentic AI →</span></a></div>`;
 $('#menu-btn').innerHTML = icon('menu');
 $('#theme-btn').innerHTML = icon('moon');
 $('#search-btn').innerHTML = icon('search');

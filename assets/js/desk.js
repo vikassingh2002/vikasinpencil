@@ -552,7 +552,7 @@
     var name = String(site.name || '').split(' ')[0];
     return '<header class="desk__top">' +
         '<p class="desk__kicker">Desk · ' + esc(longDay(d)) + '</p>' +
-        '<p class="desk__right">' + syncHtml() + '<a class="desk__out ink-link" href="index.html">The notebook →</a></p>' +
+        '<p class="desk__right">' + syncHtml() + '<a class="desk__out ink-link" href="/desk.html?install=1">Install Desk</a><a class="desk__out ink-link" href="index.html">The notebook →</a></p>' +
       '</header>' +
       (mode === 'local' ? '<p class="desk__banner">The cloud isn\'t connected yet, so this desk is kept in this browser only. <a class="ink-link" href="#settings">How to connect it</a></p>' : '') +
       (mode === 'owner' && status === 'error' && problem ? '<p class="desk__banner desk__banner--warn">' + esc(problem) + '</p>' : '') +
@@ -1129,7 +1129,7 @@
     var ps = projects().filter(function (r) { return r.shared; });
     var lib = library().filter(function (r) { return r.shared; });
     var top =
-      '<header class="desk__top"><p class="desk__kicker">Desk · ' + esc(longDay(d)) + '</p><p class="desk__right"><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
+      '<header class="desk__top"><p class="desk__kicker">Desk · ' + esc(longDay(d)) + '</p><p class="desk__right"><a class="desk__out ink-link" href="/desk.html?install=1">Install Desk</a><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
       (ui.preview ? '<p class="desk__banner">This is what visitors see. <button type="button" class="btn btn--text" data-act="preview-off">Back to my desk</button></p>' : '') +
       (mode === 'stranger' ? '<p class="desk__banner">You\'re signed in as ' + esc(user && user.email) + ', which isn\'t ' + esc(me) + '\'s account, so you see what\'s shared. <button type="button" class="btn btn--text" data-act="signout">Sign out</button></p>' : '') +
       (problem && mode === 'visitor' ? '<p class="desk__banner desk__banner--warn">' + esc(problem) + (user ? ' <button type="button" class="btn btn--text" data-act="recheck">Try again</button>' : '') + '</p>' : '') +
@@ -1160,7 +1160,7 @@
   }
 
   function signinHtml() {
-    return '<header class="desk__top"><p class="desk__kicker">Desk</p><p class="desk__right"><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
+    return '<header class="desk__top"><p class="desk__kicker">Desk</p><p class="desk__right"><a class="desk__out ink-link" href="/desk.html?install=1">Install Desk</a><a class="desk__out ink-link" href="index.html">The notebook →</a></p></header>' +
       '<section class="signin">' +
         '<h1 class="hand-xl">Sign in to the desk</h1>' +
         '<p class="lede">For ' + esc(me) + '. Everyone else can see what\'s shared without signing in.</p>' +

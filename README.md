@@ -232,3 +232,27 @@ The site is plain files, so moving means uploading this folder to the new host a
 - The earlier E-01 progress was starter copy. Its correction is visible in Errata and on the entry; add actual observations only after doing the work.
 - Field notes are intentionally broad: books, history, science and personal writing belong alongside AI.
 - Update content when there is something to record. The original monthly routine above is optional, not a public promise.
+
+
+## Separate phone apps
+
+Install each app from its own address in the phone's regular browser:
+
+- Desk: https://vikasinpencil.com/desk.html?install=1
+- Agentic AI: https://vikasinpencil.com/agentic/?install=1
+- Watch in Pencil: https://vikasinpencil.com/watch/?install=1
+
+On Android Chrome use Install or the browser menu's Add to Home screen / Install.
+On iPhone use Safari's Share > Add to Home Screen (Open as Web App if offered).
+Open these links in the browser, rather than navigating from inside another installed app.
+
+The identities/scopes are `/desk.html`, `/agentic/` and `/watch/` respectively.
+Keep them distinct and do not broaden any scope to `/`. The installed Agentic AI
+identity has been preserved. Watch and Desk have scoped workers with separate
+cache prefixes. Only listed public app files are cached; authentication and API
+responses pass through. Video playback still requires an internet connection.
+Installation does not enable new cloud synchronization or erase browser data.
+
+If an older app claims links for the whole website, open it online and allow
+its manifest to update, then retry the direct install URL in the browser. Export
+local data before considering removing an old installation or clearing site data.
