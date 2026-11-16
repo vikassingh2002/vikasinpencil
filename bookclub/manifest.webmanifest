@@ -1,0 +1,17 @@
+{
+  "id": "/bookclub/",
+  "name": "Ambernath Book Club",
+  "short_name": "Book Club",
+  "description": "Our shared shelf: what we have, who has it, and what you can borrow next.",
+  "start_url": "/bookclub/",
+  "scope": "/bookclub/",
+  "display": "standalone",
+  "background_color": "#F6F0E4",
+  "theme_color": "#F6F0E4",
+  "lang": "en",
+  "icons": [
+    { "src": "/bookclub/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/bookclub/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/bookclub/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

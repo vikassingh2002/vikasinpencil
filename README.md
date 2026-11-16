@@ -13,6 +13,7 @@ Your lab-notebook website for **vikasinpencil.com**. Plain HTML, CSS and JavaScr
 | `assets/js/desk-config.js` | Which Supabase project the desk uses | Once, when connecting Supabase |
 | `curiosity.html`, `content/curiosity.js`, `assets/js/cat*.js`, `assets/css/cat.css` | Agentic AI, the learning app (see below) | Add discoveries in `content/curiosity.js` |
 | `supabase/schema.sql` | The desk's database and who may do what | Run once in Supabase; rarely edited |
+| `bookclub/`, `supabase/bookclub.sql` | The Ambernath Book Club app (see "Ambernath Book Club" below) | Rarely. Books and members are managed in the app |
 | `assets/css/notebook.css` | The look | Only for design changes |
 | `assets/js/notebook.js` | How the notebook behaves | Only for new features |
 | `robots.txt` | Tells search engines to stay out while it's a draft | Once, at launch |
@@ -152,6 +153,46 @@ Until Supabase is connected, the desk keeps everything in the browser instead, a
 Both of those are meant to be public, so they're safe in this repository. **Never** put the secret key (`sb_secret_…` or `service_role`) or the database password in any file here: anyone can read this repository. The desk refuses to run with a secret key in its config.
 
 **The free plan pauses** a project after about a week with no activity (using the desk counts). A paused project keeps your things: open the Supabase dashboard, restore it, and the desk works again. Restoring isn't possible forever, though, so download a backup now and then.
+
+## Ambernath Book Club
+
+**vikasinpencil.com/bookclub/** is the club's shared shelf: every book a member has put in, who owns it, who has it right now, and who's waiting for it.
+
+- **Shelf:** every book with its cover and where it is (*Available*, *With Priya · Sun 7 Dec*, *Promised to Rahul*, *overdue*). Search by title, author or owner, and filter to Available, Borrowed or My books.
+- **Borrowing:** a member asks, the owner says yes and picks a return date (in Sundays, because the club meets on Sundays), and either of them taps *Handed over* when the book changes hands. To return it, the borrower taps *I've given it back* and the owner taps *Got it back*. Only the owner's confirmation puts a book back on the shelf, so the app stays truthful. Owners can also hand a book straight to someone at the meetup (*Lend it to someone*).
+- **Queue:** asking for a book that's out puts you in line, and the owner sees who's next.
+- **Me:** what needs you (requests to answer, books to collect or confirm, books due soon), what you've borrowed, what you've lent out.
+- **Adding books:** search by title, author or ISBN (or scan the barcode on Android), and the cover, author and pages fill in from Open Library. Covers for the first 32 books are saved in `bookclub/covers/`.
+- **WhatsApp buttons** prepare a message (a reminder, a request, an invite) for you to send to whoever you choose. The app never sends anything by itself.
+- **Visitors** (not signed in) see the titles and whether each is in, never who has it. Members see everything. Nobody's address is ever in the app.
+
+### Who can do what
+
+The rules are in the database (`supabase/bookclub.sql`), not the page:
+
+- Only invited members can see the club or borrow. Any member can add their own books and edit or remove them (not while they're out).
+- Each lending step is a database function that checks who's asking: only the owner can approve or confirm a return, only the borrower can say they've returned it.
+- **Admins** (you, and anyone you tick as an admin) invite and remove members and can fix any book or loan.
+- The club uses its own `bc_` tables in the desk's Supabase project. It never touches desk data, and the desk stays owner-only.
+
+### Setting it up (once)
+
+1. **Supabase → SQL Editor:** paste all of `supabase/bookclub.sql` and press **Run**. This makes you (the desk owner) the club's first admin, named Vikas, and puts the 32 starting books on the shelf as yours.
+2. **Authentication → Sign In / Providers:** turn **Allow new users to sign up** on. Members sign in with a code sent to their email, and their first sign-in creates their account. This is safe: an uninvited person who signs up sees only the public shelf, and the desk still only lets the owner in. (If you'd rather keep sign-ups off, also add each member under **Authentication → Users → Add user**, with "Auto Confirm User" ticked.)
+3. **Authentication → Emails:** in both the **Magic Link** and **Confirm signup** templates, add the code to the message, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. Members type the code into the app, which works even when the app is installed on their phone.
+4. **Authentication → URL Configuration → Redirect URLs:** add `https://vikasinpencil.com/bookclub/`, so the link in the email also works.
+5. Publish (merge the `bookclub` branch into `main`). Open the club, sign in with your email, and check the shelf.
+
+**Email limit:** Supabase's built-in email sends only a few emails an hour per project. Each member signs in once per device and stays signed in, so that's usually fine. If codes stop arriving when several people join at once, wait an hour, or connect a free email service (such as Resend or Brevo) under **Authentication → Emails → SMTP Settings**.
+
+### Adding a member
+
+1. In the app: **Members → Invite someone**, with their name and the email they'll use.
+2. Tap **Send link** to share the address on WhatsApp. They open it, sign in with that email, and they're in.
+
+### On phones
+
+Open vikasinpencil.com/bookclub/ and choose **Install app** (Chrome) or **Share → Add to Home Screen** (Safari). As with Watch (see "Android same-domain installation workaround" below), Android Chrome sometimes refuses to install a second app from the same domain. If that happens, it still works fully as a bookmarked page.
 
 ## What visitors can do, and where it's saved
 

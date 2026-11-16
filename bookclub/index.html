@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ambernath Book Club</title>
+<meta name="description" content="Books shared between friends in Ambernath: what we have, who has it, and what you can borrow next.">
+<meta name="theme-color" content="#F6F0E4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C1915" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Book Club">
+<meta property="og:title" content="Ambernath Book Club">
+<meta property="og:description" content="Our shared shelf: what we have, who has it, and what you can borrow next.">
+<meta property="og:image" content="https://vikasinpencil.com/bookclub/icon-512.png">
+<link rel="manifest" href="/bookclub/manifest.webmanifest">
+<link rel="icon" href="/bookclub/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/bookclub/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap">
+<link rel="stylesheet" href="/bookclub/style.css?v=1">
+</head>
+<body>
+<a class="skip" href="#view">Skip to the shelf</a>
+<header class="top">
+  <a class="brand" href="#/">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="6" width="6" height="21" rx="1.2"/><rect x="12.5" y="9" width="5" height="18" rx="1.2"/><rect x="19" y="5.5" width="5.5" height="21.5" rx="1.2" transform="rotate(8 21.75 16)"/></svg>
+    <span><b>Ambernath</b> Book Club</span>
+  </a>
+  <nav class="tabs" id="tabs" aria-label="Main"></nav>
+</header>
+<div id="banner" class="banner" hidden></div>
+<main id="view" class="view" tabindex="-1">
+  <p class="loading">Opening the shelf…</p>
+</main>
+<nav class="bottom" id="bottom" aria-label="Main"></nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<dialog id="dialog" class="dialog"></dialog>
+<noscript><p class="loading">The book club needs JavaScript to work.</p></noscript>
+
+<script src="/assets/js/desk-config.js?v=bookclub1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.js" integrity="sha256-LbKRLxaTmjshtHKYCnradGszpqQHCLxVXLC+JVxutbE=" crossorigin="anonymous"></script>
+<script src="/bookclub/app.js?v=1"></script>
+</body>
+</html>
