@@ -464,3 +464,27 @@ update public.bc_books b
   ) as s (title, genres, ol_work)
  where b.title = s.title
    and b.owner_id in (select id from public.desk_owner);
+
+-- 11. Member profiles (added 17 Nov 2026) -------------------------------------
+-- A short bio, favourite genres and an optional WhatsApp number, which each
+-- member fills in themselves. Like everything else in bc_members, only signed-in
+-- club members can read them; visitors never see members at all.
+-- phone: digits only, with country code (91 for India). Empty means "don't share".
+
+alter table public.bc_members add column if not exists bio text;
+alter table public.bc_members add column if not exists fav_genres text[] not null default '{}';
+alter table public.bc_members add column if not exists phone text;
+
+alter table public.bc_members drop constraint if exists bc_members_bio_length;
+alter table public.bc_members add constraint bc_members_bio_length check (bio is null or length(bio) <= 240);
+alter table public.bc_members drop constraint if exists bc_members_fav_genres_known;
+alter table public.bc_members add constraint bc_members_fav_genres_known check (
+  fav_genres <@ array['fantasy', 'paranormal', 'scifi', 'horror', 'thriller', 'literary', 'classics', 'comingofage',
+                      'romance', 'myth', 'history', 'war', 'lives', 'science', 'tech', 'money', 'mind', 'philosophy',
+                      'craft', 'india']::text[]
+  and cardinality(fav_genres) <= 5);
+alter table public.bc_members drop constraint if exists bc_members_phone_shape;
+alter table public.bc_members add constraint bc_members_phone_shape check (phone is null or phone ~ '^[1-9][0-9]{9,14}$');
+
+-- Members change only their own row (the existing "Members rename themselves" rule).
+grant update (bio, fav_genres, phone) on public.bc_members to authenticated;

@@ -22,6 +22,7 @@
     filter: 'all',
     sort: 'title',
     genre: '',
+    grid: false,          // true after "See all": show the full grid instead of rows
     signin: { step: 'email', email: '' },
     lastLoad: 0
   };
@@ -100,19 +101,44 @@
     return { kind: 'in', loan: null, queue: q, holder: b.owner_id, label: 'Available' };
   }
 
-  function coverHTML(b, badge) {
-    var src = b.cover && /^covers\//.test(b.cover) ? '/bookclub/' + b.cover : b.cover;
+  // Covers: local files, or Open Library's large size (medium looks soft on phone screens).
+  function coverSrc(c) {
+    if (!c) return '';
+    if (/^covers\//.test(c)) return '/bookclub/' + c;
+    return c.replace(/(covers\.openlibrary\.org\/b\/(?:id|isbn)\/[^-/]+)-M\.jpg/, '$1-L.jpg');
+  }
+  function coverHTML(b) {
+    var src = coverSrc(b.cover);
     var img = src ? '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" onerror="this.remove()">' : '';
-    return '<div class="cover" style="background:' + cloth(b.title) + '">' +
+    return '<div class="cover" style="--cloth:' + cloth(b.title) + '">' +
       '<div class="drawn"><span class="t">' + esc(b.title) + '</span><span class="a">' + esc(b.author) + '</span></div>' +
-      img + (badge || '') + '</div>';
+      img + '</div>';
   }
   function badgeHTML(kind, label) { return '<span class="badge ' + kind + '">' + esc(label) + '</span>'; }
+  function statusHTML(kind, label) { return '<div class="st ' + kind + '">' + esc(label) + '</div>'; }
+  function cardHTML(b) {
+    var st = state(b);
+    return '<a class="card" href="#/book/' + b.id + '">' + coverHTML(b) +
+      '<div class="meta"><div class="t">' + esc(b.title) + '</div><div class="a">' + esc(b.author) + '</div>' +
+      statusHTML(st.kind, st.label) + '</div></a>';
+  }
+  function avatarHTML(m, big) {
+    var nm = m ? m.name : '?';
+    return '<span class="avatar' + (big ? ' big' : '') + '" style="--av:' + cloth(nm) + '">' + initial(nm) + '</span>';
+  }
+  function skeletonHTML(n) {
+    var h = '<div class="sk-head"><span class="sk sk-line w40"></span><span class="sk sk-line w60"></span></div><div class="grid">';
+    for (var i = 0; i < (n || 8); i++) h += '<div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div>';
+    return h + '</div>';
+  }
 
-  function whatsapp(text) { return 'https://wa.me/?text=' + encodeURIComponent(text); }
+  function whatsapp(text, phone) { return 'https://wa.me/' + (phone || '') + '?text=' + encodeURIComponent(text); }
   var WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-1.3-.6-2.4-1.5-3.1-2.8-.2-.4.2-.4.7-1.2.1-.1 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.8.8-1 1.8-.7 2.8.4 1.4 1.3 2.7 2.4 3.7 1.4 1.3 2.6 1.8 4 2.2.9.3 1.8.1 2.4-.5.3-.3.5-.7.5-1.1 0-.2-.1-.3-.3-.4Z"/></svg>';
-  function waButton(text, label) {
-    return '<a class="btn small ghost wa" target="_blank" rel="noopener" href="' + esc(whatsapp(text)) + '">' + WA_ICON + esc(label || 'Tell them on WhatsApp') + '</a>';
+  // With a member id, opens a chat with that member if they've shared their number.
+  function waButton(text, label, toId) {
+    var m = toId && S.members[toId];
+    var phone = m && m.phone && toId !== (S.me && S.me.id) ? m.phone : '';
+    return '<a class="btn small ghost wa" target="_blank" rel="noopener" href="' + esc(whatsapp(text, phone)) + '">' + WA_ICON + esc(label || 'Tell them on WhatsApp') + '</a>';
   }
   function clubLink(b) { return location.origin + '/bookclub/#/book/' + b.id; }
 
@@ -281,6 +307,28 @@
     DETAILS[key] = d;
     return d;
   }
+  // Tint the top of the book page with the cover's own colour (local covers only: same origin).
+  function paintWash(b) {
+    var src = b.cover && /^covers\//.test(b.cover) ? coverSrc(b.cover) : '';
+    if (!src) return;
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var c = document.createElement('canvas'); c.width = 12; c.height = 18;
+        var x = c.getContext('2d'); x.drawImage(img, 0, 0, 12, 18);
+        var d = x.getImageData(0, 0, 12, 18).data, r = 0, g = 0, bl = 0, n = 0;
+        for (var i = 0; i < d.length; i += 4) {
+          var mx = Math.max(d[i], d[i + 1], d[i + 2]), mn = Math.min(d[i], d[i + 1], d[i + 2]);
+          var w = 1 + (mx - mn) / 40;               // favour colourful pixels over grey
+          r += d[i] * w; g += d[i + 1] * w; bl += d[i + 2] * w; n += w;
+        }
+        var el = document.getElementById('wash');
+        if (el && route().name === 'book' && Number(route().id) === b.id) el.style.setProperty('--wash', 'rgb(' + Math.round(r / n) + ',' + Math.round(g / n) + ',' + Math.round(bl / n) + ')');
+      } catch (e) { /* keep the default tint */ }
+    };
+    img.src = src;
+  }
+
   function stars(avg) {
     var full = Math.round(avg * 2) / 2, h = '';
     for (var i = 1; i <= 5; i++) h += '<span class="star' + (full >= i ? ' on' : full >= i - 0.5 ? ' half' : '') + '">★</span>';
@@ -315,7 +363,7 @@
     if (!S.me) return;
     var c = S.client;
     var res = await Promise.all([
-      c.from('bc_members').select('id,name,is_admin,joined_at').order('joined_at'),
+      c.from('bc_members').select('id,name,is_admin,joined_at,bio,fav_genres,phone').order('joined_at'),
       c.from('bc_books').select('*').order('title'),
       c.from('bc_loans').select('*').order('id')
     ]);
@@ -376,7 +424,7 @@
     var h = location.hash.replace(/^#\/?/, '');
     if (/access_token|error_description|^error=/.test(h)) h = '';
     var parts = h.split('/');
-    return { name: parts[0] || 'shelf', id: parts[1] ? Number(parts[1]) : null };
+    return { name: parts[0] || 'shelf', id: parts[1] ? decodeURIComponent(parts[1]) : null };
   }
 
   function needsYou() {
@@ -402,8 +450,8 @@
       var dot = n ? '<span class="dot">' + n + '</span>' : '';
       items = [
         { href: '#/', key: 'shelf', label: 'Shelf', icon: ICONS.shelf },
+        { href: '#/community', key: 'community', label: 'Community', icon: ICONS.people },
         { href: '#/add', key: 'add', label: 'Add a book', short: 'Add', icon: ICONS.add },
-        { href: '#/members', key: 'members', label: 'Members', icon: ICONS.people, desktop: true },
         { href: '#/me', key: 'me', label: 'Me', icon: ICONS.me, extra: dot }
       ];
     } else {
@@ -413,7 +461,7 @@
       ];
     }
     function link(it, bottom) {
-      var cur = (r === it.key || (it.key === 'shelf' && r === 'book')) ? ' aria-current="page"' : '';
+      var cur = (r === it.key || (it.key === 'shelf' && r === 'book') || (it.key === 'community' && (r === 'members' || r === 'member'))) ? ' aria-current="page"' : '';
       return '<a href="' + it.href + '"' + cur + '>' + it.icon + '<span>' + esc(bottom && it.short ? it.short : it.label) + '</span>' + (it.extra || '') + '</a>';
     }
     document.getElementById('tabs').innerHTML = items.map(function (it) { return link(it, false); }).join('');
@@ -428,11 +476,12 @@
     if (!S.me) {
       html = r.name === 'signin' ? signinView() : visitorView();
     } else if (r.name === 'book') {
-      var b = book(r.id);
+      var b = book(Number(r.id));
       html = b ? bookView(b) : '<a class="back" href="#/">' + ICONS.back + 'Shelf</a><p class="empty">That book isn’t on the shelf any more.</p>';
     } else if (r.name === 'add') html = addView();
     else if (r.name === 'me') html = meView();
-    else if (r.name === 'members') html = membersView();
+    else if (r.name === 'community' || r.name === 'members') html = communityView();
+    else if (r.name === 'member') html = memberView(r.id);
     else if (r.name === 'signin') { location.replace('#/me'); return; }
     else html = shelfView();
     view.innerHTML = html;
@@ -492,7 +541,33 @@
       [['title', 'A–Z'], ['author', 'By author'], ['owner', 'By owner'], ['newest', 'Newest']].map(function (o) {
         return '<option value="' + o[0] + '"' + (S.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
       }).join('') + '</select></label></div>' +
-      '<div class="grid" id="grid"></div>';
+      '<div id="shelf-body"></div>';
+  }
+
+  function rowHTML(title, books, seeAll) {
+    if (!books.length) return '';
+    return '<section class="shelf-row"><div class="row-head"><h2>' + esc(title) + ' <span class="count">' + books.length + '</span></h2>' +
+      (seeAll ? '<button class="link" type="button" data-see="' + esc(seeAll) + '">See all</button>' : '') + '</div>' +
+      '<div class="row-scroll">' + books.slice(0, 14).map(cardHTML).join('') + '</div></section>';
+  }
+
+  function browseHTML() {
+    var byTitle = S.books.slice().sort(function (a, b) { return norm(a.title).replace(/^(the|a|an) /, '') < norm(b.title).replace(/^(the|a|an) /, '') ? -1 : 1; });
+    var h = '';
+    var times = S.books.map(function (b) { return new Date(b.added_at).getTime(); });
+    if (times.length && Math.max.apply(null, times) - Math.min.apply(null, times) > 86400000) {
+      var newest = S.books.slice().sort(function (a, b) { return a.added_at < b.added_at ? 1 : -1; });
+      h += rowHTML('New on the shelf', newest.slice(0, 10), 'sort:newest');
+    }
+    h += rowHTML('Ready to borrow', byTitle.filter(function (b) { return state(b).kind === 'in'; }), 'filter:available');
+    var gcount = {};
+    S.books.forEach(function (b) { (b.genres || []).forEach(function (k) { gcount[k] = (gcount[k] || 0) + 1; }); });
+    GENRES.filter(function (g) { return gcount[g[0]] >= 3; })
+      .sort(function (a, b) { return gcount[b[0]] - gcount[a[0]]; }).slice(0, 6)
+      .forEach(function (g) { h += rowHTML(g[1], byTitle.filter(function (b) { return (b.genres || []).indexOf(g[0]) >= 0; }), 'genre:' + g[0]); });
+    h += '<section class="shelf-row"><div class="row-head"><h2>All books <span class="count">' + S.books.length + '</span></h2></div>' +
+      '<div class="grid">' + filtered().map(cardHTML).join('') + '</div></section>';
+    return h;
   }
 
   function renderShelfParts() {
@@ -508,7 +583,10 @@
     document.getElementById('chips').innerHTML = chips.map(function (ch) {
       return '<button class="chip" data-filter="' + ch[0] + '" aria-pressed="' + (S.filter === ch[0]) + '">' + ch[1] + '<span class="n">' + c[ch[0]] + '</span></button>';
     }).join('');
+    var body = document.getElementById('shelf-body');
+    if (!S.q && S.filter === 'all' && !S.genre && !S.grid) { body.innerHTML = browseHTML(); return; }
     var list = filtered();
+    body.innerHTML = '<div class="grid" id="grid"></div>';
     var grid = document.getElementById('grid');
     if (!list.length) {
       grid.innerHTML = '<p class="empty" style="grid-column:1/-1">' +
@@ -516,12 +594,7 @@
           S.filter === 'mine' ? 'You haven’t added any books yet. <a href="#/add">Add your first</a>.' : 'No books here right now.') + '</p>';
       return;
     }
-    grid.innerHTML = list.map(function (b) {
-      var st = state(b);
-      return '<a class="card" href="#/book/' + b.id + '">' + coverHTML(b, badgeHTML(st.kind, st.label)) +
-        '<div class="meta"><div class="t">' + esc(b.title) + '</div><div class="a">' + esc(b.author) +
-        (isMine(b) ? '' : ' · ' + esc(Name(b.owner_id)) + '’s') + '</div></div></a>';
-    }).join('');
+    grid.innerHTML = list.map(cardHTML).join('');
   }
 
   function wireShelf() {
@@ -530,10 +603,18 @@
     q.addEventListener('input', function () { S.q = q.value; renderShelfParts(); });
     document.getElementById('chips').addEventListener('click', function (e) {
       var btn = e.target.closest('[data-filter]'); if (!btn) return;
-      S.filter = btn.dataset.filter; remember(); renderShelfParts();
+      S.filter = btn.dataset.filter; S.grid = btn.dataset.filter === 'all' ? false : S.grid; remember(); renderShelfParts();
     });
     document.getElementById('sort').addEventListener('change', function (e) { S.sort = e.target.value; remember(); renderShelfParts(); });
     document.getElementById('genre').addEventListener('change', function (e) { S.genre = e.target.value; remember(); renderShelfParts(); });
+    document.getElementById('shelf-body').addEventListener('click', function (e) {
+      var see = e.target.closest('[data-see]'); if (!see) return;
+      var kv = see.dataset.see.split(':');
+      if (kv[0] === 'filter') S.filter = kv[1];
+      if (kv[0] === 'genre') S.genre = kv[1];
+      if (kv[0] === 'sort') { S.sort = kv[1]; document.getElementById('sort').value = kv[1]; S.grid = true; }
+      remember(); renderShelfParts(); window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   }
   function remember() { try { localStorage.setItem(FILTER_KEY, JSON.stringify({ filter: S.filter, sort: S.sort, genre: S.genre })); } catch (e) { /* fine */ } }
 
@@ -553,7 +634,8 @@
     else if (a.status === 'returning') { whereV = 'On its way back'; whereS = name(a.borrower_id) === 'you' ? 'You said you’ve returned it' : Name(a.borrower_id) + ' says it’s returned'; }
     else { whereV = a.borrower_id === me ? 'With you' : 'With ' + name(a.borrower_id); whereS = 'Since ' + fmtWhen(a.handed_at) + (a.due_on ? ' · ' + dueText(a.due_on) : ''); if (st.kind === 'late') whereCls = ' late'; }
 
-    var h = '<a class="back" href="#/">' + ICONS.back + 'Shelf</a>' +
+    var h = '<div class="wash" id="wash" style="--wash:' + cloth(b.title) + '"></div>' +
+      '<a class="back" href="#/">' + ICONS.back + 'Shelf</a>' +
       '<article class="book">' + coverHTML(b) + '<div>' +
       '<h1>' + esc(b.title) + '</h1>' + (b.author ? '<div class="by">' + esc(b.author) + '</div>' : '') +
       '<div class="facts">' + facts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' + genreChips(b) +
@@ -568,7 +650,7 @@
     if (canManage(b) && queue.length) {
       h += '<section class="section"><h2>Asked to borrow <span class="count">' + queue.length + '</span></h2><div class="items">' +
         queue.map(function (l, i) {
-          return '<div class="item' + (!a ? ' urgent' : '') + '" style="grid-template-columns:40px 1fr"><span class="avatar" style="background:' + cloth(name(l.borrower_id)) + '">' + initial(name(l.borrower_id)) + '</span><div>' +
+          return '<div class="item' + (!a ? ' urgent' : '') + '" style="grid-template-columns:40px 1fr">' + avatarHTML(S.members[l.borrower_id]) + '<div>' +
             '<h3>' + esc(Name(l.borrower_id)) + (i === 0 && a ? ' <span class="muted small">is next</span>' : '') + '</h3>' +
             '<p>Asked ' + fmtWhen(l.requested_at) + (l.note ? ' · “' + esc(l.note) + '”' : '') + '</p>' +
             '<div class="actions">' + (a ? '<p class="hint">Approve once it’s back with you.</p>' :
@@ -614,7 +696,7 @@
       return '<p class="hint">' + (a.status === 'returning' ? esc(who) + ' says they’ve given it back. Confirm when you have it.' : esc(who) + ' has it, ' + esc(dueText(a.due_on)) + '.') + '</p>' +
         '<button class="btn primary" data-act="returned" data-loan="' + a.id + '">Got it back</button>' +
         (a.status === 'out' ? '<button class="btn" data-act="extend" data-loan="' + a.id + '">Change return date</button>' +
-          waButton('Hi ' + who + ', just a reminder about “' + b.title + '” from the book club' + (late ? ' (it was due ' + fmtDay(a.due_on) + ')' : ', ' + dueText(a.due_on)) + '. Bring it on Sunday? ' + clubLink(b), 'Remind on WhatsApp') : '');
+          waButton('Hi ' + who + ', just a reminder about “' + b.title + '” from the book club' + (late ? ' (it was due ' + fmtDay(a.due_on) + ')' : ', ' + dueText(a.due_on)) + '. Bring it on Sunday? ' + clubLink(b), 'Remind on WhatsApp', a.borrower_id) : '');
     }
     // I'm the borrower.
     if (myOpen && myOpen.status === 'approved') {
@@ -625,16 +707,16 @@
     if (myOpen && myOpen.status === 'out') {
       return '<p class="hint">It’s with you, ' + esc(dueText(myOpen.due_on)) + '. When you give it back, tap below and ' + esc(ownerName) + ' will confirm.</p>' +
         '<button class="btn primary" data-act="returning" data-loan="' + myOpen.id + '">I’ve given it back</button>' +
-        waButton('Hi ' + ownerName + ', could I keep “' + b.title + '” a little longer? ' + clubLink(b), 'Ask for more time');
+        waButton('Hi ' + ownerName + ', could I keep “' + b.title + '” a little longer? ' + clubLink(b), 'Ask for more time', owner);
     }
     if (myOpen && myOpen.status === 'returning') {
       return '<p class="hint">Waiting for ' + esc(ownerName) + ' to confirm it’s back.</p>' +
-        waButton('Hi ' + ownerName + ', I’ve returned “' + b.title + '”. Could you tap “Got it back” on the club app? ' + clubLink(b), 'Nudge on WhatsApp');
+        waButton('Hi ' + ownerName + ', I’ve returned “' + b.title + '”. Could you tap “Got it back” on the club app? ' + clubLink(b), 'Nudge on WhatsApp', owner);
     }
     if (myOpen && myOpen.status === 'requested') {
       var pos = st.queue.findIndex(function (l) { return l.id === myOpen.id; }) + 1;
       return '<p class="hint">' + (a ? 'You’re number ' + pos + ' in line. ' + esc(Name(owner)) + ' will say yes once it’s back.' : 'You’ve asked. Waiting for ' + esc(ownerName) + ' to say yes.') + '</p>' +
-        waButton('Hi ' + ownerName + ', I’ve asked to borrow “' + b.title + '” on the book club app. ' + clubLink(b), 'Tell ' + ownerName) +
+        waButton('Hi ' + ownerName + ', I’ve asked to borrow “' + b.title + '” on the book club app. ' + clubLink(b), 'Tell ' + ownerName, owner) +
         '<button class="btn ghost" data-act="cancel" data-loan="' + myOpen.id + '">Cancel my request</button>';
     }
     if (mine) {
@@ -970,8 +1052,12 @@
     var asked = S.loans.filter(function (l) { return l.borrower_id === me && l.status === 'requested'; });
     var waiting = S.loans.filter(function (l) { return mineIds[l.book_id] && l.status === 'requested' && todo.indexOf(l) < 0; });
 
-    var h = '<div class="page-head"><div class="who"><span class="avatar" style="background:' + cloth(S.me.name) + '">' + initial(S.me.name) + '</span><div><h1>Hi, ' + esc(S.me.name) + '</h1>' +
+    var h = '<div class="page-head"><div class="who">' + avatarHTML(S.me) + '<div><h1>Hi, ' + esc(S.me.name) + '</h1>' +
       '<p class="lede" style="margin:0">' + Object.keys(mineIds).length + ' of your books on the shelf' + (S.me.is_admin ? ' · admin' : '') + '</p></div></div></div>';
+
+    h += '<div class="panel pcard"><div>' + (S.me.bio ? '<p class="pbio" style="margin:0">' + esc(S.me.bio) + '</p>' : '<p class="muted" style="margin:0">Tell the club a little about yourself: what you like to read, and your WhatsApp number if you want members to message you.</p>') +
+      favChips(S.me) + '<p class="small muted" style="margin:8px 0 0">' + (S.me.phone ? 'WhatsApp number shared with members.' : 'No WhatsApp number shared.') + '</p></div>' +
+      '<div class="actions" style="margin:0"><button class="btn small primary" data-act="edit-profile">Edit profile</button><a class="btn small ghost" href="#/member/' + encodeURIComponent(S.me.id) + '">View my profile</a></div></div>';
 
     h += '<section class="section"><h2>Needs you <span class="count">' + (todo.length || '') + '</span></h2>';
     if (!todo.length) h += '<p class="empty">Nothing to do. Go and read something.</p>';
@@ -981,7 +1067,7 @@
       if (b.owner_id === me && l.status === 'approved') return loanItem(l, 'You said yes to <b>' + esc(who) + '</b>. Tap once you’ve handed it over.', btn('handover', l, 'Handed over', 'primary') + btn('cancel', l, 'Call it off', 'ghost'), true);
       if (b.owner_id === me && l.status === 'returning') return loanItem(l, '<b>' + esc(who) + '</b> says they’ve given it back. Do you have it?', btn('returned', l, 'Got it back', 'primary'), true);
       if (l.status === 'approved') return loanItem(l, '<b>' + esc(owner) + '</b> said yes! Tap once you have it.', btn('handover', l, 'I’ve got it', 'primary') + btn('cancel', l, 'I don’t need it', 'ghost'), true);
-      return loanItem(l, 'From ' + esc(owner) + ', <b>' + esc(dueText(l.due_on)) + '</b>. Bring it on Sunday?', btn('returning', l, 'I’ve given it back', 'primary') + waButton('Hi ' + owner + ', could I keep “' + b.title + '” a little longer? ' + clubLink(b), 'Ask for more time'), true);
+      return loanItem(l, 'From ' + esc(owner) + ', <b>' + esc(dueText(l.due_on)) + '</b>. Bring it on Sunday?', btn('returning', l, 'I’ve given it back', 'primary') + waButton('Hi ' + owner + ', could I keep “' + b.title + '” a little longer? ' + clubLink(b), 'Ask for more time', b.owner_id), true);
     }).join('') + '</div>';
     h += '</section><div class="cols"><div>';
 
@@ -1002,7 +1088,7 @@
       var b = book(l.book_id), who = Name(l.borrower_id), late = l.due_on && daysUntil(l.due_on) < 0;
       return loanItem(l, 'With <b>' + esc(who) + '</b> · <span style="' + (late ? 'color:var(--late)' : '') + '">' + esc(dueText(l.due_on)) + '</span>',
         btn('returned', l, 'Got it back') + btn('extend', l, 'Change date', 'ghost') +
-        (late ? waButton('Hi ' + who + ', just a reminder about “' + b.title + '” from the book club (due ' + fmtDay(l.due_on) + '). Bring it on Sunday? ' + clubLink(b), 'Remind') : ''));
+        (late ? waButton('Hi ' + who + ', just a reminder about “' + b.title + '” from the book club (due ' + fmtDay(l.due_on) + '). Bring it on Sunday? ' + clubLink(b), 'Remind', l.borrower_id) : ''));
     }).join('') + '</div>' : '<p class="empty">None of your books are out.</p>') + '</section>';
 
     if (waiting.length) {
@@ -1019,28 +1105,46 @@
     h += '<section class="section"><h2>Your account</h2><div class="panel">' +
       '<ul class="list"><li>Name<span class="when"><b>' + esc(S.me.name) + '</b></span></li>' +
       '<li>Signed in as<span class="when">' + esc((S.session && S.session.user && S.session.user.email) || '') + '</span></li></ul>' +
-      '<div class="actions"><button class="btn small" data-act="rename">Change my name</button><button class="btn small" data-act="set-password">' + (S.session && S.session.user && S.session.user.user_metadata && S.session.user.user_metadata.bc_password ? 'Change my password' : 'Set a password') + '</button>' +
+      '<div class="actions"><button class="btn small" data-act="edit-profile">Edit profile</button><button class="btn small" data-act="set-password">' + (S.session && S.session.user && S.session.user.user_metadata && S.session.user.user_metadata.bc_password ? 'Change my password' : 'Set a password') + '</button>' +
       (standalone() ? '' : '<button class="btn small" data-act="install">' + ICONS.download + 'Install the app</button>') +
-      '<a class="btn small" href="#/members">Members</a><button class="btn small ghost" data-act="signout">Sign out</button></div>' +
+      '<a class="btn small" href="#/community">Community</a><button class="btn small ghost" data-act="signout">Sign out</button></div>' +
       '<p class="small muted" style="margin:10px 0 0">A password lets you sign in inside the installed app on iPhone, where email links open in Safari instead.</p></div></section>';
     return h;
   }
 
-  /* ---------------------------------------------------------------- members */
+  /* ---------------------------------------------------------------- community & profiles */
 
   var invites = null;
 
-  function membersView() {
+  function memberStats(id) {
+    var st = { owned: 0, borrowed: 0, reading: [], read: [] };
+    S.books.forEach(function (b) { if (b.owner_id === id) st.owned++; });
+    S.loans.forEach(function (l) {
+      if (l.borrower_id !== id) return;
+      if (l.status === 'out' || l.status === 'returning') { st.reading.push(l.book_id); st.borrowed++; }
+      if (l.status === 'returned') { st.borrowed++; if (st.read.indexOf(l.book_id) < 0) st.read.push(l.book_id); }
+    });
+    return st;
+  }
+  function favChips(m) {
+    var g = (m.fav_genres || []).filter(function (k) { return GENRE_LABEL[k]; });
+    return g.length ? '<div class="genres">' + g.map(function (k) { return '<span class="gchip static">' + esc(GENRE_LABEL[k]) + '</span>'; }).join('') + '</div>' : '';
+  }
+
+  function communityView() {
     var list = Object.keys(S.members).map(function (id) { return S.members[id]; }).sort(function (a, b) { return a.joined_at < b.joined_at ? -1 : 1; });
-    var owned = {}, reading = {};
-    S.books.forEach(function (b) { owned[b.owner_id] = (owned[b.owner_id] || 0) + 1; });
-    S.loans.forEach(function (l) { if (l.status === 'out' || l.status === 'returning') reading[l.borrower_id] = (reading[l.borrower_id] || 0) + 1; });
-    var h = '<div class="page-head"><div><h1>Members</h1><p class="lede">' + list.length + ' reader' + (list.length === 1 ? '' : 's') + ' sharing ' + S.books.length + ' books.</p></div></div>' +
-      '<ul class="list people panel" style="padding:6px 18px">' + list.map(function (m) {
-        return '<li><span class="avatar" style="background:' + cloth(m.name) + '">' + initial(m.name) + '</span><div><b>' + esc(m.name) + (m.id === S.me.id ? ' (you)' : '') + '</b>' + (m.is_admin ? ' <span class="badge wait" style="margin-left:4px">admin</span>' : '') +
-          '<div class="small muted">' + (owned[m.id] || 0) + ' book' + (owned[m.id] === 1 ? '' : 's') + ' shared' + (reading[m.id] ? ' · reading ' + reading[m.id] + ' from the club' : '') + ' · joined ' + fmtWhen(m.joined_at) + '</div></div>' +
-          (S.me.is_admin && m.id !== S.me.id ? '<button class="btn small ghost danger" style="margin-left:auto" data-act="remove-member" data-id="' + esc(m.id) + '">Remove</button>' : '') + '</li>';
-      }).join('') + '</ul>';
+    var h = '<div class="page-head"><div><h1>Community</h1><p class="lede">' + list.length + ' reader' + (list.length === 1 ? '' : 's') + ' sharing ' + S.books.length + ' books. We meet every Sunday.</p></div></div>' +
+      '<div class="mgrid">' + list.map(function (m) {
+        var st = memberStats(m.id);
+        var now = st.reading.length ? book(st.reading[0]) : null;
+        return '<a class="mcard" href="#/member/' + encodeURIComponent(m.id) + '">' +
+          '<div class="mtop">' + avatarHTML(m) + '<div><div class="mname">' + esc(m.name) + (m.id === S.me.id ? ' <span class="muted">(you)</span>' : '') + '</div>' +
+          '<div class="small muted">' + (m.is_admin ? 'Admin · ' : '') + 'since ' + fmtWhen(m.joined_at) + '</div></div></div>' +
+          (m.bio ? '<p class="mbio">' + esc(m.bio) + '</p>' : '<p class="mbio muted">' + (m.id === S.me.id ? 'Add a line about yourself from Me → Edit profile.' : 'No bio yet.') + '</p>') +
+          favChips(m) +
+          (now ? '<p class="mnow"><span class="muted">Reading</span> ' + esc(now.title) + '</p>' : '') +
+          '<div class="mstats"><span><b>' + st.owned + '</b> shared</span><span><b>' + st.borrowed + '</b> borrowed</span><span><b>' + st.read.length + '</b> read</span></div></a>';
+      }).join('') + '</div>';
 
     if (S.me.is_admin) {
       h += '<section class="section"><h2>Invite someone</h2><div class="panel"><form class="form" id="invite-form">' +
@@ -1063,10 +1167,64 @@
     return h;
   }
 
+  function memberView(id) {
+    var m = S.members[id];
+    if (!m) return '<a class="back" href="#/community">' + ICONS.back + 'Community</a><p class="empty">That member isn’t in the club any more.</p>';
+    var mine = m.id === S.me.id, st = memberStats(m.id);
+    var theirs = S.books.filter(function (b) { return b.owner_id === m.id; }).sort(function (a, b) { return norm(a.title) < norm(b.title) ? -1 : 1; });
+    var h = '<a class="back" href="#/community">' + ICONS.back + 'Community</a>' +
+      '<section class="profile">' + avatarHTML(m, true) + '<div class="pinfo"><h1>' + esc(m.name) + '</h1>' +
+      '<p class="muted small" style="margin:4px 0 0">' + (m.is_admin ? 'Admin · ' : '') + 'Member since ' + fmtWhen(m.joined_at) + '</p>' +
+      (m.bio ? '<p class="pbio">' + esc(m.bio) + '</p>' : '') + favChips(m) +
+      '<div class="mstats"><span><b>' + st.owned + '</b> ' + (st.owned === 1 ? 'book' : 'books') + ' shared</span><span><b>' + st.borrowed + '</b> borrowed</span><span><b>' + st.read.length + '</b> read</span></div>' +
+      '<div class="actions">' + (mine ? '<button class="btn primary small" data-act="edit-profile">Edit profile</button>' :
+        (m.phone ? waButton('Hi ' + m.name + '! ', 'Message on WhatsApp', m.id) : '<span class="small muted">' + esc(m.name) + ' hasn’t shared a WhatsApp number.</span>')) +
+      (S.me.is_admin && !mine ? '<button class="btn small ghost danger" data-act="remove-member" data-id="' + esc(m.id) + '">Remove from club</button>' : '') + '</div></div></section>';
+    if (st.reading.length) h += rowHTML('Reading now', st.reading.map(book).filter(Boolean));
+    h += rowHTML((mine ? 'Your' : m.name + '’' + 's') + ' books on the shelf', theirs);
+    if (st.read.length) h += rowHTML('Read from the club', st.read.map(book).filter(Boolean));
+    if (!theirs.length && !st.reading.length && !st.read.length) h += '<p class="empty">' + (mine ? 'Nothing here yet. <a href="#/add">Add your first book</a>.' : 'Nothing on the shelf from ' + esc(m.name) + ' yet.') + '</p>';
+    return h;
+  }
+
+  function normPhone(v) {
+    var d = String(v || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.length === 11 && d[0] === '0') d = d.slice(1);
+    if (d.length === 10) d = '91' + d;
+    return /^[1-9]\d{9,14}$/.test(d) ? d : null;
+  }
+  async function editProfile() {
+    var m = S.me;
+    var fd = await ask({ title: 'Your profile', ok: 'Save',
+      body: '<div class="field"><label for="p-name">Name</label><input id="p-name" name="name" required maxlength="60" value="' + esc(m.name) + '"></div>' +
+        '<div class="field"><label for="p-bio">About you</label><textarea id="p-bio" name="bio" maxlength="240" placeholder="What you like to read, what you’re reading lately…">' + esc(m.bio || '') + '</textarea><span class="help">A line or two. Members see it in Community.</span></div>' +
+        '<div class="field"><span class="label">Favourite genres</span><div class="genre-pick">' + GENRES.map(function (g) {
+          return '<label><input type="checkbox" name="fav" value="' + g[0] + '"' + ((m.fav_genres || []).indexOf(g[0]) >= 0 ? ' checked' : '') + '><span>' + esc(g[1]) + '</span></label>';
+        }).join('') + '</div></div>' +
+        '<div class="field"><label for="p-phone">WhatsApp number <span class="muted small" style="font-weight:400">optional</span></label>' +
+        '<input id="p-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="98765 43210" value="' + esc(m.phone ? (m.phone.indexOf('91') === 0 && m.phone.length === 12 ? m.phone.slice(2) : '+' + m.phone) : '') + '">' +
+        '<label class="check small"><input type="checkbox" name="consent"' + (m.phone ? ' checked' : '') + '> Show my number to club members so they can message me</label>' +
+        '<span class="help">Only signed-in members can see it, never visitors. Clear it any time to stop sharing.</span></div>',
+      validate: function (f) {
+        var ph = normPhone(f.get('phone'));
+        if (ph === null) return 'That number doesn’t look right. Use your 10-digit mobile number, or +country code for outside India.';
+        if (ph && f.get('consent') !== 'on') return 'Tick the box to share your number, or clear it.';
+        if (f.getAll('fav').length > 5) return 'Pick up to five genres.';
+        return '';
+      } });
+    if (!fd) return;
+    var upd = { name: String(fd.get('name')).trim().slice(0, 60), bio: String(fd.get('bio') || '').trim().slice(0, 240) || null,
+      fav_genres: fd.getAll('fav').filter(function (k) { return GENRE_LABEL[k]; }).slice(0, 5), phone: normPhone(fd.get('phone')) || null };
+    var r = await S.client.from('bc_members').update(upd).eq('id', m.id);
+    if (r.error) toast(errMsg(r.error), true); else toast('Profile saved.');
+    await refresh();
+  }
+
   async function loadInvites() {
     var r = await S.client.from('bc_invites').select('email,name,is_admin,created_at').order('created_at');
     invites = r.error ? [] : r.data;
-    if (route().name === 'members') render();
+    if (route().name === 'community' || route().name === 'members') render();
   }
 
   /* ---------------------------------------------------------------- visitors & sign in */
@@ -1084,11 +1242,12 @@
         '<div class="actions"><button class="btn" data-act="recheck">I’ve been added, check again</button><button class="btn ghost" data-act="signout">Sign out</button></div></div>';
     }
     h += '<div class="page-head"><div><h2 style="font-size:26px">On the shelf</h2><p class="lede">' + pub.length + ' books · ' + inCount + ' available right now</p></div></div>';
-    if (!S.pub) h += '<p class="loading">Opening the shelf…</p>';
+    if (!S.pub) h += skeletonHTML(8);
     else if (!pub.length) h += '<p class="empty">The shelf is being set up.</p>';
     else h += '<div class="grid">' + pub.map(function (b) {
-      return '<div class="card">' + coverHTML(b, b.available ? badgeHTML('in', 'Available') : badgeHTML('out', 'Out')) +
-        '<div class="meta"><div class="t">' + esc(b.title) + '</div><div class="a">' + esc(b.author) + '</div></div></div>';
+      return '<div class="card">' + coverHTML(b) +
+        '<div class="meta"><div class="t">' + esc(b.title) + '</div><div class="a">' + esc(b.author) + '</div>' +
+        (b.available ? statusHTML('in', 'Available') : statusHTML('out', 'Out right now')) + '</div></div>';
     }).join('') + '</div>';
     return h;
   }
@@ -1134,8 +1293,8 @@
 
   function wire(r) {
     if (S.me && r.name === 'shelf') wireShelf();
-    if (S.me && r.name === 'book' && book(r.id)) paintAbout(book(r.id));
-    if (S.me && r.name === 'members' && S.me.is_admin && invites === null) loadInvites();
+    if (S.me && r.name === 'book' && book(Number(r.id))) { paintAbout(book(Number(r.id))); paintWash(book(Number(r.id))); }
+    if (S.me && (r.name === 'community' || r.name === 'members') && S.me.is_admin && invites === null) loadInvites();
     if (r.name !== 'add') stopScan();
 
     var findForm = document.getElementById('find-form');
@@ -1210,6 +1369,7 @@
       case 'signin-back': S.signin = { step: 'email', email: S.signin.email }; render(); return;
       case 'resend': el.disabled = true; if (await sendCode(S.signin.email)) toast('New link sent.'); el.disabled = false; return;
       case 'install': install(); return;
+      case 'edit-profile': editProfile(); return;
       case 'genre': S.genre = el.dataset.genre; S.filter = 'all'; S.q = ''; remember(); location.hash = '#/'; return;
       case 'more': { var dsc = view.querySelector('.desc'); if (dsc) dsc.classList.remove('clamp'); el.remove(); return; }
       case 'set-password': {
@@ -1248,7 +1408,7 @@
     }
 
     // Lending steps: from a book page, or from the Me page (data-book).
-    var b = r.name === 'book' ? book(r.id) : book(Number(el.dataset.book));
+    var b = r.name === 'book' ? book(Number(r.id)) : book(Number(el.dataset.book));
     if (b) await bookAction(b, a, el.dataset.loan ? Number(el.dataset.loan) : null);
   });
 

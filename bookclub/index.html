@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ambernath Book Club</title>
 <meta name="description" content="Books shared between friends in Ambernath: what we have, who has it, and what you can borrow next.">
-<meta name="theme-color" content="#F6F0E4" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1C1915" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Book Club">
@@ -18,8 +18,8 @@
 <link rel="apple-touch-icon" href="/bookclub/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap">
-<link rel="stylesheet" href="/bookclub/style.css?v=4">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&amp;display=swap">
+<link rel="stylesheet" href="/bookclub/style.css?v=5">
 </head>
 <body>
 <a class="skip" href="#view">Skip to the shelf</a>
@@ -32,8 +32,8 @@
   <button class="install-btn" id="install-btn" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Install</button>
 </header>
 <div id="banner" class="banner" hidden></div>
-<main id="view" class="view" tabindex="-1">
-  <p class="loading">Opening the shelf…</p>
+<main id="view" class="view" tabindex="-1" aria-busy="true">
+  <div class="sk-head"><span class="sk sk-line w40"></span><span class="sk sk-line w60"></span></div><div class="grid"><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div><div class="card"><div class="cover sk"></div><span class="sk sk-line w80"></span><span class="sk sk-line w50"></span></div></div>
 </main>
 <nav class="bottom" id="bottom" aria-label="Main"></nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -42,6 +42,6 @@
 
 <script src="/assets/js/desk-config.js?v=bookclub1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.js" integrity="sha256-LbKRLxaTmjshtHKYCnradGszpqQHCLxVXLC+JVxutbE=" crossorigin="anonymous"></script>
-<script src="/bookclub/app.js?v=4"></script>
+<script src="/bookclub/app.js?v=5"></script>
 </body>
 </html>
