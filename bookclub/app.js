@@ -239,6 +239,7 @@
     signin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l4-4-4-4M14 12H4"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
     back: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
     scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>'
   };
 
@@ -450,6 +451,7 @@
     if (canManage(b)) {
       h += '<div class="owner-tools">' +
         '<button class="btn small" data-act="edit">Edit details</button>' +
+        (!b.cover ? '<button class="btn small" data-act="find-cover">Find a cover</button>' : '') +
         (!a || a.status === 'approved' ? '<button class="btn small" data-act="toggle-lend">' + (b.lendable ? 'Pause lending' : 'Start lending again') + '</button>' : '') +
         (!a ? '<button class="btn small ghost danger" data-act="remove">Remove from the shelf</button>' : '') +
         (owner !== me ? '<span class="muted small" style="align-self:center">You can change this because you’re an admin.</span>' : '') +
@@ -582,10 +584,20 @@
         await refresh();
         return;
       }
+      case 'find-cover': {
+        toast('Looking for a cover…');
+        var found = await findCover(b.title, b.author, b.isbn);
+        if (!found) { toast('No cover found. You can paste an image link under Edit details.', true); return; }
+        var r4 = await S.client.from('bc_books').update({ cover: found }).eq('id', b.id);
+        if (r4.error) toast(errMsg(r4.error), true); else toast('Cover added.');
+        await refresh();
+        return;
+      }
       case 'edit':
         fd = await ask({ title: 'Edit details', ok: 'Save', body: bookFields(b, false) });
         if (!fd) return;
         var upd = bookPayload(fd);
+        if (!upd.cover) upd.cover = await findCover(upd.title, upd.author, upd.isbn);
         var r2 = await S.client.from('bc_books').update(upd).eq('id', b.id);
         if (r2.error) toast(errMsg(r2.error), true); else toast('Saved.');
         await refresh();
@@ -756,6 +768,22 @@
     }
   }
 
+  // A real cover for any book saved without one: Open Library first, then Google Books.
+  async function findCover(title, author, isbn) {
+    var q = String(title || '') + ' ' + String(author || '');
+    try {
+      var hit = (await openLibrary(isbn ? '' : q, isbn || '')).find(function (r) { return r.cover; });
+      if (!hit && isbn) hit = (await openLibrary(q, '')).find(function (r) { return r.cover; });
+      if (hit) return hit.cover;
+    } catch (e) { /* try the other source */ }
+    try {
+      var g = await googleBooks(isbn ? 'isbn:' + isbn : 'intitle:' + title + (author ? ' inauthor:' + author : ''));
+      var gh = g.find(function (r) { return r.cover && !/openlibrary\.org\/b\/isbn/.test(r.cover); });
+      if (gh) return gh.cover;
+    } catch (e) { /* none found */ }
+    return null;
+  }
+
   async function saveNewBook(form) {
     var fd = new FormData(form);
     var p = bookPayload(fd);
@@ -765,6 +793,7 @@
     p.lendable = fd.get('lendable') === 'on';
     if (!p.cover && addState.found && addState.found.cover) p.cover = addState.found.cover;
     var btn = form.querySelector('[type=submit]'); btn.disabled = true; btn.textContent = 'Adding…';
+    if (!p.cover) { btn.textContent = 'Finding a cover…'; p.cover = await findCover(p.title, p.author, p.isbn); }
     var r = await S.client.from('bc_books').insert(p).select('id').single();
     if (r.error) { err.textContent = errMsg(r.error); err.hidden = false; btn.disabled = false; btn.textContent = 'Add to the shelf'; return; }
     addState = { found: null, results: [], busy: false, msg: '' };
@@ -841,7 +870,10 @@
     h += '<section class="section"><h2>Your account</h2><div class="panel">' +
       '<ul class="list"><li>Name<span class="when"><b>' + esc(S.me.name) + '</b></span></li>' +
       '<li>Signed in as<span class="when">' + esc((S.session && S.session.user && S.session.user.email) || '') + '</span></li></ul>' +
-      '<div class="actions"><button class="btn small" data-act="rename">Change my name</button><a class="btn small" href="#/members">Members</a><button class="btn small ghost" data-act="signout">Sign out</button></div></div></section>';
+      '<div class="actions"><button class="btn small" data-act="rename">Change my name</button><button class="btn small" data-act="set-password">' + (S.session && S.session.user && S.session.user.user_metadata && S.session.user.user_metadata.bc_password ? 'Change my password' : 'Set a password') + '</button>' +
+      (standalone() ? '' : '<button class="btn small" data-act="install">' + ICONS.download + 'Install the app</button>') +
+      '<a class="btn small" href="#/members">Members</a><button class="btn small ghost" data-act="signout">Sign out</button></div>' +
+      '<p class="small muted" style="margin:10px 0 0">A password lets you sign in inside the installed app on iPhone, where email links open in Safari instead.</p></div></section>';
     return h;
   }
 
@@ -873,7 +905,7 @@
       else if (invites.length) {
         h += '<h2 style="font-size:18px;margin-top:20px">Invited, not signed in yet</h2><ul class="list panel" style="padding:6px 18px">' + invites.map(function (i) {
           return '<li><div><b>' + esc(i.name) + '</b> <span class="small muted">' + esc(i.email) + '</span></div><span class="when" style="display:flex;gap:6px">' +
-            waButton('Hi ' + i.name + '! You’re invited to the Ambernath Book Club app. Open ' + location.origin + '/bookclub/ and sign in with ' + i.email + '. You’ll get a sign-in link by email.', 'Send link') +
+            waButton('Hi ' + i.name + '! You’re invited to the Ambernath Book Club app. Open ' + location.origin + '/bookclub/ in Chrome or Safari and sign in with ' + i.email + ' (you’ll get a sign-in link by email). Then tap “Install the app” to put it on your home screen.', 'Send link') +
             '<button class="btn small ghost danger" data-act="uninvite" data-email="' + esc(i.email) + '">Remove</button></span></li>';
         }).join('') + '</ul>';
       }
@@ -895,7 +927,8 @@
     var inCount = pub.filter(function (b) { return b.available; }).length;
     var h = '<section class="hero"><h1>Ambernath Book Club</h1>' +
       '<p>Friends in Ambernath sharing their books. We meet every Sunday. Members can see who has each book, borrow it, and add their own to the shelf.</p>' +
-      '<div class="actions" style="margin:0">' + (S.session && S.joined && !S.me ? '' : '<a class="btn primary" href="#/signin">' + ICONS.signin + 'Members sign in</a>') + '</div></section>';
+      '<div class="actions" style="margin:0">' + (S.session && S.joined && !S.me ? '' : '<a class="btn primary" href="#/signin">' + ICONS.signin + 'Members sign in</a>') +
+      (standalone() ? '' : '<button class="btn" data-act="install">' + ICONS.download + 'Install the app</button>') + '</div></section>';
     if (S.session && S.joined && !S.me) {
       h += '<div class="panel" style="margin-bottom:24px"><h2 style="font-size:20px">You’re not on the member list yet</h2>' +
         '<p class="muted">You’re signed in as <b>' + esc(S.session.user.email) + '</b>, but this email hasn’t been invited. Ask Vikas to add it, then come back.</p>' +
@@ -925,6 +958,11 @@
     return '<div class="signin panel"><h1>Members sign in</h1><p class="muted">Use the email you gave the club. We’ll email you a sign-in link: no password to remember.</p>' +
       '<form class="form" id="email-form"><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required value="' + esc(s.email) + '"></div>' +
       '<p class="err" id="signin-err" hidden></p><button class="btn primary" type="submit">Email me a link</button></form>' +
+      '<details style="margin-top:16px"' + (standalone() && isIOS() ? ' open' : '') + '><summary class="small muted">Sign in with a password instead</summary>' +
+      '<form class="form" id="pw-form" style="margin-top:10px"><div class="field"><label for="pw-email">Email</label><input id="pw-email" name="email" type="email" autocomplete="username" required value="' + esc(s.email) + '"></div>' +
+      '<div class="field"><label for="pw">Password</label><input id="pw" name="password" type="password" autocomplete="current-password" required minlength="8"></div>' +
+      '<p class="err" id="pw-err" hidden></p><button class="btn primary" type="submit">Sign in</button>' +
+      '<p class="small muted" style="margin:0">No password yet? Sign in once with the email link, then set one under <b>Me</b>.</p></form></details>' +
       '<p class="small muted" style="margin-top:14px">Not a member yet? Come along on a Sunday and ask Vikas to add you.</p></div>';
   }
 
@@ -974,6 +1012,17 @@
       S.signin.email = email;
       if (await sendCode(email)) render(); else { b.disabled = false; b.textContent = 'Email me a link'; }
     });
+    var pwForm = document.getElementById('pw-form');
+    if (pwForm) pwForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var b = pwForm.querySelector('button'); b.disabled = true; b.textContent = 'Signing in…';
+      var res = await S.client.auth.signInWithPassword({ email: pwForm.email.value.trim().toLowerCase(), password: pwForm.password.value });
+      if (res.error) {
+        var err = document.getElementById('pw-err');
+        err.textContent = /invalid login/i.test(res.error.message) ? 'That email and password don’t match. No password yet? Use the email link once, then set one under Me.' : errMsg(res.error);
+        err.hidden = false; b.disabled = false; b.textContent = 'Sign in';
+      }
+    });
     var codeForm = document.getElementById('code-form');
     if (codeForm) codeForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -1010,6 +1059,19 @@
       case 'recheck': S.joined = false; await refresh(); if (!S.me) toast('Still not on the list. Ask Vikas to add ' + S.session.user.email + '.', true); return;
       case 'signin-back': S.signin = { step: 'email', email: S.signin.email }; render(); return;
       case 'resend': el.disabled = true; if (await sendCode(S.signin.email)) toast('New link sent.'); el.disabled = false; return;
+      case 'install': install(); return;
+      case 'set-password': {
+        var pf = await ask({ title: 'Set a password', ok: 'Save password',
+          body: '<p class="muted" style="margin:0">For signing in inside the installed app. Email links still work too.</p>' +
+            '<div class="field"><label for="np">New password</label><input id="np" name="np" type="password" autocomplete="new-password" required minlength="8"></div>' +
+            '<div class="field"><label for="np2">Type it again</label><input id="np2" name="np2" type="password" autocomplete="new-password" required minlength="8"></div>',
+          validate: function (f) { return String(f.get('np')).length < 8 ? 'Use at least 8 characters.' : f.get('np') !== f.get('np2') ? 'The two don’t match.' : ''; } });
+        if (!pf) return;
+        var up = await S.client.auth.updateUser({ password: String(pf.get('np')), data: { bc_password: true } });
+        if (up.error) toast(/reauthenticat|recent/i.test(up.error.message) ? 'For safety, sign out, sign back in with the email link, then try again.' : errMsg(up.error), true);
+        else { if (up.data && up.data.user) S.session.user = up.data.user; toast('Password saved.'); render(); }
+        return;
+      }
       case 'rename': {
         var fd = await ask({ title: 'Your name', ok: 'Save', body: '<div class="field"><label for="f-name">How members see you</label><input id="f-name" name="name" required maxlength="60" value="' + esc(S.me.name) + '"></div>' });
         if (!fd) return;
@@ -1077,6 +1139,41 @@
         await refresh();
       }, 0);
     });
+  }
+
+  /* ---------------------------------------------------------------- install */
+
+  var installEvt = null;
+  function standalone() { return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+  function isIOS() { return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installEvt = e; });
+  window.addEventListener('appinstalled', function () { installEvt = null; toast('Installed. Look for the Book Club icon on your home screen.'); render(); });
+
+  async function install() {
+    if (standalone()) { toast('You’re already in the installed app.'); return; }
+    var title = 'Install the Book Club app';
+    if (installEvt) {
+      var ok = await ask({ title: title, ok: 'Install', cancel: 'Not now',
+        body: '<p class="muted" style="margin:0">It gets its own icon on your home screen and opens straight to the shelf, like any other app.</p>' });
+      if (!ok || !installEvt) return;
+      var ev = installEvt; installEvt = null;
+      try { await ev.prompt(); await ev.userChoice; } catch (e) { /* the browser said no */ }
+      return;
+    }
+    var how;
+    if (isIOS()) how = '<ol class="steps"><li>Open this page in <b>Safari</b>.</li><li>Tap <b>Share</b> (the square with an arrow).</li><li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>' +
+      '<p class="small muted" style="margin:0">On iPhone the installed app signs in separately. Set a password under <b>Me</b> first, then sign in with it inside the app.</p>';
+    else if (/Android/.test(navigator.userAgent)) how = '<ol class="steps"><li>Open this page in <b>Chrome</b> (from WhatsApp, tap <b>⋮</b> then <b>Open in Chrome</b>).</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Tap <b>Install app</b> or <b>Add to Home screen</b>.</li></ol>';
+    else how = '<ol class="steps"><li>In Chrome or Edge, click the <b>install</b> icon at the right end of the address bar,</li><li>or open the browser menu and choose <b>Install Ambernath Book Club</b>.</li></ol>' +
+      '<p class="small muted" style="margin:0">On a phone, open vikasinpencil.com/bookclub/ and add it to the home screen.</p>';
+    await ask({ title: title, ok: 'Got it', cancel: 'Close', body: how });
+  }
+
+  var installBtn = document.getElementById('install-btn');
+  if (installBtn) { installBtn.hidden = standalone(); installBtn.addEventListener('click', install); }
+  if (/[?&]install\b/.test(location.search)) {
+    history.replaceState(null, '', location.pathname + location.hash);
+    setTimeout(install, 1500); // give the browser a moment to offer its install prompt
   }
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {

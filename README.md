@@ -162,7 +162,7 @@ Both of those are meant to be public, so they're safe in this repository. **Neve
 - **Borrowing:** a member asks, the owner says yes and picks a return date (in Sundays, because the club meets on Sundays), and either of them taps *Handed over* when the book changes hands. To return it, the borrower taps *I've given it back* and the owner taps *Got it back*. Only the owner's confirmation puts a book back on the shelf, so the app stays truthful. Owners can also hand a book straight to someone at the meetup (*Lend it to someone*).
 - **Queue:** asking for a book that's out puts you in line, and the owner sees who's next.
 - **Me:** what needs you (requests to answer, books to collect or confirm, books due soon), what you've borrowed, what you've lent out.
-- **Adding books:** search by title, author or ISBN (or scan the barcode on Android), and the cover, author and pages fill in from Open Library. Covers for the first 32 books are saved in `bookclub/covers/`.
+- **Adding books:** search by title, author or ISBN (or scan the barcode on Android), and the cover, author and pages fill in from Open Library. A book saved without a cover (typed in by hand, or search found no picture) gets one looked up automatically, and any book still without one shows a **Find a cover** button to its owner. Covers for the first 32 books are saved in `bookclub/covers/`.
 - **WhatsApp buttons** prepare a message (a reminder, a request, an invite) for you to send to whoever you choose. The app never sends anything by itself.
 - **Visitors** (not signed in) see the titles and whether each is in, never who has it. Members see everything. Nobody's address is ever in the app.
 
@@ -178,7 +178,7 @@ The rules are in the database (`supabase/bookclub.sql`), not the page:
 ### Setting it up (once)
 
 1. **Supabase → SQL Editor:** paste all of `supabase/bookclub.sql` and press **Run**. This makes you (the desk owner) the club's first admin, named Vikas, and puts the 32 starting books on the shelf as yours.
-2. **Authentication → Sign In / Providers:** turn **Allow new users to sign up** on. Members sign in with a code sent to their email, and their first sign-in creates their account. This is safe: an uninvited person who signs up sees only the public shelf, and the desk still only lets the owner in. (If you'd rather keep sign-ups off, also add each member under **Authentication → Users → Add user**, with "Auto Confirm User" ticked.)
+2. **Authentication → Sign In / Providers:** turn **Allow new users to sign up** on. Members sign in with a link sent to their email, and their first sign-in creates their account. This is safe: an uninvited person who signs up sees only the public shelf, and the desk still only lets the owner in. (If you'd rather keep sign-ups off, also add each member under **Authentication → Users → Add user**, with "Auto Confirm User" ticked.)
 3. **Emails:** members get Supabase's standard sign-in email, which holds a link. Tapping it brings them back to the club, signed in. (Supabase only allows editing the email, for example to add a typed code with `{{ .Token }}`, once you connect your own email service under **Authentication → Emails → SMTP Settings**. The app already has a box for a code if you do.)
 4. **Authentication → URL Configuration:** set **Site URL** to `https://vikasinpencil.com` and add `https://vikasinpencil.com/bookclub/` under **Redirect URLs**, so the link in the email opens the club.
 5. Publish (merge the `bookclub` branch into `main`). Open the club, sign in with your email, and check the shelf.
@@ -190,9 +190,13 @@ The rules are in the database (`supabase/bookclub.sql`), not the page:
 1. In the app: **Members → Invite someone**, with their name and the email they'll use.
 2. Tap **Send link** to share the address on WhatsApp. They open it, enter that email, tap the link Supabase emails them, and they're in.
 
-### On phones
+### On phones (installing the app)
 
-Open vikasinpencil.com/bookclub/ and choose **Install app** (Chrome) or **Share → Add to Home Screen** (Safari). As with Watch (see "Android same-domain installation workaround" below), Android Chrome sometimes refuses to install a second app from the same domain. If that happens, it still works fully as a bookmarked page.
+**Install link to share:** https://vikasinpencil.com/bookclub/?install=1 opens the club and shows how to install it on that device. The **Install** button in the top bar, on the welcome page and under **Me** does the same.
+
+- **Android:** in Chrome, the app offers a one-tap **Install**. Opened from WhatsApp, tap ⋮ → **Open in Chrome** first. The installed app shares Chrome's sign-in, so signing in once in Chrome covers both.
+- **iPhone:** in Safari, **Share → Add to Home Screen**. The installed app keeps its own sign-in, separate from Safari, and email links always open in Safari. So members sign in once in Safari, set a password under **Me → Set a password**, then use **Sign in with a password instead** inside the installed app.
+- As with Watch (see "Android same-domain installation workaround" below), Android Chrome sometimes refuses to install another app from vikasinpencil.com on a phone that already has Desk or Agentic AI installed. That mostly affects your own phone; members won't have those apps. If it happens, the club still works fully as a bookmarked page.
 
 ## What visitors can do, and where it's saved
 

@@ -116,6 +116,16 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.2; marg
   .tabs { display: flex; }
   .bottom { display: none; }
 }
+.install-btn {
+  display: inline-flex; align-items: center; gap: 6px; flex: none; margin-left: auto;
+  border: 1px solid var(--line-2); background: transparent; color: var(--ink-2); cursor: pointer;
+  border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600;
+}
+.install-btn svg { width: 15px; height: 15px; }
+.install-btn[hidden] { display: none; }
+@media (min-width: 760px) { .install-btn { margin-left: 0; } }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; color: var(--ink-2); }
+.steps b { color: var(--ink); }
 
 /* ---------- layout ---------- */
 .view { max-width: 1120px; margin: 0 auto; padding: 20px var(--gutter) 24px; outline: none; }
