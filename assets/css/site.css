@@ -316,3 +316,15 @@ dialog.item .x{position:sticky;top:10px;float:right;margin:10px 10px 0 0;width:3
 @media (max-width:760px){.proj-art{height:72px}}
 .proj{align-content:start}
 .proj .org{font-size:13px;color:var(--faint);margin:2px 0 0}
+/* organisation logos */
+.logo{display:inline-flex;align-items:center;justify-content:center;height:34px;min-width:34px;padding:5px 9px;background:#fff;border:1px solid var(--line);border-radius:8px;flex:none}
+.logo img{height:100%;width:auto;max-width:110px;display:block;object-fit:contain}
+.logo.sm{height:28px;padding:4px 8px;margin:4px 0 6px}
+.org-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.org-row .org{font-size:13px;color:var(--faint);margin:0;line-height:1.35}
+.logo.lg{height:84px;width:120px;padding:12px}
+.logo.lg img{max-width:100%;max-height:100%}
+.earlier .org{font-size:13px;color:var(--faint);margin:0 0 6px}
+@media (max-width:760px){.logo.lg{height:64px;width:84px;padding:9px}}
+.stop .when{display:block}
+.stop .logo.sm{margin:10px 0 0}
