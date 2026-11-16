@@ -12,6 +12,7 @@ NB.goodreads = {
 "profile":"https://www.goodreads.com/user/show/115146123",
 "synced":"2026-10-26",
 "books":[
+{"id":"genius-makers","shelf":"currently-reading","title":"Genius Makers","subtitle":"The Mavericks Who Brought AI to Google, Facebook, and the World","series":"","author":"Cade Metz","rating":0,"read":"","added":"2026-11-16","published":"2021","pages":360,"avg":0,"tags":[],"review":"","cover":"assets/covers/genius-makers.jpg","spine":"#13294b","accent":"#5aa9e6"},
 {"id":"7126","shelf":"currently-reading","title":"The Count of Monte Cristo","subtitle":"","series":"","author":"Alexandre Dumas","rating":0,"read":"","added":"2026-09-20","published":"1846","pages":1276,"avg":4.31,"tags":["classic"],"review":"","cover":"assets/covers/7126.jpg","spine":"#101113","accent":"#f6f6f4"},
 {"id":"13356644","shelf":"read","title":"The Physics of Wall Street","subtitle":"A Brief History of Predicting the Unpredictable","series":"","author":"James Owen Weatherall","rating":4,"read":"2026-05-22","added":"2026-05-22","published":"2013","pages":286,"avg":3.81,"tags":[],"review":"","cover":"assets/covers/13356644.jpg","spine":"#ed1b24","accent":"#e54e4f"},
 {"id":"21","shelf":"read","title":"A Short History of Nearly Everything","subtitle":"","series":"","author":"Bill Bryson","rating":5,"read":"2026-05-07","added":"2026-05-07","published":"2003","pages":544,"avg":4.21,"tags":[],"review":"Every sapien should read this","cover":"assets/covers/21.jpg","spine":"#314970","accent":"#748694"},

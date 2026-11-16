@@ -120,7 +120,12 @@
   } else if (page === 'work') {
     var shown = allProjects.filter(function (p) { return p.status !== 'idea' || (p.exp && p.exp.featured); });
     main = sheetHead('02', 'Work', esc(W.intro), 'work') +
-      '<div class="projects">' + shown.map(function (p) { return projCard(p); }).join('') + '</div>';
+      '<div class="projects">' + shown.map(function (p) { return projCard(p); }).join('') + '</div>' +
+      ((W.earlier || []).length ? block('Earlier work', null, '<div class="projects">' + W.earlier.map(function (e) {
+        return '<article class="card proj is-live earlier" id="' + esc(e.id) + '"><div class="proj-art">' + Sketch.svg(e.drawing, '0 0 160 110', 'mini', '') + '</div>' +
+          '<div class="proj-body"><span class="status">' + esc(e.year) + '</span><h3>' + esc(e.title) + '</h3><p class="org">' + esc(e.org) + '</p><p>' + md(e.text) + '</p>' +
+          (e.link ? '<a class="go" href="' + esc(e.link) + '" rel="noopener">' + esc(e.linkText || 'See the work') + ' →</a>' : '') + '</div></article>';
+      }).join('') + '</div>', 'earlier') : '');
   } else if (page === 'library') {
     var present = TYPES.filter(function (t) { return things.some(function (x) { return x.type === t[0]; }); });
     var counts = [read.length + ' books read'].concat(present.map(function (t) { var c = things.filter(function (x) { return x.type === t[0]; }).length; return c + ' ' + (c === 1 ? t[2] : t[1]).toLowerCase(); }));
@@ -241,7 +246,7 @@
         (b.subtitle ? '<p class="ib-sub">' + esc(b.subtitle) + '</p>' : '') + '<p class="ib-by">' + esc(b.author) + (b.series ? ' · ' + esc(b.series) : '') + '</p>' + stars(b.rating) + '</div></div>' +
         (b.line ? '<blockquote>' + md(b.line) + '</blockquote>' : '') +
         '<div class="ib-words"><div class="label">' + (b.review ? 'What I wrote' : b.why ? 'Why it is on my list' : 'My notes') + '</div>' + words + '</div>' +
-        '<p class="ib-meta">' + esc(meta) + (shelves.length ? (meta ? ' · ' : '') + esc(shelves.join(', ')) : '') + ' · <a href="https://www.goodreads.com/book/show/' + esc(b.id) + '" rel="noopener">On Goodreads ↗</a></p>';
+        '<p class="ib-meta">' + esc(meta) + (shelves.length ? (meta ? ' · ' : '') + esc(shelves.join(', ')) : '') + ' · <a href="' + (/^\d+$/.test(b.id) ? 'https://www.goodreads.com/book/show/' + esc(b.id) : 'https://www.goodreads.com/search?q=' + encodeURIComponent(b.title + ' ' + b.author)) + '" rel="noopener">On Goodreads ↗</a></p>';
     }
     function thingCard(t) {
       return (t.image ? '<img class="ib-wide" src="' + esc(t.image) + '" alt="">' : '') + '<div class="label">' + esc(typeName[t.type]) + (t.date ? ' · ' + esc(month(t.date) || t.date) : '') + '</div><h2>' + esc(t.title) + '</h2><p class="ib-by">' + esc(t.by) + '</p>' + stars(t.rating) +

@@ -49,6 +49,8 @@ window.Sketch = (function () {
     satellite: '<rect x="64" y="40" width="32" height="32" rx="3"/><path d="M64 56 H44 M96 56 H116"/><rect x="12" y="44" width="32" height="24"/><rect x="116" y="44" width="32" height="24"/><path class="thin" d="M12 52 H44 M12 60 H44 M116 52 H148 M116 60 H148"/><path d="M80 40 V20 M72 20 H88"/><path class="acc" d="M64 64 H96"/>',
     report: '<path d="M40 12 H96 L112 28 V100 H40 Z"/><path class="thin" d="M52 36 H96 M52 48 H100 M52 60 H88"/><circle cx="96" cy="78" r="14"/><path class="acc" d="M106 88 L122 104"/>',
     house: '<path d="M24 96 V58 L56 32 L88 58 V96 Z"/><path class="thin" d="M48 96 V74 H64 V96"/><path class="thin" d="M100 96 H146"/><path class="acc" d="M104 84 L118 70 L130 76 L144 50"/>',
+    org: '<rect x="62" y="10" width="36" height="22" rx="3"/><path d="M80 32 V48 M30 48 H130 M30 48 V60 M80 48 V60 M130 48 V60"/><rect x="12" y="60" width="36" height="22" rx="3"/><rect x="62" y="60" width="36" height="22" rx="3"/><rect x="112" y="60" width="36" height="22" rx="3"/><path class="acc" d="M18 96 H142"/>',
+    portfolio: '<circle cx="48" cy="56" r="34"/><path d="M48 56 V22 M48 56 L78 72"/><path class="acc" d="M48 22 A 34 34 0 0 1 78 72"/><path class="thin" d="M98 92 H150 M98 92 V24"/><path d="M102 82 L116 70 L128 74 L146 46"/>',
     flow: '<rect x="12" y="40" width="34" height="30" rx="3"/><rect x="63" y="40" width="34" height="30" rx="3"/><rect x="114" y="40" width="34" height="30" rx="3"/><path d="M46 55 H63 M97 55 H114"/><path class="acc" d="M28 86 C 60 104, 100 104, 132 86"/>'
   };
 

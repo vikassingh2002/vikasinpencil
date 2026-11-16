@@ -48,6 +48,7 @@ NB.shelves = {
     { key: "india", family: "threads", label: "India", short: "India", color: "#D9822B", thread: true }
   ],
   books: {
+    "genius-makers": ["tech", "lives"],       // Genius Makers, Metz (added by hand while the Goodreads sync is down)
     // ---------- Fantasy ----------
     "68428": ["fantasy"],                    // Mistborn: The Final Empire, Sanderson
     "68429": ["fantasy"],                    // The Well of Ascension

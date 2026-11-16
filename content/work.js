@@ -13,6 +13,9 @@
    journey   the line on the home page, oldest first. state is
              "done", "now" or "next".
 
+   earlier   internships and college projects shown under "Earlier work"
+             on Work. drawing: org, portfolio (or any drawing above).
+
    summary   one sentence for an experiment from content/experiments.js
              that is shown on Work (by its id, e.g. "E-04").
    ============================================================= */
@@ -46,6 +49,25 @@ NB.work = {
       text: "A small app for a local book club: what members are reading, ratings and meet-ups.",
       drawing: "club",
       link: "/bookclub/"
+    }
+  ],
+  // Earlier projects: internships and college projects, newest first.
+  earlier: [
+    {
+      id: "dvc",
+      title: "Redesigning performance management at Damodar Valley Corporation",
+      org: "Damodar Valley Corporation · MBA project",
+      year: "2025",
+      text: "Led a five-person team redesigning the performance management system for 5,243 employees across 34 departments, built on 136 key performance areas mapped from 200+ employee conversations at four plants and offices.",
+      drawing: "org"
+    },
+    {
+      id: "bajaj",
+      title: "Portfolio analysis for private-wealth clients",
+      org: "Bajaj Capital · Global Private Wealth intern",
+      year: "Apr–Jun 2025",
+      text: "Analysed asset allocation and risk-return trade-offs to rebalance portfolios against benchmarks, and drafted investment proposals for high-net-worth clients.",
+      drawing: "portfolio"
     }
   ],
   journey: [
