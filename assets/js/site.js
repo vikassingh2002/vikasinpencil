@@ -50,8 +50,6 @@
   function block(title, more, body, id) {
     return '<section class="block"' + (id ? ' id="' + id + '"' : '') + '><div class="block-head"><h2>' + title + '</h2>' + (more ? '<a href="' + more[0] + '" data-sheet>' + more[1] + ' →</a>' : '') + '</div>' + body + '</section>';
   }
-  // A small white chip holding an organisation's logo, so logos look alike in light and dark mode.
-  function logo(file, name, size) { return file ? '<span class="logo' + (size ? ' ' + size : '') + '"><img src="/assets/img/logos/' + esc(file) + '" alt="' + esc(String(name || '').split(' · ')[0]) + ' logo" loading="lazy"></span>' : ''; }
   function steps(x) { var s = x.steps || [], d = s.filter(function (y) { return y.state === 'done'; }).length; return { done: d, total: s.length }; }
   function expStatus(x) { var st = steps(x); return x.status === 'done' ? 'live' : x.status === 'active' || st.done ? 'building' : 'idea'; }
   var LABEL = { live: 'Live', building: 'Building', idea: 'On the drawing board' };
@@ -117,14 +115,14 @@
       '<h1>I sketch ideas, then <em>build them</em>.</h1><p class="lede">' + esc((S.coverLines || []).join(' ')) + '</p>' +
       '<div class="cta"><a class="btn dark" href="/work.html" data-sheet>See the work</a><a class="btn" href="/library.html" data-sheet>The library</a></div></div>' +
       '<div class="hero-art">' + Sketch.svg('home', '0 0 360 280', 'hero', 'A line drawing of a workbench with a lamp and a half-drawn part') + '</div></section>' +
-      block('The journey so far', null, '<ol class="journey">' + W.journey.map(function (j) { return '<li class="stop st-' + j.state + '"><span class="when">' + esc(j.when) + '</span><h3>' + esc(j.title) + '</h3><p>' + esc(j.text) + '</p>' + (j.logo ? logo(j.logo, j.title, 'sm') : '') + '</li>'; }).join('') + '</ol>') +
+      block('The journey so far', null, '<ol class="journey">' + W.journey.map(function (j) { return '<li class="stop st-' + j.state + '"><span class="when">' + esc(j.when) + '</span><h3>' + esc(j.title) + '</h3><p>' + esc(j.text) + '</p>' + '</li>'; }).join('') + '</ol>') +
       block('Selected work', ['/work.html', 'All work'], '<div class="grid3">' + allProjects.filter(function (p) { return p.status === 'live'; }).slice(0, 3).map(function (p) { return projCard(p); }).join('') + '</div>');
   } else if (page === 'work') {
     var shown = allProjects.filter(function (p) { return p.status !== 'idea' || (p.exp && p.exp.featured); });
     main = sheetHead('02', 'Work', esc(W.intro), 'work') +
       '<div class="projects">' + shown.map(function (p) { return projCard(p); }).join('') + '</div>' +
       ((W.earlier || []).length ? block('Earlier work', null, '<div class="projects">' + W.earlier.map(function (e) {
-        return '<article class="card proj is-live earlier" id="' + esc(e.id) + '"><div class="proj-art">' + (e.logo ? logo(e.logo, e.org, 'lg') : Sketch.svg(e.drawing, '0 0 160 110', 'mini', '')) + '</div>' +
+        return '<article class="card proj is-live earlier" id="' + esc(e.id) + '"><div class="proj-art">' + Sketch.svg(e.drawing, '0 0 160 110', 'mini', '') + '</div>' +
           '<div class="proj-body"><p class="org">' + esc(e.org) + ' · ' + esc(e.year) + '</p><h3>' + esc(e.title) + '</h3><p>' + md(e.text) + '</p>' +
           (e.link ? '<a class="go" href="' + esc(e.link) + '" rel="noopener">' + esc(e.linkText || 'See the work') + ' →</a>' : '') + '</div></article>';
       }).join('') + '</div>', 'earlier') : '');

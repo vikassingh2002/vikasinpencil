@@ -1,13 +1,11 @@
-# Copies your Goodreads shelves into content/books.js every morning, and
-# looks up any new links in the log of content/references.js (films,
-# articles, videos, podcasts) for their titles and pictures.
-# Nothing to do day to day: read, rate and review on Goodreads as usual.
-# To sync right now: GitHub -> Actions -> "Sync Goodreads" -> Run workflow.
+# Copies your Goodreads shelves into content/books.js and looks up any new
+# links in the log of content/references.js for their titles and pictures.
+# It no longer runs on a schedule (the Goodreads profile is private, and
+# the library is updated by hand on request). To run it anyway:
+# GitHub -> Actions -> "Sync Goodreads" -> Run workflow.
 name: Sync Goodreads
 
 on:
-  schedule:
-    - cron: "30 0 * * *" # 06:00 India time, every day
   workflow_dispatch:
 
 permissions:
