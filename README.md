@@ -179,8 +179,8 @@ The rules are in the database (`supabase/bookclub.sql`), not the page:
 
 1. **Supabase → SQL Editor:** paste all of `supabase/bookclub.sql` and press **Run**. This makes you (the desk owner) the club's first admin, named Vikas, and puts the 32 starting books on the shelf as yours.
 2. **Authentication → Sign In / Providers:** turn **Allow new users to sign up** on. Members sign in with a code sent to their email, and their first sign-in creates their account. This is safe: an uninvited person who signs up sees only the public shelf, and the desk still only lets the owner in. (If you'd rather keep sign-ups off, also add each member under **Authentication → Users → Add user**, with "Auto Confirm User" ticked.)
-3. **Authentication → Emails:** in both the **Magic Link** and **Confirm signup** templates, add the code to the message, for example `<p>Your code: <strong>{{ .Token }}</strong></p>`. Members type the code into the app, which works even when the app is installed on their phone.
-4. **Authentication → URL Configuration → Redirect URLs:** add `https://vikasinpencil.com/bookclub/`, so the link in the email also works.
+3. **Emails:** members get Supabase's standard sign-in email, which holds a link. Tapping it brings them back to the club, signed in. (Supabase only allows editing the email, for example to add a typed code with `{{ .Token }}`, once you connect your own email service under **Authentication → Emails → SMTP Settings**. The app already has a box for a code if you do.)
+4. **Authentication → URL Configuration:** set **Site URL** to `https://vikasinpencil.com` and add `https://vikasinpencil.com/bookclub/` under **Redirect URLs**, so the link in the email opens the club.
 5. Publish (merge the `bookclub` branch into `main`). Open the club, sign in with your email, and check the shelf.
 
 **Email limit:** Supabase's built-in email sends only a few emails an hour per project. Each member signs in once per device and stays signed in, so that's usually fine. If codes stop arriving when several people join at once, wait an hour, or connect a free email service (such as Resend or Brevo) under **Authentication → Emails → SMTP Settings**.
@@ -188,7 +188,7 @@ The rules are in the database (`supabase/bookclub.sql`), not the page:
 ### Adding a member
 
 1. In the app: **Members → Invite someone**, with their name and the email they'll use.
-2. Tap **Send link** to share the address on WhatsApp. They open it, sign in with that email, and they're in.
+2. Tap **Send link** to share the address on WhatsApp. They open it, enter that email, tap the link Supabase emails them, and they're in.
 
 ### On phones
 

@@ -57,7 +57,7 @@ create table if not exists public.bc_books (
   id bigint generated always as identity primary key,
   title text not null check (length(btrim(title)) between 1 and 200),
   author text not null default '' check (length(author) <= 200),
-  cover text check (cover is null or cover ~ '^(covers/[a-z0-9.-]+|https://[^[:space:]"''<>]{1,500})$'),
+  cover text check (cover is null or (length(cover) <= 500 and cover ~ '^(covers/[a-z0-9.-]+|https://[^[:space:]"''<>]+)$')),
   isbn text check (isbn is null or isbn ~ '^[0-9Xx]{10,13}$'),
   pages int check (pages is null or pages between 1 and 10000),
   year int check (year is null or year between 0 and 2100),

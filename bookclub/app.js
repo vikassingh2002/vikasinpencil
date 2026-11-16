@@ -873,7 +873,7 @@
       else if (invites.length) {
         h += '<h2 style="font-size:18px;margin-top:20px">Invited, not signed in yet</h2><ul class="list panel" style="padding:6px 18px">' + invites.map(function (i) {
           return '<li><div><b>' + esc(i.name) + '</b> <span class="small muted">' + esc(i.email) + '</span></div><span class="when" style="display:flex;gap:6px">' +
-            waButton('Hi ' + i.name + '! You’re invited to the Ambernath Book Club app. Open ' + location.origin + '/bookclub/ and sign in with ' + i.email + '. You’ll get a code by email.', 'Send link') +
+            waButton('Hi ' + i.name + '! You’re invited to the Ambernath Book Club app. Open ' + location.origin + '/bookclub/ and sign in with ' + i.email + '. You’ll get a sign-in link by email.', 'Send link') +
             '<button class="btn small ghost danger" data-act="uninvite" data-email="' + esc(i.email) + '">Remove</button></span></li>';
         }).join('') + '</ul>';
       }
@@ -915,15 +915,16 @@
     var s = S.signin;
     if (S.session && S.joined && !S.me) { location.replace('#/'); return ''; }
     if (s.step === 'code') {
-      return '<div class="signin panel"><h1>Check your email</h1><p class="muted">We sent a sign-in code to <b>' + esc(s.email) + '</b>. Type it here, or tap the link in the email on this device.</p>' +
-        '<form class="form" id="code-form"><div class="field"><label for="code">Code</label><input id="code" name="code" class="code-input" inputmode="numeric" autocomplete="one-time-code" required pattern="[0-9]{6,10}" maxlength="10"></div>' +
-        '<p class="err" id="signin-err" hidden></p><button class="btn primary" type="submit">Sign in</button></form>' +
-        '<div class="actions"><button class="btn small ghost" data-act="signin-back">Use a different email</button><button class="btn small ghost" data-act="resend">Send a new code</button></div>' +
+      return '<div class="signin panel"><h1>Check your email</h1><p class="muted">We sent a sign-in link to <b>' + esc(s.email) + '</b>. Open the email on this phone or computer and tap the link: it brings you straight back here, signed in.</p>' +
+        '<details style="margin-bottom:14px"><summary class="small muted">The email has a code instead?</summary>' +
+        '<form class="form" id="code-form" style="margin-top:10px"><div class="field"><label for="code">Code</label><input id="code" name="code" class="code-input" inputmode="numeric" autocomplete="one-time-code" required pattern="[0-9]{6,10}" maxlength="10"></div>' +
+        '<p class="err" id="signin-err" hidden></p><button class="btn primary" type="submit">Sign in</button></form></details>' +
+        '<div class="actions"><button class="btn small ghost" data-act="signin-back">Use a different email</button><button class="btn small ghost" data-act="resend">Send a new link</button></div>' +
         '<p class="small muted">Nothing arrived? Check spam, and give it a minute.</p></div>';
     }
-    return '<div class="signin panel"><h1>Members sign in</h1><p class="muted">Use the email you gave the club. We’ll email you a code: no password to remember.</p>' +
+    return '<div class="signin panel"><h1>Members sign in</h1><p class="muted">Use the email you gave the club. We’ll email you a sign-in link: no password to remember.</p>' +
       '<form class="form" id="email-form"><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required value="' + esc(s.email) + '"></div>' +
-      '<p class="err" id="signin-err" hidden></p><button class="btn primary" type="submit">Email me a code</button></form>' +
+      '<p class="err" id="signin-err" hidden></p><button class="btn primary" type="submit">Email me a link</button></form>' +
       '<p class="small muted" style="margin-top:14px">Not a member yet? Come along on a Sunday and ask Vikas to add you.</p></div>';
   }
 
@@ -971,7 +972,7 @@
       var b = emailForm.querySelector('button'); b.disabled = true; b.textContent = 'Sending…';
       var email = emailForm.email.value.trim().toLowerCase();
       S.signin.email = email;
-      if (await sendCode(email)) render(); else { b.disabled = false; b.textContent = 'Email me a code'; }
+      if (await sendCode(email)) render(); else { b.disabled = false; b.textContent = 'Email me a link'; }
     });
     var codeForm = document.getElementById('code-form');
     if (codeForm) codeForm.addEventListener('submit', async function (e) {
@@ -1008,7 +1009,7 @@
         return;
       case 'recheck': S.joined = false; await refresh(); if (!S.me) toast('Still not on the list. Ask Vikas to add ' + S.session.user.email + '.', true); return;
       case 'signin-back': S.signin = { step: 'email', email: S.signin.email }; render(); return;
-      case 'resend': el.disabled = true; if (await sendCode(S.signin.email)) toast('New code sent.'); el.disabled = false; return;
+      case 'resend': el.disabled = true; if (await sendCode(S.signin.email)) toast('New link sent.'); el.disabled = false; return;
       case 'rename': {
         var fd = await ask({ title: 'Your name', ok: 'Save', body: '<div class="field"><label for="f-name">How members see you</label><input id="f-name" name="name" required maxlength="60" value="' + esc(S.me.name) + '"></div>' });
         if (!fd) return;
