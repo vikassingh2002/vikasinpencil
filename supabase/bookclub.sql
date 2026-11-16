@@ -403,3 +403,64 @@ select s.title, s.author, s.cover, s.pages, s.year, o.id, o.id
   ) as s (title, author, cover, pages, year)
   cross join (select id from public.desk_owner limit 1) o
  where not exists (select 1 from public.bc_books b where b.title = s.title and b.owner_id = o.id);
+
+-- 10. Genres and Open Library links (added 16 Nov 2026) ----------------------
+-- genres: keys from the site's own genre list (content/shelves.js).
+-- ol_work: the book's Open Library work, which the app uses to show its
+-- description and rating. Both are optional; owners can change genres.
+
+alter table public.bc_books add column if not exists genres text[] not null default '{}';
+alter table public.bc_books add column if not exists ol_work text;
+
+alter table public.bc_books drop constraint if exists bc_books_genres_known;
+alter table public.bc_books add constraint bc_books_genres_known check (
+  genres <@ array['fantasy', 'paranormal', 'scifi', 'horror', 'thriller', 'literary', 'classics', 'comingofage',
+                  'romance', 'myth', 'history', 'war', 'lives', 'science', 'tech', 'money', 'mind', 'philosophy',
+                  'craft', 'india']::text[]
+  and cardinality(genres) <= 5);
+alter table public.bc_books drop constraint if exists bc_books_ol_work_shape;
+alter table public.bc_books add constraint bc_books_ol_work_shape check (ol_work is null or ol_work ~ '^/works/OL[0-9]+W$');
+
+grant insert (genres, ol_work), update (genres, ol_work) on public.bc_books to authenticated;
+
+-- The starting 32: genres chosen by hand, works matched by hand. Only fills
+-- books that have no genres or work yet, so it never overwrites a member's edits.
+update public.bc_books b
+   set genres = case when cardinality(b.genres) = 0 then s.genres::text[] else b.genres end,
+       ol_work = coalesce(b.ol_work, s.ol_work)
+  from (values
+    ('Verity', '{thriller}', '/works/OL20068530W'),
+    ('Sapiens: A Brief History of Humankind', '{history,science}', '/works/OL17075811W'),
+    ('The Girl in Room 105', '{thriller,romance,india}', '/works/OL20764592W'),
+    ('Autobiography of a Yogi', '{lives,philosophy,india}', '/works/OL528094W'),
+    ('1984', '{classics,scifi}', '/works/OL1168083W'),
+    ('Sputnik Sweetheart', '{literary,romance}', '/works/OL2625443W'),
+    ('Harry Potter and the Order of the Phoenix', '{fantasy,comingofage}', '/works/OL82548W'),
+    ('Skeleton Crew', '{horror}', '/works/OL81627W'),
+    ('The Hunger Games', '{scifi,comingofage}', '/works/OL5735363W'),
+    ('Kafka on the Shore', '{literary,fantasy}', '/works/OL2625431W'),
+    ('Catching Fire', '{scifi,comingofage}', '/works/OL5735360W'),
+    ('The Personal MBA', '{money}', '/works/OL15473892W'),
+    ('Mindset', '{mind}', '/works/OL2003465W'),
+    ('The Metamorphosis', '{classics}', '/works/OL498556W'),
+    ('Frankenstein', '{classics,horror,scifi}', '/works/OL450063W'),
+    ('Calling Sehmat', '{thriller,war,india}', '/works/OL20670981W'),
+    ('Crime and Punishment', '{classics}', '/works/OL166894W'),
+    ('Flow', '{mind}', '/works/OL278571W'),
+    ('A Wild Sheep Chase', '{literary}', '/works/OL2625441W'),
+    ('The Picture of Dorian Gray', '{classics}', '/works/OL8193416W'),
+    ('What I Talk About When I Talk About Running', '{lives}', '/works/OL2625422W'),
+    ('White Nights', '{classics,romance}', '/works/OL166952W'),
+    ('And Then There Were None', '{thriller,classics}', '/works/OL471565W'),
+    ('Man''s Search for Meaning', '{philosophy,lives,mind}', '/works/OL1268413W'),
+    ('The Psychology of Money', '{money,mind}', '/works/OL21640039W'),
+    ('Desperation', '{horror}', '/works/OL81611W'),
+    ('Insomnia', '{horror,fantasy}', '/works/OL81603W'),
+    ('The Street Lawyer', '{thriller}', '/works/OL77014W'),
+    ('Meditations', '{philosophy,classics}', '/works/OL1317211W'),
+    ('The Subtle Art of Not Giving a F*ck', '{mind}', '/works/OL17590212W'),
+    ('Show Your Work!', '{craft}', '/works/OL16821630W'),
+    ('The Da Vinci Code', '{thriller}', '/works/OL76837W')
+  ) as s (title, genres, ol_work)
+ where b.title = s.title
+   and b.owner_id in (select id from public.desk_owner);

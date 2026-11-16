@@ -21,6 +21,7 @@
     q: '',
     filter: 'all',
     sort: 'title',
+    genre: '',
     signin: { step: 'email', email: '' },
     lastLoad: 0
   };
@@ -28,7 +29,7 @@
   var ACTIVE = ['approved', 'out', 'returning'];
   var OPEN = ['requested', 'approved', 'out', 'returning'];
   var FILTER_KEY = 'bookclub-shelf';
-  try { var saved = JSON.parse(localStorage.getItem(FILTER_KEY) || '{}'); if (saved.filter) S.filter = saved.filter; if (saved.sort) S.sort = saved.sort; } catch (e) { /* private window */ }
+  try { var saved = JSON.parse(localStorage.getItem(FILTER_KEY) || '{}'); if (saved.filter) S.filter = saved.filter; if (saved.sort) S.sort = saved.sort; if (saved.genre) S.genre = saved.genre; } catch (e) { /* private window */ }
 
   /* ---------------------------------------------------------------- helpers */
 
@@ -180,6 +181,134 @@
     });
   }
 
+  /* ---------------------------------------------------------------- genres */
+
+  // Same keys as the site's References shelves (content/shelves.js).
+  var GENRES = [
+    ['literary', 'Literary fiction'], ['classics', 'Classics'], ['thriller', 'Thriller & mystery'], ['horror', 'Horror'],
+    ['fantasy', 'Fantasy'], ['scifi', 'Sci-fi & dystopia'], ['romance', 'Romance'], ['comingofage', 'Coming-of-age'],
+    ['myth', 'Myths & retellings'], ['paranormal', 'Paranormal'], ['history', 'History'], ['war', 'War & the military'],
+    ['lives', 'Biography & memoir'], ['science', 'Science'], ['tech', 'Technology & AI'], ['money', 'Business & money'],
+    ['mind', 'Mind & self-help'], ['philosophy', 'Philosophy & meaning'], ['craft', 'Writing & creativity'], ['india', 'India']
+  ];
+  var GENRE_LABEL = {}; GENRES.forEach(function (g) { GENRE_LABEL[g[0]] = g[1]; });
+  var GENRE_RULES = [
+    ['fantasy', /fantasy|magic|wizard|dragon/], ['scifi', /science fiction|dystopi|space opera/], ['horror', /horror|supernatural|ghost stor/],
+    ['thriller', /thriller|mystery|detective|suspense|crime fiction|murder/], ['romance', /romance|love stor/], ['classics', /classic/],
+    ['comingofage', /coming of age|young adult|juvenile fiction|teen/], ['myth', /mytholog|retelling/], ['war', /\bwar\b|military|espionage|spies/],
+    ['lives', /biograph|memoir/], ['money', /business|finance|money|economics|management|entrepreneur|invest/],
+    ['mind', /self-help|self help|psycholog|habit|success|motivation|happiness|productivity/],
+    ['philosophy', /philosoph|stoic|ethics|spiritual|meaning of life/], ['craft', /authorship|creative writing|poetry|creativity/],
+    ['tech', /computer|technolog|artificial intelligence|programming|internet/], ['india', /\bindia/]
+  ];
+  // Open Library's subject tags are messy; turn them into up to three of ours.
+  function guessGenres(subjects) {
+    var subj = (subjects || []).slice(0, 60).map(function (x) { return String(x).toLowerCase(); });
+    var score = {};
+    function add(k) { score[k] = (score[k] || 0) + 1; }
+    subj.forEach(function (x) {
+      GENRE_RULES.forEach(function (r) { if (r[1].test(x)) add(r[0]); });
+      if (/\bhistory\b/.test(x) && !/fiction/.test(x)) add('history');
+      if (/\bscience\b/.test(x) && !/fiction/.test(x)) add('science');
+    });
+    var keys = Object.keys(score).sort(function (a, b) { return score[b] - score[a]; }).slice(0, 3);
+    var stories = ['fantasy', 'scifi', 'horror', 'thriller', 'romance', 'classics', 'comingofage', 'myth', 'paranormal'];
+    var ideas = ['lives', 'money', 'mind', 'philosophy', 'history', 'science', 'tech'];
+    var isFiction = subj.some(function (x) { return /\bfiction\b/.test(x); });
+    if (isFiction && !keys.some(function (k) { return stories.indexOf(k) >= 0 || ideas.indexOf(k) >= 0; })) keys.unshift('literary');
+    return keys.slice(0, 3);
+  }
+  function genreChips(b) {
+    var g = (b.genres || []).filter(function (k) { return GENRE_LABEL[k]; });
+    if (!g.length) return '';
+    return '<div class="genres">' + g.map(function (k) {
+      return '<a class="gchip" href="#/" data-act="genre" data-genre="' + k + '">' + esc(GENRE_LABEL[k]) + '</a>';
+    }).join('') + '</div>';
+  }
+
+  // Description and rating, fetched when a book page opens (Open Library, then Wikipedia).
+  var DETAILS = {};
+  function cleanDesc(t) {
+    t = String(t || '').replace(/\r/g, '');
+    t = t.split(/\n\s*(?:-{3,}|\*{3,}|_{3,})/)[0];
+    t = t.replace(/\[([^\]]+)\]\[\d+\]/g, '$1').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/^\s*\[\d+\]:.*$/gm, '').replace(/\(\s*source:[^)]*\)/gi, '')
+      .replace(/^\s*from wikipedia:?\s*/i, '')
+      .replace(/\\([[\]*_])/g, '$1')
+      // "(Russian: ..., tr. ...; IPA: [...])" and similar original-language asides
+      .replace(/\s*\((?:Russian|Japanese|German|French|Greek|Latin|Spanish|Italian|Hindi|Ancient Greek|Koine Greek)\s*:[^()]*(?:\([^()]*\)[^()]*)*\)/g, '')
+      .replace(/\n{3,}/g, '\n\n');
+    return t.trim();
+  }
+  function looksEnglish(t) { return t && (t.match(/[a-z]/gi) || []).length / t.length > 0.6; }
+  async function details(b) {
+    var key = b.id + '|' + (b.ol_work || '') + '|' + b.title;
+    if (DETAILS[key]) return DETAILS[key];
+    var d = { desc: '', source: '', sourceUrl: '', rating: null, count: 0, work: b.ol_work || null };
+    try {
+      if (!d.work) {
+        var found = await fetchJSON('https://openlibrary.org/search.json?limit=1&fields=key&q=' + encodeURIComponent(b.title + ' ' + (b.author || '')));
+        d.work = found.docs && found.docs[0] && found.docs[0].key || null;
+      }
+      if (d.work && /^\/works\/OL\d+W$/.test(d.work)) {
+        var both = await Promise.all([
+          fetchJSON('https://openlibrary.org' + d.work + '.json').catch(function () { return null; }),
+          fetchJSON('https://openlibrary.org' + d.work + '/ratings.json').catch(function () { return null; })
+        ]);
+        var w = both[0], r = both[1];
+        var text = w && w.description ? cleanDesc(typeof w.description === 'string' ? w.description : w.description.value) : '';
+        if (text.length >= 120 && looksEnglish(text)) { d.desc = text; d.source = 'Open Library'; d.sourceUrl = 'https://openlibrary.org' + d.work; }
+        if (r && r.summary && r.summary.count) { d.rating = r.summary.average; d.count = r.summary.count; }
+      }
+    } catch (e) { /* try Wikipedia */ }
+    if (d.desc.length < 300) {   // none, or only a line: see if Wikipedia says more
+      try {
+        var short = String(b.title).split(':')[0].trim();
+        var last = String(b.author || '').split(/[ ,]+/).filter(Boolean).pop() || '';
+        var sr = await fetchJSON('https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=6&srsearch=' + encodeURIComponent(short + ' ' + last + ' book'));
+        var want = norm(short);
+        var page = ((sr.query && sr.query.search) || []).find(function (pg) { return norm(pg.title).indexOf(want) === 0; });
+        if (page) {
+          var sum = await fetchJSON('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(page.title.replace(/ /g, '_')));
+          if (sum && sum.extract && sum.type !== 'disambiguation' && sum.extract.length > Math.max(80, d.desc.length)) {
+            sum.extract = cleanDesc(sum.extract);
+            d.desc = sum.extract; d.source = 'Wikipedia';
+            d.sourceUrl = (sum.content_urls && sum.content_urls.desktop && sum.content_urls.desktop.page) || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(page.title));
+          }
+        }
+      } catch (e) { /* no description */ }
+    }
+    DETAILS[key] = d;
+    return d;
+  }
+  function stars(avg) {
+    var full = Math.round(avg * 2) / 2, h = '';
+    for (var i = 1; i <= 5; i++) h += '<span class="star' + (full >= i ? ' on' : full >= i - 0.5 ? ' half' : '') + '">★</span>';
+    return '<span class="stars" aria-hidden="true">' + h + '</span>';
+  }
+  function goodreadsUrl(b) { return 'https://www.goodreads.com/search?q=' + encodeURIComponent(b.isbn || (b.title + ' ' + (b.author || ''))); }
+  async function paintAbout(b) {
+    var box = document.getElementById('about');
+    if (!box) return;
+    var d = await details(b);
+    box = document.getElementById('about');
+    if (!box || box.dataset.book !== String(b.id)) return;   // the reader moved on
+    var h = '<h2>About this book</h2>';
+    if (d.count >= 3) h += '<p class="rating">' + stars(d.rating) + '<b>' + d.rating.toFixed(1) + '</b> out of 5 <span class="muted">· ' + d.count + ' ratings on Open Library</span></p>';
+    if (d.desc) {
+      var paras = d.desc.split(/\n\s*\n/).map(function (x) { return '<p>' + esc(x.trim()).replace(/\n/g, '<br>') + '</p>'; }).join('');
+      var long = d.desc.length > 650;
+      h += '<div class="desc' + (long ? ' clamp' : '') + '">' + paras + '</div>' +
+        (long ? '<button class="btn small ghost" data-act="more" type="button">Read more</button>' : '') +
+        '<p class="small muted">From <a href="' + esc(d.sourceUrl) + '" target="_blank" rel="noopener">' + esc(d.source) + '</a></p>';
+    } else {
+      h += '<p class="muted">No description found yet.</p>';
+    }
+    h += '<div class="actions" style="margin-top:8px"><a class="btn small" href="' + esc(goodreadsUrl(b)) + '" target="_blank" rel="noopener">Reviews on Goodreads</a>' +
+      (d.work ? '<a class="btn small ghost" href="https://openlibrary.org' + esc(d.work) + '" target="_blank" rel="noopener">Open Library</a>' : '') + '</div>';
+    box.innerHTML = h;
+  }
+
   /* ---------------------------------------------------------------- data */
 
   async function loadAll() {
@@ -325,7 +454,8 @@
       if (S.filter === 'out' && ['out', 'late', 'wait'].indexOf(st.kind) < 0) return false;
       if (S.filter === 'mine' && !isMine(b)) return false;
       if (S.filter === 'holding' && !(st.holder === S.me.id && !isMine(b))) return false;
-      if (q && norm(b.title + ' ' + b.author + ' ' + name(b.owner_id)).indexOf(q) < 0) return false;
+      if (S.genre && (b.genres || []).indexOf(S.genre) < 0) return false;
+      if (q && norm(b.title + ' ' + b.author + ' ' + name(b.owner_id) + ' ' + (b.genres || []).map(function (k) { return GENRE_LABEL[k] || ''; }).join(' ')).indexOf(q) < 0) return false;
       return true;
     });
     var key = {
@@ -357,6 +487,7 @@
       '<div class="toolbar">' +
       '<label class="search">' + ICONS.search + '<input id="q" type="search" placeholder="Search titles, authors, owners" value="' + esc(S.q) + '" autocomplete="off" aria-label="Search the shelf"></label>' +
       '<div class="chips" id="chips"></div>' +
+      '<label class="sort"><select id="genre" aria-label="Genre"></select></label>' +
       '<label class="sort"><span class="sr-only" hidden>Sort</span><select id="sort" aria-label="Sort">' +
       [['title', 'A–Z'], ['author', 'By author'], ['owner', 'By owner'], ['newest', 'Newest']].map(function (o) {
         return '<option value="' + o[0] + '"' + (S.sort === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
@@ -366,6 +497,12 @@
 
   function renderShelfParts() {
     var c = counts();
+    var gcount = {};
+    S.books.forEach(function (b) { (b.genres || []).forEach(function (k) { gcount[k] = (gcount[k] || 0) + 1; }); });
+    if (S.genre && !gcount[S.genre]) S.genre = '';
+    document.getElementById('genre').innerHTML = '<option value="">All genres</option>' + GENRES.filter(function (g) { return gcount[g[0]]; }).map(function (g) {
+      return '<option value="' + g[0] + '"' + (S.genre === g[0] ? ' selected' : '') + '>' + esc(g[1]) + ' (' + gcount[g[0]] + ')</option>';
+    }).join('');
     var chips = [['all', 'All'], ['available', 'Available'], ['out', 'Borrowed'], ['mine', 'My books']];
     if (c.holding) chips.push(['holding', 'With me']);
     document.getElementById('chips').innerHTML = chips.map(function (ch) {
@@ -396,8 +533,9 @@
       S.filter = btn.dataset.filter; remember(); renderShelfParts();
     });
     document.getElementById('sort').addEventListener('change', function (e) { S.sort = e.target.value; remember(); renderShelfParts(); });
+    document.getElementById('genre').addEventListener('change', function (e) { S.genre = e.target.value; remember(); renderShelfParts(); });
   }
-  function remember() { try { localStorage.setItem(FILTER_KEY, JSON.stringify({ filter: S.filter, sort: S.sort })); } catch (e) { /* fine */ } }
+  function remember() { try { localStorage.setItem(FILTER_KEY, JSON.stringify({ filter: S.filter, sort: S.sort, genre: S.genre })); } catch (e) { /* fine */ } }
 
   /* ---------------------------------------------------------------- book page */
 
@@ -418,12 +556,13 @@
     var h = '<a class="back" href="#/">' + ICONS.back + 'Shelf</a>' +
       '<article class="book">' + coverHTML(b) + '<div>' +
       '<h1>' + esc(b.title) + '</h1>' + (b.author ? '<div class="by">' + esc(b.author) + '</div>' : '') +
-      '<div class="facts">' + facts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' +
+      '<div class="facts">' + facts.map(function (f) { return '<span>' + esc(f) + '</span>'; }).join('') + '</div>' + genreChips(b) +
       '<div class="where"><div><div class="k">Belongs to</div><div class="v">' + esc(Name(owner)) + '</div><div class="s">' + (owner === me ? 'Your book' : 'Club member') + '</div></div>' +
       '<div><div class="k">Where it is now</div><div class="v' + whereCls + '">' + esc(whereV) + '</div><div class="s">' + esc(whereS) + '</div></div></div>' +
       (b.note ? '<p class="note">' + esc(b.note) + '</p>' : '');
 
     h += '<div class="actions">' + actionsFor(b, st, myOpen) + '</div>';
+    h += '<section class="section about" id="about" data-book="' + b.id + '"><h2>About this book</h2><p class="muted">Looking it up…</p></section>';
 
     // Requests waiting for the owner (they decide here).
     if (canManage(b) && queue.length) {
@@ -619,6 +758,11 @@
     b = b || {};
     return '<div class="field"><label for="f-title">Title</label><input id="f-title" name="title" required maxlength="200" value="' + esc(b.title) + '"></div>' +
       '<div class="field"><label for="f-author">Author</label><input id="f-author" name="author" maxlength="200" value="' + esc(b.author) + '"></div>' +
+      '<div class="field"><span class="label">Genres <span class="muted small" style="font-weight:400">pick up to 3</span></span><div class="genre-pick">' +
+      GENRES.map(function (g) {
+        return '<label><input type="checkbox" name="genre" value="' + g[0] + '"' + ((b.genres || []).indexOf(g[0]) >= 0 ? ' checked' : '') + '><span>' + esc(g[1]) + '</span></label>';
+      }).join('') + '</div></div>' +
+      '<input type="hidden" name="ol_work" value="' + esc(b.ol_work || '') + '">' +
       '<div class="row"><div class="field"><label for="f-year">Year</label><input id="f-year" name="year" inputmode="numeric" pattern="[0-9]{1,4}" value="' + esc(b.year || '') + '"></div>' +
       '<div class="field"><label for="f-pages">Pages</label><input id="f-pages" name="pages" inputmode="numeric" pattern="[0-9]{1,5}" value="' + esc(b.pages || '') + '"></div></div>' +
       '<div class="field"><label for="f-note">Note for borrowers</label><textarea id="f-note" name="note" maxlength="500" placeholder="Condition, edition, signed copy, “please don’t fold the pages”…">' + esc(b.note || '') + '</textarea></div>' +
@@ -641,7 +785,9 @@
       pages: num(fd.get('pages')),
       note: String(fd.get('note') || '').trim().slice(0, 500) || null,
       cover: cover || fd.get('cover_keep') || null,
-      isbn: isbn.length === 10 || isbn.length === 13 ? isbn : null
+      isbn: isbn.length === 10 || isbn.length === 13 ? isbn : null,
+      genres: fd.getAll('genre').filter(function (k) { return GENRE_LABEL[k]; }).slice(0, 5),
+      ol_work: /^\/works\/OL\d+W$/.test(String(fd.get('ol_work') || '')) ? String(fd.get('ol_work')) : null
     };
   }
 
@@ -707,13 +853,14 @@
         year: v.publishedDate ? Number(String(v.publishedDate).slice(0, 4)) || null : null,
         pages: v.pageCount || null,
         isbn: cleanIsbn(isbn) || null,
-        cover: img && /^https:\/\//.test(img) ? img : (isbn ? 'https://covers.openlibrary.org/b/isbn/' + cleanIsbn(isbn) + '-M.jpg?default=false' : null)
+        cover: img && /^https:\/\//.test(img) ? img : (isbn ? 'https://covers.openlibrary.org/b/isbn/' + cleanIsbn(isbn) + '-M.jpg?default=false' : null),
+        genres: guessGenres(v.categories)
       };
     }).filter(function (r) { return r.title; });
   }
 
   async function openLibrary(q, isbn) {
-    var url = 'https://openlibrary.org/search.json?limit=12&fields=title,author_name,first_publish_year,number_of_pages_median,cover_i,isbn&' +
+    var url = 'https://openlibrary.org/search.json?limit=12&fields=key,title,author_name,first_publish_year,number_of_pages_median,cover_i,isbn,subject&' +
       (isbn ? 'isbn=' + encodeURIComponent(isbn) : 'q=' + encodeURIComponent(q));
     var d = await fetchJSON(url);
     return (d.docs || []).map(function (x) {
@@ -721,7 +868,9 @@
       return {
         title: x.title || '', author: (x.author_name || []).slice(0, 2).join(', '),
         year: x.first_publish_year || null, pages: x.number_of_pages_median || null, isbn: i || null,
-        cover: x.cover_i ? 'https://covers.openlibrary.org/b/id/' + x.cover_i + '-M.jpg' : null
+        cover: x.cover_i ? 'https://covers.openlibrary.org/b/id/' + x.cover_i + '-M.jpg' : null,
+        ol_work: /^\/works\/OL\d+W$/.test(x.key || '') ? x.key : null,
+        genres: guessGenres(x.subject)
       };
     }).filter(function (r) { return r.title; });
   }
@@ -985,6 +1134,7 @@
 
   function wire(r) {
     if (S.me && r.name === 'shelf') wireShelf();
+    if (S.me && r.name === 'book' && book(r.id)) paintAbout(book(r.id));
     if (S.me && r.name === 'members' && S.me.is_admin && invites === null) loadInvites();
     if (r.name !== 'add') stopScan();
 
@@ -1043,7 +1193,7 @@
     if (!el) return;
     if (el.hasAttribute('data-pick')) { pick(addState.results[Number(el.dataset.pick)]); return; }
     var a = el.dataset.act;
-    if (el.tagName === 'A' && a !== 'show-mine' && a !== 'add-reset' && a !== 'manual') return;
+    if (el.tagName === 'A' && a !== 'show-mine' && a !== 'add-reset' && a !== 'manual' && a !== 'genre') return;
     e.preventDefault();
     var r = route();
 
@@ -1060,6 +1210,8 @@
       case 'signin-back': S.signin = { step: 'email', email: S.signin.email }; render(); return;
       case 'resend': el.disabled = true; if (await sendCode(S.signin.email)) toast('New link sent.'); el.disabled = false; return;
       case 'install': install(); return;
+      case 'genre': S.genre = el.dataset.genre; S.filter = 'all'; S.q = ''; remember(); location.hash = '#/'; return;
+      case 'more': { var dsc = view.querySelector('.desc'); if (dsc) dsc.classList.remove('clamp'); el.remove(); return; }
       case 'set-password': {
         var pf = await ask({ title: 'Set a password', ok: 'Save password',
           body: '<p class="muted" style="margin:0">For signing in inside the installed app. Email links still work too.</p>' +
