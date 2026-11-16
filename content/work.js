@@ -13,15 +13,12 @@
    journey   the line on the home page, oldest first. state is
              "done", "now" or "next".
 
-   next      the plans on the home page.
-
-   notes     which notes from content/notes.js appear where:
-             "E-04": [...] shows them under that experiment on Work,
-             "now": [...] shows them at the bottom of Now.
+   summary   one sentence for an experiment from content/experiments.js
+             that is shown on Work (by its id, e.g. "E-04").
    ============================================================= */
 window.NB = window.NB || {};
 NB.work = {
-  intro: "What I have made and what I am building. Ideas start as dashed sketches and are inked in green once they are real. All public or personal material.",
+  intro: "Things I have built, and what I am building next. All made with public or personal material.",
   projects: [
     {
       id: "agentic",
@@ -58,13 +55,7 @@ NB.work = {
     { when: "Since Oct 2026", title: "Building with AI", text: "Agents, experiments and a weekly magazine.", state: "now" },
     { when: "Next", title: "Something of my own", text: "Find out whether something I build can stand on its own.", state: "next" }
   ],
-  next: [
-    { when: "This year", text: "Finish the satellite agent and test it honestly, in public." },
-    { when: "Then", text: "Apply agents to real consulting workflows, using public material." },
-    { when: "Later", text: "See whether something I build can become an independent business." }
-  ],
-  notes: {
-    "E-04": ["N-04", "N-02"],
-    "now": ["N-01", "N-03"]
+  summary: {
+    "E-04": "An agent that spots unusual satellite readings, works out the likely cause and drafts a response for a person to approve."
   }
 };

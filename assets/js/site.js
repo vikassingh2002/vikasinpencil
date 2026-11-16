@@ -1,12 +1,12 @@
-/* vikasinpencil.com: four sheets (Home, Now, Work, Library) drawn from content/*.js.
+/* vikasinpencil.com: three sheets (Home, Work, Library) drawn from content/*.js.
    Each page's drawing is sketched the first time a visitor opens it, then shown finished. */
 (function () {
   'use strict';
-  var NB = window.NB || {}, S = NB.site || {}, T = NB.today || {}, W = NB.work || { projects: [], journey: [], next: [], notes: {} };
-  var X = NB.experiments || [], N = NB.notes || [];
+  var NB = window.NB || {}, S = NB.site || {}, W = NB.work || { projects: [], journey: [], summary: {} };
+  var X = NB.experiments || [];
   var G = (NB.goodreads || {}).books || [], SH = NB.shelves || {}, R = NB.references || {}, M = NB.media || {};
   var page = document.body.getAttribute('data-page') || 'home';
-  var SHEETS = [['home', 'Home', '/'], ['now', 'Now', '/now.html'], ['work', 'Work', '/work.html'], ['library', 'Library', '/library.html']];
+  var SHEETS = [['home', 'Home', '/'], ['work', 'Work', '/work.html'], ['library', 'Library', '/library.html']];
   var idx = Math.max(0, SHEETS.map(function (s) { return s[0]; }).indexOf(page));
 
   var ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -18,12 +18,6 @@
   function month(d) { var p = String(d || '').split('-'); return p.length < 2 ? (d || '') : MON[+p[1] - 1] + ' ' + p[0]; }
   function short(d) { var p = String(d).split('-'); return p.length < 3 ? d : MON[+p[1] - 1] + ' ' + (+p[2]); }
   function stars(n) { return n ? '<span class="stars" aria-label="' + n + ' out of 5 stars">' + '★'.repeat(n) + '<i>' + '★'.repeat(5 - n) + '</i></span>' : ''; }
-
-  // Freshness: the newest dated entry, and how many dated entries there are (the revision number).
-  var dates = [T.date].concat((T.log || []).map(function (l) { return l.date; }), N.map(function (n) { return n.date; })).filter(Boolean).sort();
-  var updated = dates[dates.length - 1], rev = dates.length;
-  var started = (T.log || []).map(function (l) { return l.date; }).sort()[0] || '2026-10-21';
-  var day = Math.max(1, Math.floor((Date.now() - new Date(started + 'T00:00:00').getTime()) / 864e5) + 1);
 
   var drawn = {};
   try { drawn = JSON.parse(localStorage.getItem('vip-drawn') || '{}') || {}; } catch (e) {}
@@ -38,14 +32,14 @@
   };
   function squiggle() { return '<svg class="squiggle" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 5 C 22 2, 48 7, 70 4 S 92 3, 98 4"/></svg>'; }
   var header = '<header class="top"><div class="wrap"><a class="brand" href="/" data-sheet>Vikas <i>in</i> Pencil</a><nav class="main" aria-label="Main">' +
-    SHEETS.slice(1).map(function (s) { return '<a href="' + s[2] + '" data-sheet' + (s[0] === page ? ' aria-current="page"' : '') + '>' + s[1] + (s[0] === page ? squiggle() : '') + '</a>'; }).join('') + '</nav></div></header>';
+    SHEETS.map(function (s) { return '<a href="' + s[2] + '" data-sheet' + (s[0] === page ? ' aria-current="page"' : '') + '>' + s[1] + (s[0] === page ? squiggle() : '') + '</a>'; }).join('') + '</nav></div></header>';
   var tabbar = '<nav class="tabbar" aria-label="Sections">' + SHEETS.map(function (s) {
     return '<a href="' + s[2] + '" data-sheet' + (s[0] === page ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[s[0]] + '</svg><span>' + s[1] + '</span></a>';
   }).join('') + '</nav>';
-  // One quiet line: who drew it, the revision, and how to get in touch. #about is where brief.html forwards.
+  // One quiet line: name and how to get in touch. #about is where brief.html forwards.
   var footer = '<footer class="titleblock" id="about"><div class="wrap">' +
     (page === 'home' ? '<p class="tb-brief">' + esc(S.briefLine) + '</p>' : '') +
-    '<p class="tb-line"><span>Drawn by ' + esc(S.name || 'Vikas Singh') + '</span><span>Sheet ' + String(idx + 1).padStart(2, '0') + ' of ' + String(SHEETS.length).padStart(2, '0') + ' · Rev ' + rev + ' · ' + fmt(updated) + '</span>' +
+    '<p class="tb-line"><span>' + esc(S.name || 'Vikas Singh') + '</span>' +
     '<span><a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a> · <a href="' + esc(S.linkedin) + '" rel="noopener">LinkedIn</a></span></p></div></footer>';
 
   /* ---------- pieces ---------- */
@@ -56,40 +50,19 @@
   function block(title, more, body, id) {
     return '<section class="block"' + (id ? ' id="' + id + '"' : '') + '><div class="block-head"><h2>' + title + '</h2>' + (more ? '<a href="' + more[0] + '" data-sheet>' + more[1] + ' →</a>' : '') + '</div>' + body + '</section>';
   }
-  // A note as a fold-out: its title, then the full text.
-  function noteFold(id) {
-    var n = N.filter(function (x) { return x.id === id; })[0];
-    if (!n) return '';
-    return '<details class="note-fold" id="' + esc(n.id) + '"><summary><span class="nf-title">' + esc(n.title) + '</span><span class="nf-date">' + fmt(n.date) + '</span></summary>' +
-      (n.paragraphs || []).map(function (p) { return '<p>' + md(p) + '</p>'; }).join('') + '</details>';
-  }
   function steps(x) { var s = x.steps || [], d = s.filter(function (y) { return y.state === 'done'; }).length; return { done: d, total: s.length }; }
   function expStatus(x) { var st = steps(x); return x.status === 'done' ? 'live' : x.status === 'active' || st.done ? 'building' : 'idea'; }
   var LABEL = { live: 'Live', building: 'Building', idea: 'On the drawing board' };
   var allProjects = W.projects.concat(X.map(function (x) {
     var st = steps(x), drawing = /satellite/i.test(x.title) ? 'satellite' : /sustainab|report/i.test(x.title) ? 'report' : /propert|price/i.test(x.title) ? 'house' : 'flow';
-    return { id: x.id, status: expStatus(x), title: x.title, kind: 'Experiment ' + x.id, text: x.summary || x.question, drawing: drawing, steps: x.steps || [], st: st, exp: x };
+    return { id: x.id, status: expStatus(x), title: x.title, kind: 'Experiment ' + x.id, text: (W.summary || {})[x.id] || x.question, drawing: drawing, steps: x.steps || [], st: st, exp: x };
   }));
   function progressOf(p) { return p.status === 'live' ? 1 : p.st && p.st.total ? p.st.done / p.st.total : 0; }
-  function projCard(p, full) {
-    var pct = Math.round(progressOf(p) * 100);
-    var stepTxt = p.st ? p.st.done + ' of ' + p.st.total + ' steps done' : p.kind;
-    var h = '<article class="card proj is-' + p.status + (full ? '' : ' compact') + '" id="' + esc(p.id) + '" data-status="' + p.status + '">' +
+  function projCard(p) {
+    return '<article class="card proj is-' + p.status + '" id="' + esc(p.id) + '" data-status="' + p.status + '">' +
       '<div class="proj-art">' + Sketch.svg(p.drawing, '0 0 160 110', 'mini', '') + '</div>' +
-      '<div class="proj-body"><span class="status s-' + p.status + '">' + LABEL[p.status] + '</span><h3>' + (p.link ? '<a href="' + esc(p.link) + '">' + esc(p.title) + '</a>' : esc(p.title)) + '</h3>' +
-      '<p>' + md(p.text) + '</p>';
-    if (!full) return h + '</div></article>';
-    if (p.status !== 'live') h += '<div class="hatch" role="img" aria-label="' + pct + '% done"><span style="width:' + pct + '%"></span></div><div class="meta"><span>' + esc(stepTxt) + '</span><span>' + pct + '%</span></div>';
-    if (p.steps && p.steps.length) h += '<ol class="steps">' + p.steps.map(function (s) { return '<li class="st-' + esc(s.state) + '"><span>' + esc(s.when) + '</span>' + esc(s.name) + '</li>'; }).join('') + '</ol>';
-    if (p.exp) {
-      var x = p.exp;
-      h += '<details><summary>The plan in detail</summary>' + [['Question', x.question], ['Hypothesis', x.hypothesis], ['Method', x.method], ['What a result looks like', x.result], ['Next step', x.next], ['Tools', x.tools]]
-        .filter(function (r) { return r[1]; }).map(function (r) { return '<h4>' + r[0] + '</h4><p>' + md(r[1]) + '</p>'; }).join('') + '</details>';
-      var why = ((W.notes || {})[p.id] || []);
-      if (why.length) h += '<div class="why"><div class="label">Why I am building this</div>' + why.map(noteFold).join('') + '</div>';
-    }
-    if (p.link) h += '<a class="go" href="' + esc(p.link) + '">Open ' + esc(p.title) + ' →</a>';
-    return h + '</div></article>';
+      '<div class="proj-body"><span class="status s-' + p.status + '">' + LABEL[p.status] + '</span><h3>' + esc(p.title) + '</h3><p>' + md(p.text) + '</p>' +
+      (p.link ? '<a class="go" href="' + esc(p.link) + '">Open ' + esc(p.title) + ' →</a>' : '') + '</div></article>';
   }
 
   /* ---------- library items ---------- */
@@ -102,8 +75,6 @@
   });
   var reading = G.filter(function (b) { return b.shelf === 'currently-reading'; });
   var read = G.filter(function (b) { return b.shelf === 'read'; }).sort(function (a, b) { return (b.read || b.added || '').localeCompare(a.read || a.added || ''); });
-  var toRead = G.filter(function (b) { return b.shelf === 'to-read'; }).sort(function (a, b) { return (b.added || '').localeCompare(a.added || ''); });
-  var featured = X.filter(function (x) { return x.featured; })[0] || X[0];
 
   var TYPES = [['article', 'Articles', 'Article'], ['video', 'Videos', 'Video'], ['film', 'Films', 'Film'], ['podcast', 'Podcasts', 'Podcast'], ['picture', 'Pictures', 'Picture']];
   var typeName = {}; TYPES.forEach(function (t) { typeName[t[0]] = t[2]; });
@@ -115,9 +86,17 @@
       image: r.image || (m.image ? '/' + m.image : '') || (isImg ? r.link : ''), date: r.date || m.date || m.year || '', rating: r.rating || 0,
       note: r.note || '', line: r.line || '', why: r.why || '', status: r.status || 'done', link: r.link || '' };
   });
-  var GROUPS = [['fantasy', 'Fantasy', ['fantasy', 'paranormal', 'myth']], ['fiction', 'Fiction', ['scifi', 'horror', 'thriller', 'literary', 'classics', 'comingofage', 'romance']],
-    ['science', 'Science & tech', ['science', 'tech']], ['money', 'Business & money', ['money']], ['history', 'History', ['history', 'war', 'lives']], ['ideas', 'Ideas', ['mind', 'philosophy', 'craft']]];
+  // Professional shelves first, stories last.
+  var GROUPS = [['science', 'Science & tech', ['science', 'tech']], ['money', 'Business & money', ['money']], ['history', 'History & lives', ['history', 'war', 'lives']], ['ideas', 'Ideas', ['mind', 'philosophy', 'craft']],
+    ['fiction', 'Fiction', ['scifi', 'horror', 'thriller', 'literary', 'classics', 'comingofage', 'romance']], ['fantasy', 'Fantasy', ['fantasy', 'paranormal', 'myth']]];
   function groupOf(b) { var g = (SH.books || {})[b.id] || []; return GROUPS.filter(function (x) { return g.some(function (k) { return x[2].indexOf(k) >= 0; }); }).map(function (x) { return x[0]; }).join(' '); }
+  // The shelf a book is filed under: the most professional shelf any of its genres belongs to.
+  // Stories (fiction, fantasy) keep their own main shelf.
+  function primaryGroup(b) {
+    var ks = (SH.books || {})[b.id] || [], has = function (x) { return ks.some(function (k) { return x[2].indexOf(k) >= 0; }); };
+    var pro = GROUPS.slice(0, 4).filter(has)[0]; if (pro) return pro[0];
+    var main = GROUPS.filter(function (x) { return x[2].indexOf(ks[0]) >= 0; })[0]; return main ? main[0] : 'other';
+  }
   function bookTile(b, lazy) {
     return '<a class="book" href="#b-' + esc(b.id) + '" data-item="b-' + esc(b.id) + '" data-group="' + groupOf(b) + '" data-q="' + esc((b.title + ' ' + b.author + ' ' + (b.series || '')).toLowerCase()) + '">' +
       '<img src="/' + esc(b.cover) + '" alt="" ' + (lazy ? 'loading="lazy" ' : '') + 'width="120" height="180">' +
@@ -132,45 +111,27 @@
   /* ---------- pages ---------- */
   var main = '';
   if (page === 'home') {
-    var cur = reading[0], fst = featured ? steps(featured) : null;
-    main = '<section class="hero"><div class="hero-text"><span class="pill"><b></b>Day ' + day + ' of a year of building · updated ' + short(updated) + '</span>' +
+    main = '<section class="hero"><div class="hero-text">' +
       '<h1>I sketch ideas, then <em>build them</em>.</h1><p class="lede">' + esc((S.coverLines || []).join(' ')) + '</p>' +
       '<div class="cta"><a class="btn dark" href="/work.html" data-sheet>See the work</a><a class="btn" href="/library.html" data-sheet>The library</a></div></div>' +
       '<div class="hero-art">' + Sketch.svg('home', '0 0 360 280', 'hero', 'A line drawing of a workbench with a lamp and a half-drawn part') + '</div></section>' +
-      block('Right now', ['/now.html', 'Now'], '<div class="grid3">' +
-        '<a class="card" href="/now.html" data-sheet><div class="label">Learning</div><h3>' + esc(((T.currently || [])[0] || {}).text) + '</h3></a>' +
-        (featured ? '<a class="card" href="/work.html#' + esc(featured.id) + '" data-sheet><div class="label">Building</div><h3>' + esc(featured.title) + '</h3><div class="hatch"><span style="width:' + (fst.total ? Math.round(fst.done / fst.total * 100) : 0) + '%"></span></div><div class="meta"><span>' + (expStatus(featured) === 'idea' ? 'On the drawing board' : 'Building') + '</span><span>' + fst.done + ' of ' + fst.total + ' steps</span></div></a>' : '') +
-        (cur ? '<a class="card book-card" href="/library.html#b-' + esc(cur.id) + '" data-sheet><img src="/' + esc(cur.cover) + '" alt="" width="58" height="87"><div><div class="label">Reading</div><h3>' + esc(cur.title) + '</h3><p>' + esc(cur.author) + '</p></div></a>' : '') + '</div>') +
       block('The journey so far', null, '<ol class="journey">' + W.journey.map(function (j) { return '<li class="stop st-' + j.state + '"><span class="when">' + esc(j.when) + '</span><h3>' + esc(j.title) + '</h3><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ol>') +
-      block('What I have made', ['/work.html', 'Work'], '<div class="grid3">' + allProjects.filter(function (p) { return p.status === 'live'; }).slice(0, 3).map(function (p) { return projCard(p, false); }).join('') + '</div>') +
-      block('What is next', null, '<div class="grid3">' + W.next.map(function (n) { return '<div class="card plan"><div class="label">' + esc(n.when) + '</div><h3>' + esc(n.text) + '</h3></div>'; }).join('') + '</div>', 'next');
-  } else if (page === 'now') {
-    var around = ((T.sketch || {}).around || []), n = around.length || 1;
-    var route = '<svg class="sk route" viewBox="0 0 640 150" role="img" aria-label="Learning route: ' + esc(around.map(function (a) { return a.label + (a.state === 'now' ? ' (now)' : ''); }).join(', ')) + '">' +
-      '<path class="thin" d="M30 90 C 120 30, 200 140, 320 80 S 520 40, 610 90"/>' +
-      around.map(function (a, i) { var x = 30 + i * (580 / Math.max(1, n - 1)), y = 90 - Math.sin(i / Math.max(1, n - 1) * Math.PI * 2) * 22;
-        return '<circle class="' + (a.state === 'now' ? 'soft-acc' : a.state === 'done' ? '' : 'dash') + '" cx="' + x.toFixed(0) + '" cy="' + y.toFixed(0) + '" r="' + (a.state === 'now' ? 9 : 6) + '"/><text class="note' + (a.state === 'now' ? ' strong' : '') + '" x="' + x.toFixed(0) + '" y="' + (y + 30).toFixed(0) + '" text-anchor="middle">' + esc(a.label) + '</text>'; }).join('') + '</svg>';
-    var keep = (T.currently || []).filter(function (c) { return /learn|build/i.test(c.label); });
-    var dir = (W.notes || {}).now || [];
-    main = sheetHead('02', 'Now', 'What has my attention this month. <span class="muted">Updated ' + fmt(T.date) + '.</span>', 'now') +
-      '<div class="grid3">' + keep.map(function (c) { return '<div class="card"><div class="label">' + esc(c.label) + '</div><h3>' + esc(c.text) + '</h3></div>'; }).join('') +
-      (T.question ? '<div class="card q"><div class="label">The question on my desk</div><h3 class="serif">' + esc(T.question) + '</h3></div>' : '') + '</div>' +
-      block('The learning route', null, route + '<p class="aside">' + esc((T.sketch || {}).caption) + '</p>') +
-      (dir.length ? block('How I chose this direction', null, dir.map(noteFold).join(''), 'direction') : '');
+      block('Selected work', ['/work.html', 'All work'], '<div class="grid3">' + allProjects.filter(function (p) { return p.status === 'live'; }).slice(0, 3).map(function (p) { return projCard(p); }).join('') + '</div>');
   } else if (page === 'work') {
-    var big = allProjects.filter(function (p) { return p.status !== 'idea' || (p.exp && p.exp.featured); });
-    var ideas = allProjects.filter(function (p) { return big.indexOf(p) < 0; });
-    main = sheetHead('03', 'Work', esc(W.intro), 'work') +
-      '<div class="projects">' + big.map(function (p) { return projCard(p, true); }).join('') + '</div>' +
-      (ideas.length ? block('Also on the drawing board', null, '<ul class="ideas">' + ideas.map(function (p) {
-        var x = p.exp || {};
-        return '<li id="' + esc(p.id) + '"><span class="idea-art">' + Sketch.svg(p.drawing, '0 0 160 110', 'mini idea', '') + '</span><div><h3>' + esc(p.title) + '</h3><p>' + md(x.question || p.text) + '</p>' +
-          '<details><summary>The plan</summary>' + [['Hypothesis', x.hypothesis], ['Method', x.method], ['Next step', x.next]].filter(function (r) { return r[1]; }).map(function (r) { return '<h4>' + r[0] + '</h4><p>' + md(r[1]) + '</p>'; }).join('') + '</details></div></li>';
-      }).join('') + '</ul>') : '');
+    var shown = allProjects.filter(function (p) { return p.status !== 'idea' || (p.exp && p.exp.featured); });
+    main = sheetHead('02', 'Work', esc(W.intro), 'work') +
+      '<div class="projects">' + shown.map(function (p) { return projCard(p); }).join('') + '</div>';
   } else if (page === 'library') {
     var present = TYPES.filter(function (t) { return things.some(function (x) { return x.type === t[0]; }); });
     var counts = [read.length + ' books read'].concat(present.map(function (t) { var c = things.filter(function (x) { return x.type === t[0]; }).length; return c + ' ' + (c === 1 ? t[2] : t[1]).toLowerCase(); }));
-    main = sheetHead('04', 'Library', 'Everything that has shaped how I think: books, and the articles, videos, films and pictures worth keeping, with what I made of each.', 'reading') +
+    // Books grouped by shelf, professional shelves first; best-rated first within each.
+    var byGroup = {}; read.forEach(function (b) { var g = primaryGroup(b); (byGroup[g] = byGroup[g] || []).push(b); });
+    var order = GROUPS.map(function (g) { return [g[0], g[1]]; }).concat([['other', 'Other']]);
+    var shelvesHtml = order.filter(function (g) { return byGroup[g[0]]; }).map(function (g) {
+      var list = byGroup[g[0]].sort(function (a, b) { return (b.rating - a.rating) || (b.read || '').localeCompare(a.read || ''); });
+      return '<section class="lib-sec" data-type="book"><h2>' + esc(g[1]) + ' <span class="n">' + list.length + '</span></h2><div class="covers">' + list.map(function (b) { return bookTile(b, true); }).join('') + '</div></section>';
+    }).join('');
+    main = sheetHead('03', 'Library', 'The books, articles, videos and films that shaped how I think, with what I made of each.', 'reading') +
       '<p class="counts">' + counts.join(' · ') + '</p>' +
       '<div class="lib-tools">' +
       (present.length ? '<div class="chips types" role="group" aria-label="Show"><button aria-pressed="true" data-t="all">Everything</button><button aria-pressed="false" data-t="book">Books</button>' + present.map(function (t) { return '<button aria-pressed="false" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' : '') +
@@ -179,8 +140,7 @@
       '<div class="lib">' +
       (reading.length ? '<section class="lib-sec" data-type="book"><h2>Reading now</h2><div class="covers now">' + reading.map(function (b) { return bookTile(b, false); }).join('') + '</div></section>' : '') +
       (things.length ? '<section class="lib-sec" data-type="things"><h2>Beyond books <span class="n">' + things.length + '</span></h2><div class="things">' + things.map(thingTile).join('') + '</div></section>' : '') +
-      '<section class="lib-sec" data-type="book"><h2>Books I have read <span class="n">' + read.length + '</span></h2><div class="covers">' + read.map(function (b, i) { return bookTile(b, i > 11); }).join('') + '</div></section>' +
-      (toRead.length ? '<section class="lib-sec" data-type="book" id="list"><h2>On my list <span class="n">' + toRead.length + '</span></h2><div class="covers list collapsed">' + toRead.map(function (b) { return bookTile(b, true); }).join('') + '</div><button class="btn more" type="button" data-expand>Show all ' + toRead.length + '</button></section>' : '') +
+      shelvesHtml +
       '<p class="empty" hidden>Nothing here matches. Try another word or shelf.</p></div>' +
       '<dialog class="item" aria-label="Details"><button class="x" type="button" aria-label="Close">×</button><div class="item-body"></div></dialog>';
   }
@@ -192,7 +152,7 @@
   var root = document.documentElement;
   // Draw the sheet's main picture the first time; otherwise show it finished.
   var hero = document.querySelector('svg.hero');
-  var minis = [].slice.call(document.querySelectorAll('svg.mini, svg.route'));
+  var minis = [].slice.call(document.querySelectorAll('svg.mini'));
   if (hero) {
     if (!drawn[page]) { Sketch.draw(hero, function () { markDrawn(page); }); root.classList.add('first-visit'); }
     else Sketch.show(hero);
@@ -242,7 +202,7 @@
     var state = { t: 'all', g: 'all', q: '' };
     var secs = [].slice.call(document.querySelectorAll('.lib-sec')), empty = document.querySelector('.empty'), shelfChips = document.querySelector('.chips.shelves');
     function apply() {
-      var any = false, searching = !!state.q || state.g !== 'all';
+      var any = false;
       secs.forEach(function (sec) {
         var isBook = sec.dataset.type === 'book', shown = 0;
         [].forEach.call(sec.querySelectorAll('[data-item]'), function (el) {
@@ -252,8 +212,6 @@
           el.hidden = !ok; if (ok) shown++;
         });
         sec.hidden = !shown; if (shown) any = true;
-        var list = sec.querySelector('.covers.list'), btn = sec.querySelector('[data-expand]');
-        if (list && searching) { list.classList.remove('collapsed'); if (btn) btn.hidden = true; }
       });
       empty.hidden = any;
       if (shelfChips) shelfChips.hidden = !(state.t === 'all' || state.t === 'book');
@@ -269,7 +227,6 @@
     chipGroup('.chips.types', 't'); chipGroup('.chips.shelves', 'g');
     var input = document.querySelector('.search input'), timer;
     input.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(function () { state.q = input.value.trim().toLowerCase(); apply(); }, 120); });
-    [].forEach.call(document.querySelectorAll('[data-expand]'), function (b) { b.addEventListener('click', function () { b.previousElementSibling.classList.remove('collapsed'); b.hidden = true; }); });
 
     // The detail card: what I wrote about a book, article, video, film or picture.
     var dlg = document.querySelector('dialog.item'), body = dlg.querySelector('.item-body');

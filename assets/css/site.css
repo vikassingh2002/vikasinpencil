@@ -217,7 +217,7 @@ details h4{font-size:14px;margin:14px 0 2px}details p{margin:0;color:var(--muted
  .tb-row{grid-template-columns:1fr}.tb-row>div{border-left:0!important;border-top:1px solid var(--line)}.tb-row>div:first-child{border-top:0}
  .titleblock{padding-bottom:28px}
  body{padding-bottom:calc(68px + env(safe-area-inset-bottom))}
- .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:10;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:7px 2px calc(7px + env(safe-area-inset-bottom))}
+ .tabbar{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;z-index:10;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:7px 2px calc(7px + env(safe-area-inset-bottom))}
  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--faint);text-decoration:none}
  .tabbar svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
  .tabbar a[aria-current]{color:var(--acc)}
@@ -310,3 +310,8 @@ dialog.item .x{position:sticky;top:10px;float:right;margin:10px 10px 0 0;width:3
 }
 .th-type{font:11px var(--mono);color:var(--acc);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
 .thing .bt{margin-top:2px}
+/* equal drawing height so cards line up */
+.proj-art{height:92px;display:flex;align-items:center}
+.proj-art .sk{height:100%;width:auto;max-width:100%}
+@media (max-width:760px){.proj-art{height:72px}}
+.proj{align-content:start}
