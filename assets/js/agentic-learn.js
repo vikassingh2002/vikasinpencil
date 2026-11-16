@@ -49,7 +49,9 @@ window.AgenticLearn = (function () {
     'formal-proof': ['Formal proof', 'science', []], 'ai-maths': ['AI in mathematics', 'science', ['reasoning-models']],
     'ai-biology': ['AI in biology', 'science', ['agents']], 'weather-ai': ['AI weather forecasting', 'science', ['training']],
     'polling-ai': ['Synthetic survey respondents', 'science', ['llm']], 'games-ai': ['Game-playing AI', 'science', ['training']],
-    'mental-health': ['Chatbots and mental health', 'science', ['llm']]
+    'mental-health': ['Chatbots and mental health', 'science', ['llm']],
+    'ai-politics': ['AI in elections and politics', 'policy', ['data-centres']], 'ai-stocks': ['AI stocks and valuations', 'markets', ['ai-revenue']],
+    'ai-rd-automation': ['AI speeding up AI research', 'technology', ['benchmarks']], governance: ['Leadership and corporate governance', 'business', []]
   };
   // article: [concepts covered, concepts assumed, depth 1 primer – 3 expert]. Hand-tagged; review as the archive grows.
   var A = {
@@ -102,7 +104,20 @@ window.AgenticLearn = (function () {
     'leader-20261012': [['formal-proof', 'code-review'], ['ai-maths'], 2],
     'leader-20261019': [['incident-reporting', 'eu-ai-act', 'iot-security'], [], 2],
     'leader-20261026': [['ipo', 'compute-commitments'], ['ai-revenue'], 2],
-    'leader-20261102': [['vulnerability-discovery', 'least-privilege'], ['agents'], 2]
+    'leader-20261102': [['vulnerability-discovery', 'least-privilege'], ['agents'], 2],
+    'midterms-20261104': [['ai-politics', 'data-centres', 'power'], [], 1],
+    'selloff-20261105': [['ai-stocks', 'data-centres'], ['ai-revenue'], 2],
+    'metr-20261105': [['ai-rd-automation', 'benchmarks'], ['training'], 3],
+    'campuses-20261105': [['data-centres', 'ai-politics'], [], 1],
+    'revolut-20261103': [['open-weights', 'coding-agents', 'unit-economics'], ['token-pricing'], 2],
+    'aiads-20261104': [['ai-politics'], ['data-centres'], 1],
+    'leader-20261109': [['power', 'data-centres', 'ai-politics'], ['data-centres'], 2],
+    'nvidia-20261112': [['governance', 'gpus'], [], 1],
+    'roadshow-20261111': [['ipo', 'ai-stocks', 'ai-revenue'], ['compute-commitments'], 2],
+    'alphaproof-20261110': [['formal-proof', 'code-review'], ['agents'], 3],
+    'nysafety-20261110': [['us-state-law', 'red-teaming'], [], 2],
+    'australia-20261112': [['algorithmic-management', 'jobs-skills'], [], 1],
+    'leader-20261116': [['governance', 'ipo'], ['gpus'], 2]
   };
 
   function meta(a) {

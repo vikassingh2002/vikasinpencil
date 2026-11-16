@@ -1012,5 +1012,287 @@ window.AgenticKnowledge={
     "reviewed": false,
     "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
     "related": []
+  },
+  "midterms-20261104": {
+    "tags": [
+      "institutions",
+      "infrastructure"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "institutions",
+      "infrastructure"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "campuses-20261105",
+      "aiads-20261104",
+      "leader-20261109",
+      "selloff-20261105"
+    ]
+  },
+  "selloff-20261105": {
+    "tags": [
+      "economics",
+      "infrastructure"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "economics",
+      "infrastructure"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "midterms-20261104",
+      "roadshow-20261111",
+      "ipo-20261026",
+      "capex-20261029"
+    ]
+  },
+  "metr-20261105": {
+    "tags": [
+      "science",
+      "agents"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "science",
+      "agents"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "maths-20261007",
+      "alphaproof-20261110",
+      "roadshow-20261111",
+      "nysafety-20261110"
+    ]
+  },
+  "campuses-20261105": {
+    "tags": [
+      "infrastructure",
+      "institutions"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "infrastructure",
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "midterms-20261104",
+      "leader-20261109",
+      "pods-20261021",
+      "uprate-20261028"
+    ]
+  },
+  "revolut-20261103": {
+    "tags": [
+      "economics",
+      "agents"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "economics",
+      "agents"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "pricewar-20261008",
+      "incidents-20261012",
+      "roadshow-20261111",
+      "review-20261026"
+    ]
+  },
+  "aiads-20261104": {
+    "tags": [
+      "institutions"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "midterms-20261104",
+      "campuses-20261105",
+      "leader-20261109",
+      "pew-20260930"
+    ]
+  },
+  "leader-20261109": {
+    "tags": [
+      "infrastructure",
+      "institutions"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "infrastructure",
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "midterms-20261104",
+      "campuses-20261105",
+      "uprate-20261028",
+      "pods-20261021"
+    ]
+  },
+  "nvidia-20261112": {
+    "tags": [
+      "economics",
+      "institutions"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "economics",
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "leader-20261116",
+      "supply-20261021",
+      "selloff-20261105",
+      "roadshow-20261111"
+    ]
+  },
+  "roadshow-20261111": {
+    "tags": [
+      "economics"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "economics"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "ipo-20261026",
+      "leader-20261026",
+      "selloff-20261105",
+      "prospectus-20260930"
+    ]
+  },
+  "alphaproof-20261110": {
+    "tags": [
+      "science",
+      "security"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "science",
+      "security"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "maths-20261007",
+      "leader-20261012",
+      "review-20261026",
+      "metr-20261105"
+    ]
+  },
+  "nysafety-20261110": {
+    "tags": [
+      "institutions",
+      "security"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "institutions",
+      "security"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "regulators-20261014",
+      "leader-20261019",
+      "metr-20261105",
+      "astra-20260928"
+    ]
+  },
+  "australia-20261112": {
+    "tags": [
+      "work",
+      "institutions"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "work",
+      "institutions"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "robobosses-20260930",
+      "deference-20261027",
+      "exits-20261026",
+      "medicare-20260924"
+    ]
+  },
+  "leader-20261116": {
+    "tags": [
+      "institutions",
+      "economics"
+    ],
+    "prerequisites": [
+      "models"
+    ],
+    "explains": [
+      "institutions",
+      "economics"
+    ],
+    "difficulty": 2,
+    "reviewed": false,
+    "method": "Initial title/standfirst classification; reviewable, not mastery evidence",
+    "related": [
+      "nvidia-20261112",
+      "roadshow-20261111",
+      "nysafety-20261110",
+      "leader-20261026"
+    ]
   }
 };

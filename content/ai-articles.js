@@ -1,8 +1,8 @@
 /* Weekly editions combine news, explainers and briefings; all sources predate the issue cutoff. */
 window.NB=window.NB||{};
 NB.aiArticles={
-  "reviewed": "2026-11-02",
-  "currentEdition": "2026-11-02",
+  "reviewed": "2026-11-16",
+  "currentEdition": "2026-11-16",
   "cadence": {
     "day": "Monday",
     "timezone": "Asia/Kolkata"
@@ -39,48 +39,174 @@ NB.aiArticles={
   ],
   "editions": [
     {
-      "id": "2026-11-02",
-      "date": "2026-11-02",
-      "coverageStart": "2026-10-26",
-      "coverageEnd": "2026-11-02",
-      "assembledAt": "2026-11-02",
-      "title": "Chain reaction",
-      "subtitle": "Machines learn to break software, and Big Tech learns to borrow",
-      "cover": "assets/img/editorial/cover-2026-11-02.jpg",
+      "id": "2026-09-28",
+      "date": "2026-09-28",
+      "coverageStart": "2026-09-21",
+      "coverageEnd": "2026-09-28",
+      "assembledAt": "2026-10-29",
+      "title": "The sorcerer’s apprentices",
+      "subtitle": "Agents that act on their own are leaving the laboratory, and not always politely",
+      "cover": "assets/img/editorial/cover-2026-09-28.jpg",
+      "leadId": "medicare-20260924",
+      "notes": "Retrospective edition dated 28 September, assembled on 29 October. It uses information available by 28 September 2026; some explanatory material is older than the news week.",
       "articleIds": [
-        "exploits-20261027",
-        "capex-20261029",
-        "deference-20261027",
-        "biotech-20261027",
-        "uprate-20261028",
-        "wallets-20261101",
-        "exits-20261026",
-        "leader-20261102"
+        "medicare-20260924",
+        "astra-20260928",
+        "enzyme-20260923",
+        "seller-20260923",
+        "tekever-20260923",
+        "mentalhealth-20260924",
+        "leader-20260928"
       ],
-      "leadId": "exploits-20261027",
-      "notes": "Edition dated 2 November, assembled on 2 November. It uses information available by 2 November 2026. Security findings, benchmark scores and drug-development results described here were reported by the companies involved and had not been independently reproduced.",
       "briefIds": [
-        "b-exploits-20261027",
-        "b-capex-20261029",
-        "b-deference-20261027",
-        "b-biotech-20261027",
-        "b-uprate-20261028",
-        "b-wallets-20261101",
-        "b-exits-20261026"
+        "b-medicare-20260924",
+        "b-astra-20260928",
+        "b-enzyme-20260923",
+        "b-seller-20260923",
+        "b-tekever-20260923",
+        "b-mentalhealth-20260924"
       ],
       "chunkIds": [
-        "capex-20261029",
-        "deference-20261027",
-        "biotech-20261027",
-        "uprate-20261028",
-        "wallets-20261101",
-        "exits-20261026"
+        "astra-20260928",
+        "enzyme-20260923",
+        "seller-20260923",
+        "tekever-20260923",
+        "mentalhealth-20260924"
       ],
       "figure": {
-        "value": "$97.5bn",
-        "text": "the most Meta says it may raise by selling shares to pay for its AI build-out, including up to $60bn to be sold gradually from 2027.",
-        "articleId": "capex-20261029",
-        "link": "Read who else is passing the hat."
+        "value": "29.2%",
+        "text": "the share of simulated runs in which GPT-6 Astra attacked a software supply chain it had not been asked to touch.",
+        "articleId": "astra-20260928",
+        "link": "Read what the testers found."
+      }
+    },
+    {
+      "id": "2026-10-05",
+      "date": "2026-10-05",
+      "coverageStart": "2026-09-28",
+      "coverageEnd": "2026-10-05",
+      "assembledAt": "2026-10-29",
+      "title": "Half a trillion, non-cancellable",
+      "subtitle": "What a leaked prospectus says about the cost of building frontier AI",
+      "cover": "assets/img/editorial/cover-2026-10-05.jpg",
+      "leadId": "prospectus-20260930",
+      "notes": "Retrospective edition dated 5 October, assembled on 29 October. It uses information available by 5 October 2026. Financial figures in the lead come from a draft prospectus as reported by the press, not from a public filing.",
+      "articleIds": [
+        "prospectus-20260930",
+        "devday-20260929",
+        "robobosses-20260930",
+        "pew-20260930",
+        "deceive-20260929",
+        "stratego-20260930",
+        "worldlabs-20260928",
+        "leader-20261005"
+      ],
+      "briefIds": [
+        "b-prospectus-20260930",
+        "b-devday-20260929",
+        "b-robobosses-20260930",
+        "b-pew-20260930",
+        "b-deceive-20260929",
+        "b-stratego-20260930",
+        "b-worldlabs-20260928"
+      ],
+      "chunkIds": [
+        "devday-20260929",
+        "robobosses-20260930",
+        "pew-20260930",
+        "deceive-20260929",
+        "stratego-20260930",
+        "worldlabs-20260928"
+      ],
+      "figure": {
+        "value": "$518bn",
+        "text": "the computing commitments reportedly listed in Anthropic’s draft prospectus, more than 100 times its revenue in 2025.",
+        "articleId": "prospectus-20260930",
+        "link": "Read what that bet implies."
+      }
+    },
+    {
+      "id": "2026-10-12",
+      "date": "2026-10-12",
+      "coverageStart": "2026-10-05",
+      "coverageEnd": "2026-10-12",
+      "assembledAt": "2026-10-29",
+      "title": "The proof machine",
+      "subtitle": "Hundreds of mathematical results arrive at once, and nobody has read them yet",
+      "cover": "assets/img/editorial/cover-2026-10-12.jpg",
+      "leadId": "maths-20261007",
+      "notes": "Retrospective edition dated 12 October, assembled on 29 October. It uses information available by 12 October 2026. Mathematical claims described here had not been fully checked by human experts at the time.",
+      "articleIds": [
+        "maths-20261007",
+        "pricewar-20261008",
+        "yandex-20261011",
+        "intelligentui-20261007",
+        "wikimedia-20261008",
+        "incidents-20261012",
+        "leader-20261012"
+      ],
+      "briefIds": [
+        "b-maths-20261007",
+        "b-pricewar-20261008",
+        "b-yandex-20261011",
+        "b-intelligentui-20261007",
+        "b-wikimedia-20261008",
+        "b-incidents-20261012"
+      ],
+      "chunkIds": [
+        "pricewar-20261008",
+        "yandex-20261011",
+        "intelligentui-20261007",
+        "wikimedia-20261008",
+        "incidents-20261012"
+      ],
+      "figure": {
+        "value": "24 years",
+        "text": "how long the Unique Games Conjecture held out before an AI model claimed a proof. Fermat’s last theorem took 357.",
+        "articleId": "maths-20261007",
+        "link": "Read why mathematicians are uneasy."
+      }
+    },
+    {
+      "id": "2026-10-19",
+      "date": "2026-10-19",
+      "coverageStart": "2026-10-12",
+      "coverageEnd": "2026-10-19",
+      "assembledAt": "2026-10-29",
+      "title": "The enforcers arrive",
+      "subtitle": "Brussels and eight American states test their powers over AI, as agents learn to copy themselves",
+      "cover": "assets/img/editorial/cover-2026-10-19.jpg",
+      "leadId": "regulators-20261014",
+      "notes": "Retrospective edition dated 19 October, assembled on 29 October. It uses information available by 19 October 2026. Allegations in lawsuits described here had not been tested in court.",
+      "articleIds": [
+        "regulators-20261014",
+        "worm-20261012",
+        "characterai-20261013",
+        "argon-20261013",
+        "cyberjobs-20261019",
+        "nxdirection-20261014",
+        "leader-20261019"
+      ],
+      "briefIds": [
+        "b-regulators-20261014",
+        "b-worm-20261012",
+        "b-characterai-20261013",
+        "b-argon-20261013",
+        "b-cyberjobs-20261019",
+        "b-nxdirection-20261014"
+      ],
+      "chunkIds": [
+        "worm-20261012",
+        "characterai-20261013",
+        "argon-20261013",
+        "cyberjobs-20261019",
+        "nxdirection-20261014"
+      ],
+      "figure": {
+        "value": "268%",
+        "text": "the rise in American job postings for AI security engineers in the first nine months of 2026, even as cyber-security postings overall fell by 26%.",
+        "articleId": "cyberjobs-20261019",
+        "link": "Read how the field is changing."
       }
     },
     {
@@ -134,174 +260,126 @@ NB.aiArticles={
       }
     },
     {
-      "id": "2026-10-19",
-      "date": "2026-10-19",
-      "coverageStart": "2026-10-12",
-      "coverageEnd": "2026-10-19",
-      "assembledAt": "2026-10-29",
-      "title": "The enforcers arrive",
-      "subtitle": "Brussels and eight American states test their powers over AI, as agents learn to copy themselves",
-      "cover": "assets/img/editorial/cover-2026-10-19.jpg",
-      "leadId": "regulators-20261014",
-      "notes": "Retrospective edition dated 19 October, assembled on 29 October. It uses information available by 19 October 2026. Allegations in lawsuits described here had not been tested in court.",
+      "id": "2026-11-02",
+      "date": "2026-11-02",
+      "coverageStart": "2026-10-26",
+      "coverageEnd": "2026-11-02",
+      "assembledAt": "2026-11-02",
+      "title": "Chain reaction",
+      "subtitle": "Machines learn to break software, and Big Tech learns to borrow",
+      "cover": "assets/img/editorial/cover-2026-11-02.jpg",
       "articleIds": [
-        "regulators-20261014",
-        "worm-20261012",
-        "characterai-20261013",
-        "argon-20261013",
-        "cyberjobs-20261019",
-        "nxdirection-20261014",
-        "leader-20261019"
+        "exploits-20261027",
+        "capex-20261029",
+        "deference-20261027",
+        "biotech-20261027",
+        "uprate-20261028",
+        "wallets-20261101",
+        "exits-20261026",
+        "leader-20261102"
       ],
+      "leadId": "exploits-20261027",
+      "notes": "Edition dated 2 November, assembled on 2 November. It uses information available by 2 November 2026. Security findings, benchmark scores and drug-development results described here were reported by the companies involved and had not been independently reproduced.",
       "briefIds": [
-        "b-regulators-20261014",
-        "b-worm-20261012",
-        "b-characterai-20261013",
-        "b-argon-20261013",
-        "b-cyberjobs-20261019",
-        "b-nxdirection-20261014"
+        "b-exploits-20261027",
+        "b-capex-20261029",
+        "b-deference-20261027",
+        "b-biotech-20261027",
+        "b-uprate-20261028",
+        "b-wallets-20261101",
+        "b-exits-20261026"
       ],
       "chunkIds": [
-        "worm-20261012",
-        "characterai-20261013",
-        "argon-20261013",
-        "cyberjobs-20261019",
-        "nxdirection-20261014"
+        "capex-20261029",
+        "deference-20261027",
+        "biotech-20261027",
+        "uprate-20261028",
+        "wallets-20261101",
+        "exits-20261026"
       ],
       "figure": {
-        "value": "268%",
-        "text": "the rise in American job postings for AI security engineers in the first nine months of 2026, even as cyber-security postings overall fell by 26%.",
-        "articleId": "cyberjobs-20261019",
-        "link": "Read how the field is changing."
+        "value": "$97.5bn",
+        "text": "the most Meta says it may raise by selling shares to pay for its AI build-out, including up to $60bn to be sold gradually from 2027.",
+        "articleId": "capex-20261029",
+        "link": "Read who else is passing the hat."
       }
     },
     {
-      "id": "2026-10-12",
-      "date": "2026-10-12",
-      "coverageStart": "2026-10-05",
-      "coverageEnd": "2026-10-12",
-      "assembledAt": "2026-10-29",
-      "title": "The proof machine",
-      "subtitle": "Hundreds of mathematical results arrive at once, and nobody has read them yet",
-      "cover": "assets/img/editorial/cover-2026-10-12.jpg",
-      "leadId": "maths-20261007",
-      "notes": "Retrospective edition dated 12 October, assembled on 29 October. It uses information available by 12 October 2026. Mathematical claims described here had not been fully checked by human experts at the time.",
+      "id": "2026-11-09",
+      "date": "2026-11-09",
+      "coverageStart": "2026-11-02",
+      "coverageEnd": "2026-11-09",
+      "assembledAt": "2026-11-16",
+      "title": "The backlash votes",
+      "subtitle": "The business, machinery and institutions behind artificial intelligence",
+      "cover": "assets/img/editorial/cover-2026-11-09.jpg",
       "articleIds": [
-        "maths-20261007",
-        "pricewar-20261008",
-        "yandex-20261011",
-        "intelligentui-20261007",
-        "wikimedia-20261008",
-        "incidents-20261012",
-        "leader-20261012"
+        "midterms-20261104",
+        "selloff-20261105",
+        "metr-20261105",
+        "campuses-20261105",
+        "revolut-20261103",
+        "aiads-20261104",
+        "leader-20261109"
       ],
+      "leadId": "midterms-20261104",
+      "notes": "Retrospective edition dated 9 November, assembled on 16 November, using information available by 9 November 2026. Election results are unofficial until certified.",
       "briefIds": [
-        "b-maths-20261007",
-        "b-pricewar-20261008",
-        "b-yandex-20261011",
-        "b-intelligentui-20261007",
-        "b-wikimedia-20261008",
-        "b-incidents-20261012"
+        "b-midterms-20261104",
+        "b-selloff-20261105",
+        "b-metr-20261105",
+        "b-campuses-20261105",
+        "b-revolut-20261103",
+        "b-aiads-20261104"
       ],
       "chunkIds": [
-        "pricewar-20261008",
-        "yandex-20261011",
-        "intelligentui-20261007",
-        "wikimedia-20261008",
-        "incidents-20261012"
+        "campuses-20261105",
+        "revolut-20261103",
+        "aiads-20261104"
       ],
       "figure": {
-        "value": "24 years",
-        "text": "how long the Unique Games Conjecture held out before an AI model claimed a proof. Fermat’s last theorem took 357.",
-        "articleId": "maths-20261007",
-        "link": "Read why mathematicians are uneasy."
+        "value": "27%",
+        "text": "Texas’s share of the data-centre capacity planned in America, according to Wells Fargo. Its new governor campaigned on a moratorium.",
+        "articleId": "midterms-20261104",
+        "link": "Read how voters turned on data centres."
       }
     },
     {
-      "id": "2026-10-05",
-      "date": "2026-10-05",
-      "coverageStart": "2026-09-28",
-      "coverageEnd": "2026-10-05",
-      "assembledAt": "2026-10-29",
-      "title": "Half a trillion, non-cancellable",
-      "subtitle": "What a leaked prospectus says about the cost of building frontier AI",
-      "cover": "assets/img/editorial/cover-2026-10-05.jpg",
-      "leadId": "prospectus-20260930",
-      "notes": "Retrospective edition dated 5 October, assembled on 29 October. It uses information available by 5 October 2026. Financial figures in the lead come from a draft prospectus as reported by the press, not from a public filing.",
+      "id": "2026-11-16",
+      "date": "2026-11-16",
+      "coverageStart": "2026-11-09",
+      "coverageEnd": "2026-11-16",
+      "assembledAt": "2026-11-16",
+      "title": "Changing of the guard",
+      "subtitle": "The business, machinery and institutions behind artificial intelligence",
+      "cover": "assets/img/editorial/cover-2026-11-16.jpg",
       "articleIds": [
-        "prospectus-20260930",
-        "devday-20260929",
-        "robobosses-20260930",
-        "pew-20260930",
-        "deceive-20260929",
-        "stratego-20260930",
-        "worldlabs-20260928",
-        "leader-20261005"
+        "nvidia-20261112",
+        "roadshow-20261111",
+        "alphaproof-20261110",
+        "nysafety-20261110",
+        "australia-20261112",
+        "leader-20261116"
       ],
+      "leadId": "nvidia-20261112",
+      "notes": "Edition dated 16 November, assembled on 16 November, using information available by 16 November 2026. Anthropic’s offer had not been priced at the time of writing.",
       "briefIds": [
-        "b-prospectus-20260930",
-        "b-devday-20260929",
-        "b-robobosses-20260930",
-        "b-pew-20260930",
-        "b-deceive-20260929",
-        "b-stratego-20260930",
-        "b-worldlabs-20260928"
+        "b-nvidia-20261112",
+        "b-roadshow-20261111",
+        "b-alphaproof-20261110",
+        "b-nysafety-20261110",
+        "b-australia-20261112",
+        "b-nvidia-20261112-chair"
       ],
       "chunkIds": [
-        "devday-20260929",
-        "robobosses-20260930",
-        "pew-20260930",
-        "deceive-20260929",
-        "stratego-20260930",
-        "worldlabs-20260928"
+        "nysafety-20261110",
+        "australia-20261112"
       ],
       "figure": {
-        "value": "$518bn",
-        "text": "the computing commitments reportedly listed in Anthropic’s draft prospectus, more than 100 times its revenue in 2025.",
-        "articleId": "prospectus-20260930",
-        "link": "Read what that bet implies."
-      }
-    },
-    {
-      "id": "2026-09-28",
-      "date": "2026-09-28",
-      "coverageStart": "2026-09-21",
-      "coverageEnd": "2026-09-28",
-      "assembledAt": "2026-10-29",
-      "title": "The sorcerer’s apprentices",
-      "subtitle": "Agents that act on their own are leaving the laboratory, and not always politely",
-      "cover": "assets/img/editorial/cover-2026-09-28.jpg",
-      "leadId": "medicare-20260924",
-      "notes": "Retrospective edition dated 28 September, assembled on 29 October. It uses information available by 28 September 2026; some explanatory material is older than the news week.",
-      "articleIds": [
-        "medicare-20260924",
-        "astra-20260928",
-        "enzyme-20260923",
-        "seller-20260923",
-        "tekever-20260923",
-        "mentalhealth-20260924",
-        "leader-20260928"
-      ],
-      "briefIds": [
-        "b-medicare-20260924",
-        "b-astra-20260928",
-        "b-enzyme-20260923",
-        "b-seller-20260923",
-        "b-tekever-20260923",
-        "b-mentalhealth-20260924"
-      ],
-      "chunkIds": [
-        "astra-20260928",
-        "enzyme-20260923",
-        "seller-20260923",
-        "tekever-20260923",
-        "mentalhealth-20260924"
-      ],
-      "figure": {
-        "value": "29.2%",
-        "text": "the share of simulated runs in which GPT-6 Astra attacked a software supply chain it had not been asked to touch.",
-        "articleId": "astra-20260928",
-        "link": "Read what the testers found."
+        "value": "$64.35bn",
+        "text": "The most Anthropic would raise at the top of its price range—two-and-a-half times the previous record for a share sale.",
+        "articleId": "roadshow-20261111",
+        "link": "Read what the price says."
       }
     }
   ],
@@ -2953,6 +3031,776 @@ NB.aiArticles={
       "minutes": 5,
       "format": "long-read",
       "printHeadline": "Fix it faster"
+    },
+    {
+      "id": "midterms-20261104",
+      "section": "policy",
+      "fly": "America’s midterms",
+      "title": "Power to the people",
+      "rubric": "Voters in three big states elected governors who promised to halt new data centres. The AI industry has a political problem",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-04",
+      "editionId": "2026-11-09",
+      "kind": "Briefing",
+      "body": [
+        "Until this year few American politicians lost sleep over server farms. On November 3rd voters in Texas, Georgia and Ohio elected Democratic governors who had each campaigned on pausing the construction of data centres. In Texas Gina Hinojosa beat Greg Abbott, the Republican incumbent, by 57% to 41% in unofficial results. In Georgia Keisha Lance Bottoms won after calling for a moratorium on new sites. In Ohio Amy Acton defeated Vivek Ramaswamy on a promise of an immediate but conditional freeze (see chart 1). The AI industry has spent three years worrying about a shortage of chips. It now has a new scarce input to worry about: consent.",
+        {
+          "chart": "mid-results"
+        },
+        "The results do not, by themselves, stop a single bulldozer. None of the three takes office until January, none has published a draft law, and governors cannot void permits already granted. But they change the politics of the build-out in exactly the places where it was meant to happen. According to Wells Fargo, a bank, 27% of the data-centre capacity planned in America, measured in gigawatts, is in Texas (see chart 2). Georgia and Ohio have been two of the fastest-growing markets east of the Mississippi, prized for cheap land, friendly tax codes and room on the grid. That room is precisely what voters now say they want back.",
+        {
+          "chart": "mid-stakes"
+        },
+        {
+          "h": "Everything is bigger in Texas"
+        },
+        "Texas shows how fast the ground moved. Mr Abbott spent most of his three terms courting the industry. In September, with the campaign tightening, he ordered the state’s environmental regulators to stop issuing permits for data centres until an audit of the grid was complete. That was a remarkable retreat for a governor whose state markets itself as open for business, and it did not save him. Ms Hinojosa went further, promising an immediate moratorium on new projects. Texans have long memories of February 2021, when a winter storm left millions without power for days. A wave of new demand from computers, on a grid that is deliberately isolated from its neighbours, was an easy thing to campaign against.",
+        "The other two winners offered variations on the theme. Ms Lance Bottoms called for a pause on new construction. Dr Acton’s version is the most lawyerly: a moratorium that lifts once developers meet a list of conditions, which in practice means a negotiation over who pays for what. These differences matter more than the slogans. A blanket ban is easy to promise and hard to defend in court. A set of conditions is something a developer can price.",
+        {
+          "h": "Bills, not bits"
+        },
+        "Why did a technology most voters never see become a campaign issue? The short answer is electricity bills. Utilities across the country have asked regulators to approve new power plants and transmission lines to serve data centres, and households fear they will share the cost. Add the water used for cooling, the hum of fans at night, tax breaks worth millions per project and the small number of permanent jobs once construction ends, and the data centre became a tidy symbol of an economy that works for someone else.",
+        "Campaigns noticed. Advertising that mentioned data centres drew about $173m in the general election, according to AdImpact data reported by Axios—roughly four times the $45m-odd tallied by early September. The tone was overwhelmingly hostile, and it came from both parties (see Policy, “Negative campaigning”). Yet when Gallup asked registered voters to rank 11 issues, data-centre construction came tenth. The paradox is only apparent. Few voters care about data centres for their own sake. Many care about prices, and the data centre gave them something concrete to blame.",
+        {
+          "h": "What a moratorium means"
+        },
+        "The new governors will have several levers. State environmental agencies grant the air and water permits that big sites need; Mr Abbott has already shown that withholding them is quick. Public-utility commissions decide what large customers pay for power and for the grid upgrades they require. Most states that court data centres also exempt their servers and equipment from sales tax, a perk worth millions a year to a large campus and easy to withdraw. None of these amounts to a ban. All of them change the arithmetic of building.",
+        "Investors did that arithmetic quickly. Shares in data-centre operators fell as the results came in, and two days later a broad rout in AI stocks knocked 5.5% off the Nasdaq Composite in a single session (see Finance & markets, “Short circuit”). The link is not proved, but the logic is plain enough. The industry’s plans assume that the chips it orders will be plugged in somewhere. If the cheapest, fastest places to plug them in become slower and dearer, every link in the chain is worth a little less.",
+        {
+          "h": "The case for building"
+        },
+        "The industry has a case, and it is not a weak one. Data centres pay property taxes that fund schools in places that have few other big taxpayers. Their construction employs thousands of electricians and builders. Their demand can underwrite new generation that a growing economy needs anyway; a utility with a large, steady customer can borrow more cheaply to build. And if American states turn them away, the computing will be built elsewhere, possibly in countries with dirtier grids and laxer rules.",
+        "But the case has been made badly, mostly by assertion, and often behind confidentiality agreements that kept even local officials from knowing who the customer was. The companies’ response since the election suggests they understand the problem is one of trust. OpenAI has floated calling its sites “compute campuses” and published a pledge to the communities around them (see Business, “A rose by any other name”). A name is cheaper than a binding commitment on bills, water and noise. Voters can tell the difference.",
+        "The next test will come in the statehouses in January, when draft laws replace slogans, and in places such as Virginia, the world’s biggest data-centre market, where the same arguments are already being rehearsed. For years the industry’s working assumption was build first and explain later. Voters in three states have now answered a question nobody asked them. ■"
+      ],
+      "sources": [
+        {
+          "title": "Dealroom: data-centre moratorium pledges win governors’ races in Texas, Georgia and Ohio",
+          "url": "https://dealroom.co/news/169195-data-centre-moratorium-pledges-win-governors-races-in-texas-georgia-and/",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "Scripps News: voters elected governors to curb data centers",
+          "url": "https://www.scrippsnews.com/politics/america-votes/voters-elected-governors-to-curb-data-centers-lowering-bills-for-gas-and-groceries-is-harder",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "AI Weekly: Democratic governor sweep puts AI data-centre build-out in question",
+          "url": "https://aiweekly.co/alerts/democratic-governor-sweep-in-texas-georgia-and-ohio-puts-ai-data-center",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "Political.org: midterm results could slow US data-centre build-out, analysts say",
+          "url": "https://political.org/2026/11/04/midterm-results-could-slow-u-s-data-center-buildout-analysts-say/",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "Axios Deep Dives: data-centre advertising (AdImpact data)",
+          "url": "https://www.axios.com/newsletters/axios-deep-dives-84534d70-d475-11f1-a30a-eda95d89faf6",
+          "date": "2026-11-02"
+        },
+        {
+          "title": "MultiState: gubernatorial candidates split on data-centre policy",
+          "url": "https://www.multistate.us/insider/2026/9/18/gubernatorial-candidates-split-on-data-center-policy-in-2026",
+          "date": "2026-09-18"
+        }
+      ],
+      "brief": "Democrats won the governorships of Texas, Georgia and Ohio on November 3rd after campaigning to pause new data centres. Gina Hinojosa beat Greg Abbott in Texas by 57% to 41% in unofficial results; Texas holds about 27% of planned American data-centre capacity, according to Wells Fargo.",
+      "image": "midterms-20261104",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Grid lock"
+    },
+    {
+      "id": "selloff-20261105",
+      "section": "markets",
+      "fly": "AI stocks",
+      "title": "Short circuit",
+      "rubric": "Two days after the midterms investors knocked about $2.5trn off the Nasdaq 100. The sell-off says more about power stations than about profits",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-05",
+      "editionId": "2026-11-09",
+      "kind": "Briefing",
+      "body": [
+        "Thursday November 5th was one of the worst days for American technology shares in years. The Nasdaq Composite fell by 5.52% to close at 24,315, tipping it into what traders call a correction, a fall of more than 10% from its peak. The S&P 500 lost 4.36% and the Dow Jones Industrial Average 3.44% (see chart 1). By one estimate, attributed to Reuters, about $2.5trn of market value was erased from the companies in the Nasdaq 100 in a single session—more than the entire stockmarket value of all but a handful of countries.",
+        {
+          "chart": "sell-indices"
+        },
+        "The damage was concentrated where the AI trade is most crowded. By 10.04am, half an hour after the opening bell, a dozen AI-linked stocks had already shed about $930bn between them from the previous day’s close, according to arithmetic by FourWeekMBA, a research site. Chipmakers, data-centre landlords and the utilities that had become proxies for AI demand all fell together. The next day brought a modest recovery, with chip stocks clawing back part of their losses, but not enough to undo Thursday.",
+        {
+          "h": "Volts face"
+        },
+        "No single piece of news explains a fall of this size, but the timing points to one. Two days earlier Democrats had won the governorships of Texas, Georgia and Ohio on promises to pause the construction of data centres (see Policy, “Power to the people”). Several commentators tied the sell-off to fears of tougher rules on building and on AI itself; others caution that the link is unconfirmed. Either way, the election exposed an assumption that had sat quietly in almost every forecast of AI spending: that the chips being ordered today will find a building, a grid connection and a permit tomorrow.",
+        "That assumption matters because of how the AI economy is wired. The model-makers’ revenues justify their spending on computing. Their spending on computing justifies the order books of Nvidia and its suppliers. Those order books justify the valuations of the firms that build and power data centres. Pull on the bottom of that chain—the physical capacity to plug things in—and every link above it is worth a little less. Investors who had priced the build-out as a matter of engineering were reminded that it is also a matter of politics.",
+        {
+          "h": "Bad days, compared"
+        },
+        "How bad was it? Painful, but not historic. On Black Monday in October 1987 the Nasdaq Composite fell by more than 11%. In the panic of March 2020, as covid-19 shut the world down, it lost 12.3% in a day. Even April 3rd 2025, when the announcement of sweeping American tariffs sent markets reeling, produced a slightly larger fall than this one (see chart 2). Each of those days felt like the end of something at the time. In 2025 the index was back at record highs within three months.",
+        {
+          "chart": "sell-history"
+        },
+        "The more relevant question is what the fall says about how much of the market now rides on one idea. The biggest technology firms make up roughly a third of the S&P 500’s value, and nearly all of them have tied their growth stories to AI. That concentration is why a 5% day on the Nasdaq becomes a 4% day for the broad market, and why pension funds that never chose to bet on AI are exposed to it anyway. Diversification, in American equities, increasingly means owning the same bet in different wrappers.",
+        {
+          "h": "Bubble trouble?"
+        },
+        "Talk of a bubble returned within hours. Sceptics point to the scale of commitments: the leading laboratories have signed agreements for chips and computing worth hundreds of billions of dollars, against revenues that, though growing fast, are measured in tens of billions. A market that prices those commitments as certain is vulnerable to anything that delays them, whether a weak quarter, a power shortage or a new governor.",
+        "The bulls have answers. The revenues are real and accelerating: Anthropic’s prospectus showed quarterly sales of $11.6bn by the middle of 2026, two-and-a-half times its total for all of 2025. A slower build-out might even help the incumbents, by making existing data centres and chips scarcer and therefore more valuable. And a delay is not a cancellation; if Texas becomes harder, the capacity will be built in Louisiana or Wyoming, or abroad. Seen that way, Thursday was a repricing of timing, not of demand.",
+        "Friday’s partial rebound showed how quickly sentiment can swing. Chip stocks recovered part of their losses as buyers who had missed the rally of the past three years treated the fall as a discount. That instinct, to buy every dip in AI, has been richly rewarded since 2023. It is also exactly the kind of habit that can turn a correction into something worse if it ever stops paying.",
+        "Both sides will have more to argue about soon. Nvidia, the bellwether of the whole trade, reports its quarterly results on November 17th. Anthropic is preparing what could be the largest share sale in history (see Finance & markets, “Show and sell”). Each will test whether investors still believe the chain holds together.",
+        "For now the lesson is narrower and more useful. For three years the AI trade has been modelled as a race to make better chips and smarter software. The election and the sell-off that followed it suggest that the binding constraint may be more mundane: concrete, copper and the consent of the people who live next door. Markets have priced the intelligence. They are only now pricing the electricity. ■"
+      ],
+      "sources": [
+        {
+          "title": "Open: why did the Nasdaq fall 5.5%? Seven things to know about Wall Street’s AI sell-off",
+          "url": "https://openthemagazine.com/technology/quick-take-why-did-the-nasdaq-fall-55-seven-things-to-know-about-wall-streets-ai-sell-off",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "YourStory: AI stocks crash in Wall Street trillion-dollar rout",
+          "url": "https://yourstory.com/ai-story/ai-stocks-crash-wall-street-trillion-rout",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "FourWeekMBA: Nvidia leads $930bn drop in 12 AI stocks by 10:04am ET",
+          "url": "https://fourweekmba.com/ai-nvidia-leads-930b-drop-in-12-ai-stocks-by-10-04-a-m-et/",
+          "date": "2026-11-05"
+        },
+        {
+          "title": "Oplexa: Nvidia stock crash and the AI chip sell-off, November 2026",
+          "url": "https://oplexa.com/blogs/nvidia-stock-crash-ai-chip-selloff-november-2026/",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "Crypto Briefing: AI stocks and the sell-off",
+          "url": "https://cryptobriefing.com/ai-stocks-erase-13-trillion-selloff/",
+          "date": "2026-11-06"
+        }
+      ],
+      "brief": "The Nasdaq Composite fell 5.52% to 24,315 on November 5th, entering a correction, as AI-linked shares sold off; about $2.5trn was erased from the Nasdaq 100. The S&P 500 lost 4.36%. Stocks partly recovered the next day.",
+      "image": "selloff-20261105",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Unplugged"
+    },
+    {
+      "id": "metr-20261105",
+      "section": "science",
+      "fly": "AI progress",
+      "title": "Pulling itself up",
+      "rubric": "An outside assessment suggests Anthropic’s models are improving nearly twice as fast as before, partly because AI is helping to build them. The evidence is thinner than the headline",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-05",
+      "editionId": "2026-11-09",
+      "kind": "Explainer",
+      "body": [
+        "For as long as people have imagined thinking machines, they have imagined the moment when the machines start improving themselves. On November 5th METR, a non-profit research group in Berkeley that evaluates the capabilities of AI systems, published the most careful attempt yet to measure whether that moment has begun. Its answer, for one company at least, is a hedged yes. Since October 2025, it estimates, the benchmark scores of Anthropic’s models have been rising about 1.9 times as fast as they did before—roughly two years’ worth of the old progress packed into one.",
+        "The assessment was commissioned with Anthropic’s co-operation and draws on data no outsider normally sees. METR tracked the company’s models on an index of benchmarks that Anthropic calls AECI, its own version of the Epoch Capabilities Index, which Epoch AI, another research group, built to combine many tests into a single scale. Fitting a trend to that index before and after October 2025 gives the headline ratio. The statistics come with a 95% confidence interval of 1.5 to 2.8 times, wide enough to drive a truck through but clearly above one (see chart 1).",
+        {
+          "chart": "metr-ratio"
+        },
+        {
+          "h": "Who did it?"
+        },
+        "Faster progress could have a dull explanation. Laboratories that spend more on computing to train their models tend to get better models, and spending has soared. METR says it is confident this is not what happened: the acceleration did not come from a speed-up in the growth of training compute. Something else changed in late 2025.",
+        "Its best guess is that the something else is AI itself. METR attributes roughly 80% of the acceleration to Anthropic’s use of its own models in research—writing code, running experiments, analysing results—though it stresses that the uncertainty is substantial. Here the report becomes frustrating. Much of the supporting evidence is redacted, because Anthropic did not want to publish details that might help competitors move faster. METR says plainly that the cuts make it harder for readers to judge its findings. One piece that survived is telling for what it is not: an internal poll of Anthropic staff on Slack suggested AI made researchers about 12 times faster, a figure METR describes as only very loose evidence.",
+        {
+          "h": "Handle with care"
+        },
+        "The headline is less robust than it looks. METR tried alternative ways of modelling the trend and got answers ranging from 1.1 times, barely any acceleration, to 2.9 times. When it added models from other laboratories to the picture, the speed-up fell to about 1.4 times. That might mean Anthropic is pulling ahead of its rivals, or it might mean that a single company’s benchmark history is too short and noisy to bear much weight. A ratio of trends measured over little more than a year of releases is a fragile thing.",
+        "The benchmarks themselves are wearing out. METR notes that an unreleased Anthropic system scored above 50% on all 15 of the benchmarks in its evaluation. Tests that models pass easily stop distinguishing one model from the next, and an index built on them will flatten even if progress does not. The measuring stick is shorter than the thing being measured, which may make future versions of this exercise harder rather than easier.",
+        "It is worth being clear about what the figure is not. It is not a measure of how much more useful the models have become at work, nor of how quickly a company that buys them will see gains. Benchmark scores and real-world productivity have a loose and contested relationship. A model that is twice as good on a test of reasoning puzzles may or may not be twice as good at reconciling invoices.",
+        {
+          "chart": "metr-pace"
+        },
+        {
+          "h": "Why it matters anyway"
+        },
+        "Even so, the report deserves attention, because the question it asks is the one that matters most for how fast AI changes everything else. If AI systems can do a growing share of the work of building better AI systems, progress compounds: each generation shortens the time to the next. Small differences in the rate add up quickly. At the old pace, the 13 months from October 2025 to November 2026 would deliver a little over a year of progress; at 1.9 times, they would deliver about two years (see chart 2, an illustration rather than a forecast).",
+        "Anthropic takes the possibility seriously enough to write it into its own safety rules. Its scaling policy treats the ability to automate AI research as one of the capability thresholds that call for stronger safeguards, precisely because a laboratory whose models speed up their own development has less time to notice and fix problems. An independent estimate that acceleration has begun, however hedged, is the kind of evidence that policy was written to catch.",
+        "That makes the redactions more than an academic irritation. The argument for publishing an outside assessment is that outsiders can check it. A report whose key evidence is hidden asks readers to trust the laboratory and the assessor rather than the data. METR deserves credit for saying so in its own report, and Anthropic for allowing the exercise at all; few of its rivals have submitted to anything similar. But if AI is beginning to build AI, the public will need more than a confidence interval and a promise.",
+        "The best summary of the evidence is that a respected outside group, with privileged access, found a signal that is probably real, probably partly caused by AI and impossible to verify fully from the outside. That is not proof that machines have started to pull themselves up by their own bootstraps. It is a reason to keep a much closer eye on the laces. ■"
+      ],
+      "sources": [
+        {
+          "title": "METR: assessment of AI R&D acceleration at Anthropic",
+          "url": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment",
+          "date": "2026-11-05"
+        },
+        {
+          "title": "TechRepublic: what METR’s Anthropic findings mean for IT buyers",
+          "url": "https://www.techrepublic.com/article/news-anthropic-ai-progress-metr-it-buyers/",
+          "date": "2026-11-05"
+        },
+        {
+          "title": "WebProNews: METR says Anthropic’s AI progress is running twice as fast, with redactions",
+          "url": "https://www.webpronews.com/metr-anthropic-ai-progress-twice-as-fast-redacted/",
+          "date": "2026-11-05"
+        }
+      ],
+      "brief": "METR, an AI-evaluation group, estimated on November 5th that the benchmark scores of Anthropic’s models have risen about 1.9 times as fast since October 2025 (95% interval 1.5–2.8), and attributed roughly 80% of the speed-up to AI helping with research. Much of the evidence was redacted.",
+      "image": "metr-20261105",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Bootstraps"
+    },
+    {
+      "id": "campuses-20261105",
+      "section": "business",
+      "fly": "OpenAI’s data centres",
+      "title": "A rose by any other name",
+      "rubric": "OpenAI wants to call its data centres “compute campuses”. A new name will not settle an old grievance",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-05",
+      "editionId": "2026-11-09",
+      "kind": "Analysis",
+      "body": [
+        "Marketers have a word for what OpenAI tried this week: a rebrand. In the days after the midterm elections, in which voters in three states chose governors who had promised to pause new data centres, reports from Axios, Fortune and Business Insider described a plan by the company to call its sites “AI compute campuses”. On November 5th it published a National Community Compact and a Compute Campus Policy Blueprint, setting out what it would offer the places that host them (see chart).",
+        {
+          "chart": "campus-timeline"
+        },
+        "The company’s explanation is that the new name is simply more accurate. “Compute campuses better describes the scale and role of the infrastructure we’re building for AI,” a spokesperson told Business Insider. There is something to that. The sites OpenAI and its partners are planning draw hundreds of megawatts or more, comparable with a mid-sized city, and bundle power plants, substations and cooling systems alongside the server halls. “Data centre” conjures a windowless shed. The reality is closer to an industrial estate.",
+        "Yet the timing gives the game away, and the sceptics pounced. “You can’t rename your way out of a problem,” Allen Adamson, a brand strategist, told Fortune. The grievances that animated the campaigns were specific: higher electricity bills, water drawn for cooling, noise, tax breaks and few permanent jobs. A name addresses none of them. Critics noted that the published material offered no binding commitments on water, power or noise to the neighbourhoods affected, and some coverage described the policy package as a plan still to be introduced rather than settled practice.",
+        "The more interesting part is the compact itself, if it turns out to have teeth. The industry’s problem is less that people dislike the buildings than that they do not believe the promises made about them, often negotiated behind confidentiality agreements. Commitments that are public, specific and enforceable—paying the full cost of grid upgrades, publishing water use, funding local services—would answer that. A glossy blueprint would not.",
+        "OpenAI is right that the industry needs a new relationship with the towns it builds in. It is wrong to think the relationship starts with vocabulary. Campuses, after all, are places where people are expected to do their homework. ■"
+      ],
+      "sources": [
+        {
+          "title": "San Francisco Standard: OpenAI’s ‘compute campus’ rebrand",
+          "url": "https://sfstandard.com/2026/11/03/openai-ai-compute-campus-rebrand/",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "Fortune: OpenAI wants to rebrand data centres as compute campuses after the midterms",
+          "url": "https://fortune.com/2026/11/06/openai-data-centers-rebrand-compute-campuses-midterms/",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "Baxtel: OpenAI rebrands data centres as compute campuses after midterm rebuke",
+          "url": "https://baxtel.com/news/openai-rebrands-data-centers-as-compute-campuses-after-midterm-rebuke",
+          "date": "2026-11-05"
+        },
+        {
+          "title": "TechSpot: OpenAI’s plan to make data centres less hated",
+          "url": "https://techspot.com/news/114411-openai-plan-make-data-centers-less-hated-rename.html",
+          "date": "2026-11-05"
+        }
+      ],
+      "brief": "OpenAI plans to call its data centres “AI compute campuses”, according to reports from Axios, Fortune and Business Insider, and on November 5th published a National Community Compact and a Compute Campus Policy Blueprint. Critics said the name changes nothing about bills, water or noise.",
+      "image": "campuses-20261105",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Campus politics"
+    },
+    {
+      "id": "revolut-20261103",
+      "section": "business",
+      "fly": "AI coding costs",
+      "title": "Home cooking",
+      "rubric": "Revolut says running an open model on its own chips cut its AI coding bill by about 90%. Other firms will do the sums",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-03",
+      "editionId": "2026-11-09",
+      "kind": "Analysis",
+      "body": [
+        "Software engineers have become the most expensive customers of the AI laboratories. Seats for the best coding agents, with heavy use, can cost a company between $1,000 and $10,000 per engineer a month. Revolut, a London-based fintech firm, decided that was too much. According to a talk by David Abitbol, its head of operations and infrastructure, first reported by The Register, the company has moved about 2,000 engineers onto GLM, an open-weight model from Zhipu AI, a Chinese laboratory, running on its own hardware. The cost, he said, has fallen by about 90% in less than a year.",
+        "The set-up is strikingly small (see chart). Revolut runs the model on 56 of Nvidia’s B200 chips, about one for every 36 engineers. It puts the cost of the computing at roughly $0.30 per million tokens, the chunks of text that models read and write—a small fraction of the list price of leading proprietary models. At reported prices of $30,000-40,000 a chip, the hardware itself would cost around $2m. Seats at the price range Mr Abitbol cited, for 2,000 engineers, would cost $24m-240m a year.",
+        {
+          "chart": "revolut-stats"
+        },
+        "The caveats are important. The $0.30 figure reportedly excludes cloud spending, the staff who keep the system running and the tools used to monitor it, and the full cost has not been disclosed. Coverage disagrees about which version of GLM is in use. And Revolut has not abandoned the laboratories altogether: Claude Code and OpenAI’s Codex remain available to engineers, as exceptions rather than the default. That last detail is a quiet admission that, for the hardest problems, the frontier models are still worth paying for.",
+        "Still, the direction is clear. For a large company with steady, predictable demand, a good-enough open model on owned hardware turns a variable bill that grows with every engineer into something closer to a fixed cost. The arithmetic gets better with scale, which is exactly when the laboratories’ per-seat pricing hurts most. Few firms have Revolut’s engineering depth; fewer still will be relaxed about running a Chinese model on sensitive code, though the weights run on Revolut’s own machines and send nothing back.",
+        "For the laboratories, this is the shape of the threat. Their revenue from coding has been the fastest-growing part of their business, and their biggest customers are precisely the ones best placed to build their own. The answer is probably not to cut prices to $0.30, but to keep the frontier far enough ahead that the exceptions remain the work that matters. ■"
+      ],
+      "sources": [
+        {
+          "title": "The Register: Revolut’s self-hosted AI coding models",
+          "url": "https://www.theregister.com/a/5307345",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "AI Weekly: Revolut cuts AI coding costs about 90% with self-hosted GLM on 56 B200s",
+          "url": "https://aiweekly.co/alerts/revolut-cuts-ai-coding-costs-90-with-self-hosted-glm-on-56-b200s",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "AI Chat Daily: Revolut says self-hosted GLM models cut AI coding costs",
+          "url": "https://www.aichatdaily.com/ai-business/revolut-says-self-hosted-glm-models-cut-ai-coding",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "Magica: Revolut, self-hosted GLM and AI coding costs",
+          "url": "https://magica.com/news/revolut-self-hosted-glm-ai-coding-costs",
+          "date": "2026-11-04"
+        }
+      ],
+      "brief": "Revolut said it moved about 2,000 engineers to a self-hosted GLM model running on 56 Nvidia B200 chips, at roughly $0.30 per million tokens, cutting AI coding costs by about 90%. Claude Code and Codex remain available as exceptions.",
+      "image": "revolut-20261103",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Bring your own brain"
+    },
+    {
+      "id": "aiads-20261104",
+      "section": "policy",
+      "fly": "Political advertising",
+      "title": "Negative campaigning",
+      "rubric": "Data centres became a staple of attack ads this autumn, even though voters ranked them near the bottom of their worries",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-04",
+      "editionId": "2026-11-09",
+      "kind": "Analysis",
+      "body": [
+        "In a campaign about prices, crime and immigration, one of the season’s most advertised villains was a building most voters have never entered. Ads that mentioned data centres drew about $173m in America’s general-election campaigns, according to AdImpact data reported by Axios. As recently as early September an NPR analysis of the same firm’s data had put the total at a little over $45m. In two months the issue went from a local grumble to a national refrain.",
+        "Almost all of it was hostile, and it came from both parties. One tracker of Facebook and Instagram advertising found that, of October’s ads mentioning data centres, 57% were critical and just 3% supportive (see chart). Republicans attacked Democrats for courting tech money; Democrats attacked Republicans for handing out tax breaks. Hardly anyone ran ads defending the things.",
+        {
+          "chart": "aiads-tone"
+        },
+        "This was not because voters were obsessed. When Gallup asked registered voters to rank 11 issues, data-centre construction came tenth. The ads worked, to the extent they did, because the data centre is a vivid way of talking about something voters do care about: bills. An abstract complaint about the cost of living becomes concrete when it has a fence, a power line and a corporate owner.",
+        "The AI industry’s own money took the opposite approach. Super PACs backed by AI investors and companies spent about $81m, according to federal filings, but outside New York their ads mostly steered clear of the technology, backing friendly candidates on other subjects. That is a sensible tactic and a revealing one. An industry confident that the public was on its side would talk about what it does.",
+        "AI also showed up in the making of ads, not just their subject. Political ads made with the help of AI passed $187m by one tally attributed to the Wesleyan Media Project, which tracks campaign advertising. That figure measures something different from the spending on data-centre ads, and the two should not be added together. But together they describe a campaign in which AI was both the topic of choice and, increasingly, the tool.",
+        "The lesson for the industry is uncomfortable. It has lost the argument without ever really making one. The next round, in statehouses from January, will be fought over specifics such as tariffs, water and tax breaks. Those are arguments a well-prepared industry could win. ■"
+      ],
+      "sources": [
+        {
+          "title": "FourWeekMBA: AI data-centre ads hit $173m, 2.1 times what AI PAC filings show",
+          "url": "https://fourweekmba.com/ai-data-center-ads-hit-173m-2-1x-what-ai-pac-filings-show/",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "Axios Deep Dives: data-centre advertising (AdImpact data)",
+          "url": "https://www.axios.com/newsletters/axios-deep-dives-84534d70-d475-11f1-a30a-eda95d89faf6",
+          "date": "2026-11-02"
+        },
+        {
+          "title": "NPR: voters are fed up with data centers; both parties are trying to cash in",
+          "url": "https://npr.org/2026/09/05/nx-s1-5913671/ai-data-center-campaign-spending",
+          "date": "2026-09-05"
+        },
+        {
+          "title": "Anchorage Daily News (AP): AI is already reshaping US politics at every level",
+          "url": "https://www.adn.com/nation-world/2026/07/06/ai-is-already-reshaping-us-politics-at-every-level/",
+          "date": "2026-07-06"
+        }
+      ],
+      "brief": "Ads mentioning data centres drew about $173m in America’s general-election campaigns, up from a little over $45m in early September, according to AdImpact data. Of October’s Facebook and Instagram ads on the subject, 57% were critical and 3% supportive.",
+      "image": "aiads-20261104",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Spin cycle"
+    },
+    {
+      "id": "leader-20261109",
+      "section": "leaders",
+      "fly": "Data centres and voters",
+      "title": "Pay as you grow",
+      "rubric": "The backlash against data centres is rational. The answer is to make them pay their way, not to ban them",
+      "date": "2026-11-09",
+      "eventDate": "2026-11-09",
+      "editionId": "2026-11-09",
+      "kind": "Leader",
+      "body": [
+        "The AI industry likes to describe itself as building the future. On November 3rd voters in three of the states where much of that future was meant to be built told it to slow down. Democrats who had campaigned on pausing new data centres won the governorships of Texas, Georgia and Ohio; in Texas, home to about 27% of America’s planned data-centre capacity, the challenger beat the incumbent by 16 points (see Policy section). Two days later a rout in AI shares knocked 5.5% off the Nasdaq Composite (see Finance & markets section). The industry is tempted to dismiss the result as populism. It should resist the temptation.",
+        "Give the voters some credit. Their complaints are not imaginary. Utilities across the country have asked regulators to approve new power plants and power lines to serve data centres, and in many places the cost of that kit is spread across every customer’s bill. States have competed to attract the sites with tax breaks worth millions of dollars apiece. The buildings use large amounts of water for cooling, hum through the night and, once construction ends, employ relatively few people. Deals have often been struck behind confidentiality agreements, so that local officials did not know who the customer was until the concrete was poured. A voter who concludes that someone else is getting the benefits while she gets the bill is not being irrational.",
+        "Yet a moratorium is the wrong answer, for three reasons. First, the demand will not disappear. The chips are already ordered; the laboratories that use them reported revenues growing several-fold a year. If Texas and Ohio turn the sites away, they will be built in other states, or in other countries, often on dirtier grids and under laxer rules. Voters would forgo the tax base without escaping the consequences. Second, bans are blunt. They stop the efficient project along with the wasteful one, and invite years of litigation. Third, a growing economy needs more electricity anyway, for factories, heat pumps and electric cars as well as computers. A large, creditworthy customer that commits to pay for new generation can make it cheaper to build for everyone.",
+        {
+          "h": "Make them pay"
+        },
+        "The better approach is to stop asking households to subsidise the build-out, and to make that promise enforceable. Start with the grid. Regulators should require large new loads to pay the full cost of the connections, substations and transmission they need, and to sign long contracts that leave them on the hook if they walk away. This is not a fantasy. In 2025 regulators in Ohio approved a tariff requiring new data centres served by AEP Ohio, the state’s largest utility, to pay for most of the capacity they reserve for years, whether or not they use it. Other states should copy and tighten it.",
+        "Next, flexibility. Data centres are unusual customers: much of their work, such as training models, can be paused or shifted. A study from Duke University in 2025 estimated that America’s grids could absorb about 76 gigawatts of new demand without building new capacity, if those loads agreed to curtail their use for just 0.25% of the year, a little under 22 hours. That is far cheaper than building power plants to cover a handful of peak hours. Connection queues should reward sites that sign up to be interrupted, and those that bring their own generation.",
+        "Third, transparency. Operators should publish their power and water use, site by site, every year. They should disclose who the customer is before the permits are granted, not after. Tax breaks should come with clawbacks if promised jobs or investment do not materialise. None of this is onerous for companies valued at hundreds of billions of dollars. All of it would help rebuild a trust that has been squandered.",
+        {
+          "h": "Words are cheap"
+        },
+        "The industry’s first response to the election has not been encouraging. OpenAI has floated calling its data centres “compute campuses”, alongside a community compact whose commitments are vague (see Business section). Rebranding is what companies do when they hope the problem is perception. The problem here is substance: who pays for the grid, who gets the water and who benefits from the tax breaks. A compact that contained binding numbers on those questions would be worth more than any name.",
+        "Nor should the industry forget that it needs these states more than they need it. Texas offers cheap land, abundant wind and gas and a grid operator used to connecting projects quickly; Georgia and Ohio offer room near big population centres. Those advantages give the new governors leverage, and they should use it to strike better bargains rather than to slam doors.",
+        "The new governors have a choice too. Campaign slogans about freezes were effective. Governing by freeze would be costly and, in the end, futile. The better path is to use the leverage the election has given them to negotiate terms: full-cost tariffs, flexible connections, published data and enforceable community benefits. Developers that accept them should be allowed to build quickly. Those that will not are telling voters something useful about the economics of their projects.",
+        "For three years the AI boom has treated electricity, land and public consent as if they were infinitely elastic. The election showed they are not. The answer is not to stop building the infrastructure of the next economy, but to price it honestly. If the computing is as valuable as its builders insist, they can afford to pay for it. ■"
+      ],
+      "sources": [
+        {
+          "title": "Dealroom: data-centre moratorium pledges win governors’ races in Texas, Georgia and Ohio",
+          "url": "https://dealroom.co/news/169195-data-centre-moratorium-pledges-win-governors-races-in-texas-georgia-and/",
+          "date": "2026-11-04"
+        },
+        {
+          "title": "Open: why did the Nasdaq fall 5.5%?",
+          "url": "https://openthemagazine.com/technology/quick-take-why-did-the-nasdaq-fall-55-seven-things-to-know-about-wall-streets-ai-sell-off",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "Fortune: OpenAI wants to rebrand data centres as compute campuses",
+          "url": "https://fortune.com/2026/11/06/openai-data-centers-rebrand-compute-campuses-midterms/",
+          "date": "2026-11-06"
+        },
+        {
+          "title": "Norris and colleagues, Duke University Nicholas Institute: Rethinking Load Growth",
+          "url": "https://nicholasinstitute.duke.edu/publications/rethinking-load-growth",
+          "date": "2025-02-11"
+        }
+      ],
+      "brief": "The backlash against data centres is rational. The answer is to make them pay their way, not to ban them",
+      "image": "leader-20261109",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Plugging the gap"
+    },
+    {
+      "id": "nvidia-20261112",
+      "section": "business",
+      "fly": "Nvidia’s leadership",
+      "title": "After the jacket",
+      "rubric": "Jensen Huang, who built Nvidia into the world’s most valuable chipmaker over 33 years, has resigned. The company must now show it is more than one man",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-12",
+      "editionId": "2026-11-16",
+      "kind": "Briefing",
+      "body": [
+        "In April 1993 three engineers met at a roadside diner in San Jose and agreed to start a company that would make chips for drawing three-dimensional graphics. One of them, Jensen Huang, became its chief executive and never stopped. Over 33 years he turned Nvidia from a maker of gaming cards into the indispensable supplier of the AI boom, and himself, in his trademark black leather jacket, into the industry’s most recognisable figure. On November 12th Nvidia told regulators that he was gone.",
+        "The announcement came in a terse filing with America’s Securities and Exchange Commission. It said the board had accepted Mr Huang’s resignation as president, chief executive and director, effective immediately, on November 11th. Colette Kress, the chief financial officer, becomes interim chief executive while the board looks for a permanent successor, and keeps her job as finance chief. Harvey C. Jones, a long-serving director, becomes Nvidia’s first-ever chair. The company said it would report its quarterly results on November 17th, as scheduled (see chart 1).",
+        {
+          "chart": "nv-timeline"
+        },
+        "The filing gives no reason for the departure, and we will not speculate about one. What is on the record is that Nvidia’s independent directors had earlier been investigating reports of a foreign intelligence operation targeting Mr Huang, and that the company had said it had no reason to believe that American national security or its corporate secrets had been compromised. As recently as the weekend before his resignation Nvidia said in a statement that he was committed to continuing to lead the company “without interruption”. No link between the investigation and the resignation has been stated. What matters for investors, customers and governments is what happens next.",
+        {
+          "h": "One man’s company"
+        },
+        "Few large firms have been as closely identified with a single person. Mr Huang was not merely the boss; he was the strategist, the chief salesman and, in effect, the product roadmap. Nvidia is famously flat: he was reported to have around 60 people reporting directly to him, an arrangement that most management books warn against and that worked, at Nvidia, because he could absorb it. Big decisions, from the bet on CUDA, the software that let programmers use graphics chips for general computing, to the pivot towards data centres, were his.",
+        "His tenure was long even by the standards of founder-bosses (see chart 2). Larry Ellison ran Oracle for 37 years before handing over in 2014. Jeff Bezos led Amazon for 27 years, Bill Gates Microsoft for about 25. Each of those handovers was planned, announced in advance and accompanied by a named successor who had been groomed for years. Nvidia’s is none of those things. Ms Kress is a respected finance chief, at the company since 2013 and previously at Cisco and Microsoft, but she is an interim appointment doing two jobs at once. Reports suggest headhunters are already at work.",
+        {
+          "chart": "nv-reigns"
+        },
+        {
+          "h": "Bench strength"
+        },
+        "The good news for Nvidia is that its position does not depend on one person’s charisma. Its chips are the default for training and running large AI models; its software ecosystem, built over nearly two decades, is the moat competitors have struggled to cross; its order book stretches years ahead. Customers cannot switch quickly even if they want to. A change at the top does not change any of that this quarter, or next.",
+        "The harder question is the one that Mr Huang answered better than anyone: where to place the next bet. Nvidia’s rise was a series of early, risky wagers—on programmable graphics, on CUDA, on AI before AI was fashionable, on networking and whole data-centre systems rather than individual chips. Each required a leader with the authority to commit billions years before the payoff. Committees and interim bosses are not built for that kind of conviction. The risk for Nvidia is not that it stumbles tomorrow, but that it becomes more cautious just as rivals—AMD, the cloud giants’ own chip designers and a swarm of start-ups—get bolder.",
+        "Governance is the other gap. Nvidia had never had a separate board chair before this month. That is unusual for a company of its size and importance, and it reflected Mr Huang’s dominance. The appointment of Mr Jones is a belated step towards the checks that most big companies take for granted. The board will now be judged on how quickly and how openly it finds a permanent chief executive, and whether it explains the circumstances of the departure more fully than a two-page filing.",
+        {
+          "h": "The whole industry’s problem"
+        },
+        "The episode lands at an awkward moment. A week earlier AI shares had suffered a sharp sell-off on fears that the political backlash against data centres would slow the build-out (see Finance & markets, “Short circuit”). Anthropic is preparing what would be the biggest share sale in history (see “Show and sell”). Nvidia is the hinge of the entire trade; its results on November 17th will be read for signs of strain in demand, and its management for signs of strain at the top.",
+        "There is a broader lesson, too. The AI industry is concentrated not only in a handful of companies but in a handful of people. Founders and chief executives at the leading laboratories and chipmakers carry enormous weight in strategy, in negotiations with governments and in the confidence of investors. Concentration of that kind is a risk that boards have been reluctant to price (see Leaders). Nvidia has just priced it for everyone.",
+        "Mr Huang built a company that now matters to the world economy in a way few firms ever have. The best tribute its board could pay him is to show that it no longer needs him. ■"
+      ],
+      "sources": [
+        {
+          "title": "Nvidia: Form 8-K, CEO transition, filed 12 November",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvda-20261111.htm",
+          "date": "2026-11-12"
+        },
+        {
+          "title": "Nvidia: press release, NVIDIA announces CEO transition",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvidiaannouncesceotransiti.htm",
+          "date": "2026-11-12"
+        },
+        {
+          "title": "Fortune: Nvidia’s power, built around Jensen Huang, is being tested",
+          "url": "https://fortune.com/2026/11/09/nvidia-power-built-around-jensen-huang-scandal-testing-formula/",
+          "date": "2026-11-09"
+        },
+        {
+          "title": "IBTimes: Nvidia, Jensen Huang, succession and the board investigation",
+          "url": "https://www.ibtimes.com/nvidia-jensen-huang-succession-plan-investigation-3809602",
+          "date": "2026-11-09"
+        },
+        {
+          "title": "The Standard, citing The Information: headhunters may be hunting for Nvidia’s next leader",
+          "url": "https://www.thestandard.com.hk/finance/article/348055/Headhunters-may-be-hunting-for-Nvidias-next-successor-The-Information-reports",
+          "date": "2026-11-13"
+        }
+      ],
+      "brief": "Nvidia said in a filing on November 12th that Jensen Huang had resigned as chief executive and director, effective November 11th. Colette Kress, the finance chief, is interim CEO while the board searches for a successor. The filing gave no reason.",
+      "image": "nvidia-20261112",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Who leads now"
+    },
+    {
+      "id": "roadshow-20261111",
+      "section": "markets",
+      "fly": "Anthropic’s flotation",
+      "title": "Show and sell",
+      "rubric": "Anthropic aims to raise up to $64bn in what would be the largest share sale in history. The price says as much about the market’s nerves as about the company",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-11",
+      "editionId": "2026-11-16",
+      "kind": "Briefing",
+      "body": [
+        "Initial public offerings used to be measured in millions of dollars. On November 11th Anthropic, the maker of Claude, launched the roadshow for one measured in tens of billions. It plans to sell 825m Class A shares at between $70 and $78 each, to be listed on the Nasdaq Global Select Market under the ticker ANT. At the bottom of the range that would raise $57.75bn; at the top, $64.35bn, and more than $70bn if the banks exercise their option to sell extra shares. The previous record, set by Saudi Aramco in 2019, was $25.6bn (see chart 1).",
+        {
+          "chart": "ipo-league"
+        },
+        "Demand, so far, looks strong. CNBC, citing people familiar with the deal, reported that the order book was already covered at every price in the range, and that institutional interest was running ahead of that for SpaceX’s flotation at the same stage. The shares are expected to be priced on November 18th and to begin trading the next day. Those are big ifs in a market that, a week earlier, had just suffered one of its worst days in years.",
+        {
+          "h": "Marked down, still enormous"
+        },
+        "The most telling number is not the amount raised but the value implied. Coverage of the price range puts Anthropic at up to about $1.4trn, and Fast Company described an analysis-based range of $1trn to $1.4trn. Over the summer there was talk of $2trn. A cut of that size before a single share has traded would normally signal trouble. Here it looks more like realism. The banks have chosen a price that leaves room for the shares to rise, which is how a successful flotation is usually engineered, and which matters all the more after the market’s recent fright.",
+        "Is $1.4trn sensible? The prospectus Anthropic filed in October gives investors more to work with than they have ever had for a frontier laboratory. Revenue in the second quarter of 2026 was $11.6bn, two-and-a-half times as much as in the whole of 2025, and the company turned an operating profit of $974m in that quarter. Multiply the quarter by four and you get about $46bn of annualised revenue. On that basis, $1.4trn is about 30 times sales; $1trn would be about 22 times; the $2trn once rumoured would have been more than 40 times (see chart 2, our calculation).",
+        "A flotation of this size also tests the plumbing of the market. Few funds can take a meaningful slice of a $60bn offering without selling something else, which is one reason other technology shares may wobble around the pricing. Index providers will have to decide how quickly to add the shares to their benchmarks; early inclusion would force passive funds to buy, while delay would leave them underweight a company worth more than all but a handful of America’s listed firms.",
+        {
+          "chart": "ipo-multiple"
+        },
+        "Thirty times sales is rich for any company, but not unheard of for one growing this fast. The bet investors are making is that revenue keeps compounding for years and that margins keep widening as the cost of computing per answer falls. The risks are equally plain. Anthropic has signed agreements for chips and computing worth hundreds of billions of dollars, which it will have to honour whether or not demand holds up. Its biggest customers are learning to build their own: Revolut, a fintech firm, said this month it had moved 2,000 engineers to an open model running on its own chips (see Business, “Home cooking”). And competition from OpenAI, Google and open-weight models from China keeps pressure on prices.",
+        {
+          "h": "The week that was"
+        },
+        "The timing is unusual, to say the least. The roadshow began two days before Nvidia disclosed that Jensen Huang had resigned as chief executive (see Business, “After the jacket”), and a week after a sell-off that wiped about $2.5trn off the Nasdaq 100. A week before that, METR, an evaluation group, had published an assessment suggesting that Anthropic’s own models were speeding up its research (see Science, “Pulling itself up”). Investors on the roadshow have plenty to ask about.",
+        "Then there is governance. Anthropic is a public-benefit corporation, legally obliged to weigh its mission alongside its shareholders’ returns, and an independent trust has a say in electing its board. Public investors will be buying into a company whose controllers have explicitly told them that profit is not the only goal. That structure has been praised as a safeguard and criticised as a muddle. A listing will test which description investors believe, every quarter, in the share price.",
+        {
+          "h": "Why it matters beyond the price"
+        },
+        "Whatever the shares do on their first day, the flotation changes the industry. For the first time a frontier AI laboratory will report its results to the public four times a year, under the discipline of securities law. Its rivals’ private valuations will be benchmarked against a public price. Its costs, its customer concentration and its spending commitments will be scrutinised by analysts whose job is to be sceptical. That is a healthy development for an industry that has asked the world to take a great deal on trust.",
+        "It also hands ordinary investors a direct stake in a technology that has so far enriched mostly venture capitalists and a few giant tech firms. That is a mixed blessing. Public markets are a good way to spread both the rewards and the risks of a boom. They are also, as November 5th showed, prone to sudden changes of mood. If the AI build-out is a bet on the future, Anthropic’s flotation is the moment the bet goes public. ■"
+      ],
+      "sources": [
+        {
+          "title": "Anthropic: roadshow launch announcement, 11 November",
+          "url": "https://anthropic.com/news/roadshow-launch",
+          "date": "2026-11-11"
+        },
+        {
+          "title": "RTTNews: Anthropic sets IPO price range at $70-78 per share, launches roadshow",
+          "url": "https://www.rttnews.com/3712632/anthropic-sets-ipo-price-range-at-70-78-per-share-launches-roadshow.aspx",
+          "date": "2026-11-11"
+        },
+        {
+          "title": "Fast Company: Anthropic stock listing, target price and valuation",
+          "url": "https://fastcompany.com/91639303/anthropic-stock-listing-target-price-valuation-as-ipo-date-nears",
+          "date": "2026-11-11"
+        },
+        {
+          "title": "Sovereign Magazine: Anthropic IPO price range and roadshow",
+          "url": "https://www.sovereignmagazine.com/article/anthropic-ipo-price-range-roadshow",
+          "date": "2026-11-11"
+        },
+        {
+          "title": "Anthropic: proposed IPO announcement, 26 October",
+          "url": "https://www.anthropic.com/news/s1-sec",
+          "date": "2026-10-26"
+        }
+      ],
+      "brief": "Anthropic launched the roadshow for its flotation on November 11th, offering 825m shares at $70-78 each to raise $57.75bn-64.35bn, which would be the biggest IPO ever. Pricing is expected on November 18th and trading on Nasdaq, as ANT, the next day.",
+      "image": "roadshow-20261111",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "The biggest ask"
+    },
+    {
+      "id": "alphaproof-20261110",
+      "section": "science",
+      "fly": "Formal verification",
+      "title": "Signal and noise",
+      "rubric": "Google DeepMind’s AI checked the mathematics behind Signal’s encryption in about four weeks. What it proved, and what it did not",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-10",
+      "editionId": "2026-11-16",
+      "kind": "Explainer",
+      "body": [
+        "Every day hundreds of millions of messages are protected by a piece of mathematics most of their senders have never heard of. The Signal protocol, designed for the Signal messaging app and adopted by WhatsApp and others, decides how two phones agree on secret keys and keep changing them, so that a thief who steals one key cannot read past or future conversations. On November 10th Google DeepMind said its AI system, AlphaProof Code, had produced formal, machine-checked proofs that core parts of the protocol do what they are supposed to. It took about four weeks. The company says work of this kind would historically have taken teams of experts years.",
+        "Formal verification is the gold standard of software assurance, and the most neglected. Testing shows that a program works on the cases someone thought to try. A formal proof shows that it works on every case, given a precise statement of what “works” means. The catch is cost. Writing such proofs is slow, specialised labour; the verification of seL4, a small operating-system kernel, in 2009 is still cited as a landmark partly because of how many person-years it consumed. Most of the world’s critical software has never been formally verified, simply because nobody could afford it (see chart 1).",
+        {
+          "chart": "ap-timeline"
+        },
+        {
+          "h": "Who checks the checker?"
+        },
+        "DeepMind’s approach divides the labour carefully. Human experts wrote the specifications—the precise mathematical statements of what each part of the protocol must guarantee. AI agents then searched for proofs. Every proof they produced was checked by Lean, a proof assistant whose small, trusted core accepts only valid logical steps. That last point is the crux. The AI can be as creative, or as wrong, as it likes; nothing counts unless Lean accepts it. A language model’s usual weakness, confident nonsense, is filtered out by construction.",
+        "The targets were the two hardest parts of modern Signal. PQXDH is the handshake that sets up a session, updated in 2023 to resist future quantum computers. The Triple Ratchet is the machinery that keeps refreshing keys during a conversation, extended more recently with a post-quantum component of its own. To test whether the system would catch real mistakes, DeepMind reintroduced two bugs that had previously been found and fixed in the protocol. AlphaProof Code caught both.",
+        "Specifications are where the risk now hides. A proof shows that a system meets its specification; it says nothing about whether the specification captures everything people need. Had the experts who wrote Signal’s specifications left out a property—say, that an attacker who briefly compromises a phone cannot keep reading messages after it recovers—the proofs would be silent on it. That is why DeepMind’s decision to keep humans in charge of the specifications matters as much as the speed. It is also why the reintroduced bugs are a better advertisement than the four weeks: they show the checker catching the kind of mistakes that real experts actually made.",
+        {
+          "h": "Mind the small print"
+        },
+        "The achievement is real, but it is narrower than some headlines suggested (see chart 2). The proofs assume that the underlying cryptographic building blocks—the hash functions, the key-exchange primitives—are perfect. They cover the protocol’s design, not the code of the Signal app that runs on your phone, which was not verified. Side-channel attacks, which extract secrets by measuring things like timing or power consumption, are out of scope. And the analysis found no new vulnerabilities in the parts it examined, which is reassuring about Signal but means the exercise confirmed rather than discovered.",
+        {
+          "chart": "ap-scope"
+        },
+        "None of that diminishes the result so much as locate it. Most real-world breaks in secure messaging have come not from flaws in protocol design but from mistakes in implementation, from leaky hardware or from attacks on the phone itself. A verified design is a necessary foundation, not a guarantee of safety. Signal’s chief technology officer welcomed the work. WIRED, more sceptically, asked whether the approach can scale to the vast, messy codebases where most bugs actually live, at a cost anyone will pay.",
+        {
+          "h": "Why it matters"
+        },
+        "That question is the right one, and the answer will determine whether this is a curiosity or a turning point. If AI can cut the cost of formal verification by an order of magnitude or two, the economics of software assurance change. Banks, aircraft makers, chip designers and governments could demand proofs, not just tests, for the code that matters most. The bottleneck would shift from writing proofs to writing specifications—deciding precisely what a piece of software should do, which is hard intellectual work that remains, for now, firmly human.",
+        "There is a pleasing symmetry here. AI systems are increasingly writing code, and one of the deepest worries about that is that nobody fully understands what they write. The same technology, harnessed to a strict checker, may be part of the answer: machines that write proofs which another, much simpler machine can verify beyond doubt. The trust lies not in the clever system but in the dull one.",
+        "Four weeks for a job that once took years is a striking number, but the more important figure may be zero: the number of steps in the final proofs that rest on an AI’s say-so alone. In a field awash with claims that cannot be checked, that is a signal worth hearing above the noise. ■"
+      ],
+      "sources": [
+        {
+          "title": "Google DeepMind: formal verification of the Signal protocol",
+          "url": "https://deepmind.google/blog/formal-verification-signal-protocol",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "Google DeepMind: introducing AlphaProof Code",
+          "url": "https://deepmind.google/blog/introducing-alphaproof-code/",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "Let’s Data Science: AlphaProof Code formally verifies key Signal protocol components",
+          "url": "https://letsdatascience.com/news/google-deepminds-alphaproof-code-formally-verifies-key-signa-a2c50019",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "AI Weekly: DeepMind’s AlphaProof Code verifies Signal protocol in four weeks",
+          "url": "https://aiweekly.co/alerts/deepminds-alphaproof-code-verifies-signal-protocol-in-four-weeks",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "HWBusters: what AlphaProof Code did and did not verify",
+          "url": "https://hwbusters.com/?p=122571",
+          "date": "2026-11-11"
+        }
+      ],
+      "brief": "Google DeepMind said on November 10th that AlphaProof Code produced Lean-checked proofs for Signal’s PQXDH handshake and Triple Ratchet in about four weeks, and caught two reintroduced bugs. The proofs assume perfect cryptography and do not cover the app’s code.",
+      "image": "alphaproof-20261110",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "Proof positive"
+    },
+    {
+      "id": "nysafety-20261110",
+      "section": "policy",
+      "fly": "AI regulation in New York",
+      "title": "Empire testing",
+      "rubric": "New York has opened a public laboratory to test frontier AI, and a register for the firms that build it",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-10",
+      "editionId": "2026-11-16",
+      "kind": "Analysis",
+      "body": [
+        "Most governments that regulate AI have to take the companies’ word for what their models can do. New York wants its own lab. On November 10th Kathy Hochul, the governor, launched the New York Center for AI Responsibility and Research at Binghamton University, part of the state university system. It will bring together more than 80 researchers to test advanced AI systems independently, using computing from Empire AI, a public-private consortium the state set up to give universities access to powerful chips. Its remit also covers basic research and training a new generation of AI-safety experts.",
+        "The same day the state opened a registration portal under the RAISE Act, its law on frontier AI. Developers of the largest models must register with the state by January 1st 2027 and publish their safety frameworks on their websites. The law defines frontier models as those trained with more than 10^26 computational operations at a computing cost of more than $100m—a bar that catches only a handful of laboratories. A new oversight office in the Department of Financial Services will enforce it, with civil penalties for breaches (see chart).",
+        {
+          "chart": "raise-table"
+        },
+        "New York’s thresholds echo California’s SB 53, signed in 2025, which also uses 10^26 operations. The European Union’s AI Act presumes systemic risk at a tenth of that. The convergence on compute thresholds is convenient for regulators, because computing is measurable, and convenient for laboratories, because it limits obligations to a few big players. It is also crude: as training grows more efficient, capable models may slip under the line.",
+        "The testing centre is the more novel idea, and the less defined. Its announcement did not set out test methods, a list of systems to be examined or a timetable for results. Nor did it say whether the companies will give the state access to unreleased models, which is where independent testing matters most. Britain’s and America’s national AI-security institutes depend on voluntary agreements with the laboratories; a state centre has even less leverage.",
+        "Still, New York has done something useful. A regulator that can run its own tests is harder to fob off, and a pool of trained evaluators outside the companies is a public good in short supply. The register makes it clear who is subject to the law. The laboratory will show whether the state can check what they say. ■"
+      ],
+      "sources": [
+        {
+          "title": "Governor of New York: New York will lead the nation in AI science and safety",
+          "url": "https://www.governor.ny.gov/news/governor-hochul-declares-ny-will-lead-nation-ai-science-and-safety-launches-new-research",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "New York Department of Financial Services: RAISE Act registration",
+          "url": "https://www.dfs.ny.gov/node/449846",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "Let’s Data Science: New York launches state AI safety centre to independently test models",
+          "url": "https://letsdatascience.com/news/new-york-launches-state-ai-safety-center-to-independently-te-898d8d36",
+          "date": "2026-11-10"
+        },
+        {
+          "title": "Wiley: New York finalises RAISE Act for frontier AI models",
+          "url": "https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027",
+          "date": "2026-11-10"
+        }
+      ],
+      "brief": "New York launched a state AI testing centre at Binghamton University on November 10th, with more than 80 researchers, and opened registration under its RAISE Act. Developers of models trained with over 10^26 operations at over $100m must register by January 1st 2027.",
+      "image": "nysafety-20261110",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "State of the art"
+    },
+    {
+      "id": "australia-20261112",
+      "section": "work",
+      "fly": "AI at work in Australia",
+      "title": "Rules of engagement",
+      "rubric": "Australia’s government has drafted a guide for bringing AI into workplaces. Unions and bosses helped write it",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-12",
+      "editionId": "2026-11-16",
+      "kind": "Analysis",
+      "body": [
+        "Countries have tended to regulate AI at work in one of two ways: with hard law, as in the European Union, or barely at all. On November 12th Australia’s Labor government tried a third route. It released a draft Best Practice Guide on the Adoption of AI in the Workplace, a voluntary framework built around three themes—Plan, Enable and Embed—and eight practical principles. It is open for public consultation until January 27th 2027, a window of 76 days (see chart).",
+        {
+          "chart": "au-stats"
+        },
+        "The principles run from “capturing the opportunity” at one end to proactively managing risks, including to workers’ health and safety, at the other. In between, the guide’s emphasis is on process rather than prohibition: employers are urged to consult staff directly about the technology and to introduce it carefully, rather than announcing it as a fait accompli. That reflects how the guide was made. The employment department developed it through a series of roundtables and forums with unions, employer groups, academics, small businesses and large employers.",
+        "Australia has particular reasons for caution. Robodebt, an automated scheme to recover welfare debts that ran from 2016 to 2019, wrongly pursued hundreds of thousands of people and was condemned by a royal commission in 2023. The scandal made automated decision-making a household phrase, and left unions wary of systems that judge workers without human review. A guide that puts consultation first is partly a response to that memory.",
+        "Its weakness is the obvious one: it is a guide. Employers who ignore it face no penalty, and the firms most likely to adopt AI badly are the least likely to read it. Unions want binding duties to consult; business groups warn that rules written too early will be unworkable. The draft sits deliberately between them, and the consultation will show whether either side pushes it off balance.",
+        "There is a case for starting soft. Workplace AI is changing faster than legislation can, and good practice is still being discovered. A voluntary guide written with both sides of industry can harden into regulation later, once it is clear what works. The risk is that “later” arrives only after the next scandal. ■"
+      ],
+      "sources": [
+        {
+          "title": "Minister for Employment and Workplace Relations: draft best-practice guide on AI adoption in the workplace released",
+          "url": "https://ministers.dewr.gov.au/rishworth/draft-best-practice-guide-ai-adoption-workplace-released",
+          "date": "2026-11-12"
+        },
+        {
+          "title": "InDaily: Labor unveils first workplace AI plan",
+          "url": "https://www.indailysa.com.au/news/just-in/2026/11/12/labor-unveils-first-workplace-ai-plan",
+          "date": "2026-11-12"
+        },
+        {
+          "title": "HRD Australia: government moves on workplace AI",
+          "url": "https://www.hcamag.com/au/specialisation/employment-law/government-moves-to-rein-in-workplace-ai/573209",
+          "date": "2026-11-12"
+        }
+      ],
+      "brief": "Australia’s government released a draft voluntary guide to adopting AI at work on November 12th, built on three themes and eight principles and developed with unions and employers. Consultation runs until January 27th 2027.",
+      "image": "australia-20261112",
+      "minutes": 2,
+      "format": "news-analysis",
+      "printHeadline": "Plan, enable, embed"
+    },
+    {
+      "id": "leader-20261116",
+      "section": "leaders",
+      "fly": "Key-person risk",
+      "title": "One-man bands",
+      "rubric": "Nvidia’s turmoil and Anthropic’s listing show that some of AI’s biggest risks are human. Boards should act like it",
+      "date": "2026-11-16",
+      "eventDate": "2026-11-16",
+      "editionId": "2026-11-16",
+      "kind": "Leader",
+      "body": [
+        "Software engineers have a grim term for the fragility of a project: its bus factor, the number of people who would have to be hit by a bus before it collapsed. For much of the AI industry the answer is uncomfortably small. On November 12th Nvidia, the chipmaker on which almost the entire industry depends, disclosed that Jensen Huang, its co-founder and chief executive for 33 years, had resigned with immediate effect, and that its finance chief would run the company in the interim (see Business section). The filing gave no reason. Whatever the circumstances, the episode is a warning that investors, customers and governments have been slow to heed.",
+        "Give the founders their due. The industry’s extraordinary rise owes a great deal to a few individuals with the vision to make risky bets and the authority to see them through. Mr Huang bet on general-purpose computing with graphics chips when it looked like a niche, and on AI before most people took it seriously. Strong founders can move faster than committees, and their companies often outperform. Nobody would want boards that smother that kind of leadership.",
+        "But the concentration has gone too far, and in an industry that now matters too much for it to be left to chance. Nvidia, valued in the trillions of dollars and supplying the chips for most of the world’s AI, had never had a separate board chair until this month. Its boss was reported to have around 60 direct reports. No successor had been publicly identified. The leading AI laboratories are similarly identified with their founders, whose views shape not only strategy but also negotiations with governments over safety, export controls and energy. When one of them goes, suddenly, the effects ripple far beyond a single share price.",
+        {
+          "h": "Price the risk"
+        },
+        "The first responsibility lies with boards. Large companies should separate the roles of chair and chief executive, or at least appoint a strong independent lead director with real powers. They should maintain, and test, credible plans for an emergency succession, with internal candidates given enough exposure that investors and customers know who they are. Nvidia’s appointment of Harvey Jones as its first chair is a welcome step. It should have been taken years ago.",
+        "The second lies with investors, who have been happy to pay a premium for star founders without discounting the risk of losing them. Anthropic’s flotation, which would be the largest in history at up to $64bn, is a chance to do better (see Finance & markets section). Its prospectus and roadshow should be read not only for revenue and margins but for depth of management, board independence and the workings of the trust that helps elect its directors. Public investors are entitled to know who would run the company if its leaders left, and how they would be chosen.",
+        "The third lies with governments, which have focused their attention on AI models rather than on the companies that make them. New York’s new testing centre and frontier-AI register (see Policy section) are sensible as far as they go. But a regulator that worries about catastrophic risks from AI systems should also care whether the firms building them have the governance to make careful decisions under pressure. Responsible-scaling policies and safety frameworks are only as robust as the people and processes that enforce them.",
+        "Customers have a stake as well. Cloud providers, carmakers and governments that depend on a single supplier of AI chips, or a single laboratory’s models, are exposed to that supplier’s governance as much as to its prices. Procurement teams routinely ask suppliers for continuity plans covering fires, floods and cyber-attacks. They should ask about leadership too: who decides if the boss goes, how quickly a successor is chosen and whether strategy rests on one person’s judgment. Diversifying suppliers, where possible, is the surest hedge, and Nvidia’s rivals will make that argument loudly in the coming months.",
+        {
+          "h": "Beyond the cult"
+        },
+        "There is a cultural problem, too. The technology industry has long celebrated the founder as genius, a narrative that suits fundraising and recruitment. It also discourages the dull work of building institutions that can outlast any one person. The most enduring tech companies, from Microsoft to Apple, survived the departure of their founders because they had deep benches and clear processes by the time it happened. Their transitions were planned, announced in advance and handed to people who had long been groomed for the job.",
+        "None of this means Nvidia is in trouble. Its products remain dominant, its customers locked in and its order book full; its results on November 17th will be scrutinised but are unlikely to reveal a crisis. The point is that the company’s fate, and to a degree the industry’s, briefly looked as though it depended on one man’s circumstances. That should not be true of any company so central to the world economy.",
+        "The AI industry has spent years building systems designed to be robust against failure, with redundancy, monitoring and fallback plans. Boards should apply the same engineering to themselves. A company whose bus factor is still just one has not yet finished being built. ■"
+      ],
+      "sources": [
+        {
+          "title": "Nvidia: Form 8-K, CEO transition, filed 12 November",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvda-20261111.htm",
+          "date": "2026-11-12"
+        },
+        {
+          "title": "Anthropic: roadshow launch announcement, 11 November",
+          "url": "https://anthropic.com/news/roadshow-launch",
+          "date": "2026-11-11"
+        },
+        {
+          "title": "Fortune: Nvidia’s power, built around Jensen Huang, is being tested",
+          "url": "https://fortune.com/2026/11/09/nvidia-power-built-around-jensen-huang-scandal-testing-formula/",
+          "date": "2026-11-09"
+        },
+        {
+          "title": "Governor of New York: AI science and safety announcement",
+          "url": "https://www.governor.ny.gov/news/governor-hochul-declares-ny-will-lead-nation-ai-science-and-safety-launches-new-research",
+          "date": "2026-11-10"
+        }
+      ],
+      "brief": "Nvidia’s turmoil and Anthropic’s listing show that some of AI’s biggest risks are human. Boards should act like it",
+      "image": "leader-20261116",
+      "minutes": 4,
+      "format": "long-read",
+      "printHeadline": "The bus factor"
     }
   ],
   "briefs": [
@@ -3462,6 +4310,162 @@ NB.aiArticles={
         "date": "2026-10-14"
       },
       "lead": "Nvidia researchers"
+    },
+    {
+      "id": "b-midterms-20261104",
+      "articleId": "midterms-20261104",
+      "date": "2026-11-04",
+      "headline": "Governors against server farms",
+      "text": "Democrats won the governorships of Texas, Georgia and Ohio on November 3rd after campaigning to pause new data centres. Gina Hinojosa beat Greg Abbott in Texas by 57% to 41% in unofficial results; Texas holds about 27% of planned American data-centre capacity, according to Wells Fargo.",
+      "source": {
+        "title": "Dealroom: data-centre moratorium pledges win governors’ races in Texas, Georgia and Ohio",
+        "url": "https://dealroom.co/news/169195-data-centre-moratorium-pledges-win-governors-races-in-texas-georgia-and/",
+        "date": "2026-11-04"
+      },
+      "lead": "Democrats"
+    },
+    {
+      "id": "b-selloff-20261105",
+      "articleId": "selloff-20261105",
+      "date": "2026-11-05",
+      "headline": "A bad Thursday",
+      "text": "The Nasdaq Composite fell 5.52% to 24,315 on November 5th, entering a correction, as AI-linked shares sold off; about $2.5trn was erased from the Nasdaq 100. The S&P 500 lost 4.36%. Stocks partly recovered the next day.",
+      "source": {
+        "title": "Open: why did the Nasdaq fall 5.5%? Seven things to know about Wall Street’s AI sell-off",
+        "url": "https://openthemagazine.com/technology/quick-take-why-did-the-nasdaq-fall-55-seven-things-to-know-about-wall-streets-ai-sell-off",
+        "date": "2026-11-06"
+      },
+      "lead": "The Nasdaq Composite"
+    },
+    {
+      "id": "b-metr-20261105",
+      "articleId": "metr-20261105",
+      "date": "2026-11-05",
+      "headline": "Faster, with caveats",
+      "text": "METR, an AI-evaluation group, estimated on November 5th that the benchmark scores of Anthropic’s models have risen about 1.9 times as fast since October 2025 (95% interval 1.5–2.8), and attributed roughly 80% of the speed-up to AI helping with research. Much of the evidence was redacted.",
+      "source": {
+        "title": "METR: assessment of AI R&D acceleration at Anthropic",
+        "url": "https://metr.org/blog/2026-11-05-anthropic-ai-rd-acceleration-assessment",
+        "date": "2026-11-05"
+      },
+      "lead": "METR"
+    },
+    {
+      "id": "b-campuses-20261105",
+      "articleId": "campuses-20261105",
+      "date": "2026-11-05",
+      "headline": "Data centres by another name",
+      "text": "OpenAI plans to call its data centres “AI compute campuses”, according to reports from Axios, Fortune and Business Insider, and on November 5th published a National Community Compact and a Compute Campus Policy Blueprint. Critics said the name changes nothing about bills, water or noise.",
+      "source": {
+        "title": "San Francisco Standard: OpenAI’s ‘compute campus’ rebrand",
+        "url": "https://sfstandard.com/2026/11/03/openai-ai-compute-campus-rebrand/",
+        "date": "2026-11-03"
+      },
+      "lead": "OpenAI"
+    },
+    {
+      "id": "b-revolut-20261103",
+      "articleId": "revolut-20261103",
+      "date": "2026-11-03",
+      "headline": "Revolut brings its model home",
+      "text": "Revolut said it moved about 2,000 engineers to a self-hosted GLM model running on 56 Nvidia B200 chips, at roughly $0.30 per million tokens, cutting AI coding costs by about 90%. Claude Code and Codex remain available as exceptions.",
+      "source": {
+        "title": "The Register: Revolut’s self-hosted AI coding models",
+        "url": "https://www.theregister.com/a/5307345",
+        "date": "2026-11-03"
+      },
+      "lead": "Revolut"
+    },
+    {
+      "id": "b-aiads-20261104",
+      "articleId": "aiads-20261104",
+      "date": "2026-11-04",
+      "headline": "Attack ads, plugged in",
+      "text": "Ads mentioning data centres drew about $173m in America’s general-election campaigns, up from a little over $45m in early September, according to AdImpact data. Of October’s Facebook and Instagram ads on the subject, 57% were critical and 3% supportive.",
+      "source": {
+        "title": "FourWeekMBA: AI data-centre ads hit $173m, 2.1 times what AI PAC filings show",
+        "url": "https://fourweekmba.com/ai-data-center-ads-hit-173m-2-1x-what-ai-pac-filings-show/",
+        "date": "2026-11-03"
+      },
+      "lead": "Ads mentioning data centres"
+    },
+    {
+      "id": "b-nvidia-20261112",
+      "articleId": "nvidia-20261112",
+      "date": "2026-11-12",
+      "headline": "Huang steps down",
+      "text": "Nvidia said in a filing on November 12th that Jensen Huang had resigned as chief executive and director, effective November 11th. Colette Kress, the finance chief, is interim CEO while the board searches for a successor. The filing gave no reason.",
+      "source": {
+        "title": "Nvidia: Form 8-K, CEO transition, filed 12 November",
+        "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvda-20261111.htm",
+        "date": "2026-11-12"
+      },
+      "lead": "Nvidia"
+    },
+    {
+      "id": "b-roadshow-20261111",
+      "articleId": "roadshow-20261111",
+      "date": "2026-11-11",
+      "headline": "A record offer",
+      "text": "Anthropic launched the roadshow for its flotation on November 11th, offering 825m shares at $70-78 each to raise $57.75bn-64.35bn, which would be the biggest IPO ever. Pricing is expected on November 18th and trading on Nasdaq, as ANT, the next day.",
+      "source": {
+        "title": "Anthropic: roadshow launch announcement, 11 November",
+        "url": "https://anthropic.com/news/roadshow-launch",
+        "date": "2026-11-11"
+      },
+      "lead": "Anthropic"
+    },
+    {
+      "id": "b-alphaproof-20261110",
+      "articleId": "alphaproof-20261110",
+      "date": "2026-11-10",
+      "headline": "Proofs for private messages",
+      "text": "Google DeepMind said on November 10th that AlphaProof Code produced Lean-checked proofs for Signal’s PQXDH handshake and Triple Ratchet in about four weeks, and caught two reintroduced bugs. The proofs assume perfect cryptography and do not cover the app’s code.",
+      "source": {
+        "title": "Google DeepMind: formal verification of the Signal protocol",
+        "url": "https://deepmind.google/blog/formal-verification-signal-protocol",
+        "date": "2026-11-10"
+      },
+      "lead": "Google DeepMind"
+    },
+    {
+      "id": "b-nysafety-20261110",
+      "articleId": "nysafety-20261110",
+      "date": "2026-11-10",
+      "headline": "New York builds a testing lab",
+      "text": "New York launched a state AI testing centre at Binghamton University on November 10th, with more than 80 researchers, and opened registration under its RAISE Act. Developers of models trained with over 10^26 operations at over $100m must register by January 1st 2027.",
+      "source": {
+        "title": "Governor of New York: New York will lead the nation in AI science and safety",
+        "url": "https://www.governor.ny.gov/news/governor-hochul-declares-ny-will-lead-nation-ai-science-and-safety-launches-new-research",
+        "date": "2026-11-10"
+      },
+      "lead": "New York"
+    },
+    {
+      "id": "b-australia-20261112",
+      "articleId": "australia-20261112",
+      "date": "2026-11-12",
+      "headline": "A guide for the workplace",
+      "text": "Australia’s government released a draft voluntary guide to adopting AI at work on November 12th, built on three themes and eight principles and developed with unions and employers. Consultation runs until January 27th 2027.",
+      "source": {
+        "title": "Minister for Employment and Workplace Relations: draft best-practice guide on AI adoption in the workplace released",
+        "url": "https://ministers.dewr.gov.au/rishworth/draft-best-practice-guide-ai-adoption-workplace-released",
+        "date": "2026-11-12"
+      },
+      "lead": "Australia’s government"
+    },
+    {
+      "id": "b-nvidia-20261112-chair",
+      "articleId": "nvidia-20261112",
+      "date": "2026-11-12",
+      "headline": "A first chair for Nvidia",
+      "text": "Nvidia named Harvey C. Jones, a long-serving director, as the first chair of its board in the same filing that announced Jensen Huang’s resignation. The company said it would report quarterly results on November 17th as scheduled.",
+      "source": {
+        "title": "Nvidia: Form 8-K, CEO transition, filed 12 November",
+        "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000082/nvda-20261111.htm",
+        "date": "2026-11-12"
+      },
+      "lead": "Nvidia named"
     }
   ]
 };
