@@ -7,14 +7,16 @@
       rating and reviewing on Goodreads as usual. Which shelf (genre)
       a book sits on is decided in content/shelves.js.
 
-   2. EVERYTHING ELSE (films, articles, courses, videos, podcasts)
+   2. EVERYTHING ELSE (articles, videos, films, podcasts, pictures)
       goes in the "log" list below, one entry per thing. Paste the
       link and write your note; the next morning the sync fills in
       the title, maker and picture (content/media.js). Fields:
 
-        type     "film", "article", "course", "video" or "podcast"
+        type     "article", "video", "film", "podcast" or "picture"
+                 ("course" entries are kept here but not shown on the site)
         link     where it lives: an IMDb or Wikipedia page for a film,
-                 the YouTube link for a video, the article's address...
+                 the YouTube link for a video, the article's address, or
+                 for a picture, the image itself or the page it is on...
         status   "done" (the default), "doing", "queued" (want to) or
                  "dropped" (gave up)
         date     when you finished it: "2026-10-20", or just "2026"

@@ -46,7 +46,6 @@ window.Sketch = (function () {
     magazine: '<rect x="44" y="12" width="72" height="88" rx="2"/><path class="acc" d="M54 26 H106"/><path class="thin" d="M54 38 H96 M54 74 H106 M54 82 H100 M54 90 H90"/><rect x="54" y="46" width="52" height="22" class="thin"/>',
     screen: '<rect x="30" y="16" width="100" height="64" rx="4"/><path class="acc" d="M72 36 L94 48 L72 60 Z"/><path d="M64 96 H96 M80 80 V96"/>',
     club: '<rect x="28" y="56" width="44" height="44" rx="2" class="thin"/><rect x="88" y="56" width="44" height="44" rx="2" class="thin"/><circle cx="50" cy="30" r="12"/><circle cx="110" cy="30" r="12"/><path class="acc" d="M62 78 H98"/>',
-    cat: '<circle cx="70" cy="50" r="28"/><path d="M90 70 L118 98"/><path class="acc" d="M64 40 C 64 30, 80 30, 78 42 C 77 48, 70 49, 70 56 M70 63 V64"/>',
     satellite: '<rect x="64" y="40" width="32" height="32" rx="3"/><path d="M64 56 H44 M96 56 H116"/><rect x="12" y="44" width="32" height="24"/><rect x="116" y="44" width="32" height="24"/><path class="thin" d="M12 52 H44 M12 60 H44 M116 52 H148 M116 60 H148"/><path d="M80 40 V20 M72 20 H88"/><path class="acc" d="M64 64 H96"/>',
     report: '<path d="M40 12 H96 L112 28 V100 H40 Z"/><path class="thin" d="M52 36 H96 M52 48 H100 M52 60 H88"/><circle cx="96" cy="78" r="14"/><path class="acc" d="M106 88 L122 104"/>',
     house: '<path d="M24 96 V58 L56 32 L88 58 V96 Z"/><path class="thin" d="M48 96 V74 H64 V96"/><path class="thin" d="M100 96 H146"/><path class="acc" d="M104 84 L118 70 L130 76 L144 50"/>',

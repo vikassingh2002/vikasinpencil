@@ -198,6 +198,9 @@ def any_page(link):
 
 def look_up(link):
     host = urllib.parse.urlparse(link).netloc.lower()
+    # A link straight to an image (a "picture" entry): keep a copy of the image itself.
+    if re.search(r"\.(jpe?g|png|webp|gif)(\?|$)", urllib.parse.urlparse(link).path, re.I):
+        return {"title": "", "by": "", "source": host.replace("www.", ""), "year": "", "date": "", "image_url": link}
     if "youtube.com" in host or "youtu.be" in host:
         return youtube(link)
     if "open.spotify.com" in host:

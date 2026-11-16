@@ -7,13 +7,17 @@
              automatically, after these.
      status    "live", "building" or "idea"
      drawing   which line drawing to use: magazine, screen, club,
-               cat, satellite, report, house, flow
+               satellite, report, house, flow
      link      where it lives (optional)
 
    journey   the line on the home page, oldest first. state is
              "done", "now" or "next".
 
    next      the plans on the home page.
+
+   notes     which notes from content/notes.js appear where:
+             "E-04": [...] shows them under that experiment on Work,
+             "now": [...] shows them at the bottom of Now.
    ============================================================= */
 window.NB = window.NB || {};
 NB.work = {
@@ -45,15 +49,6 @@ NB.work = {
       text: "A small app for a local book club: what members are reading, ratings and meet-ups.",
       drawing: "club",
       link: "/bookclub/"
-    },
-    {
-      id: "curiosity",
-      status: "live",
-      title: "Curiosity Cat",
-      kind: "Explainers",
-      text: "Short discoveries about how AI agents work: guess first, then see what actually happens.",
-      drawing: "cat",
-      link: "/curiosity.html"
     }
   ],
   journey: [
@@ -67,5 +62,9 @@ NB.work = {
     { when: "This year", text: "Finish the satellite agent and test it honestly, in public." },
     { when: "Then", text: "Apply agents to real consulting workflows, using public material." },
     { when: "Later", text: "See whether something I build can become an independent business." }
-  ]
+  ],
+  notes: {
+    "E-04": ["N-04", "N-02"],
+    "now": ["N-01", "N-03"]
+  }
 };
