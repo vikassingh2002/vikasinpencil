@@ -17,7 +17,7 @@
    ============================================================= */
 window.NB = window.NB || {};
 NB.work = {
-  intro: "What I have made and what I am building. Each one starts as a sketch and is inked in as it becomes real. Everything uses public or personal material.",
+  intro: "What I have made and what I am building. Ideas start as dashed sketches and are inked in green once they are real. All public or personal material.",
   projects: [
     {
       id: "agentic",
@@ -60,7 +60,7 @@ NB.work = {
     { when: "Degree", title: "Physics", text: "B.Sc. from Mumbai University. Learned to ask how things work.", state: "done" },
     { when: "Business school", title: "MBA", text: "International Business at IIFT Kolkata.", state: "done" },
     { when: "Work", title: "Consulting", text: "Digital Engineering and R&D at Capgemini.", state: "done" },
-    { when: "Since Oct 2026", title: "Building with AI", text: "A serious year of learning to build useful AI products.", state: "now" },
+    { when: "Since Oct 2026", title: "Building with AI", text: "Agents, experiments and a weekly magazine.", state: "now" },
     { when: "Next", title: "Something of my own", text: "Find out whether something I build can stand on its own.", state: "next" }
   ],
   next: [

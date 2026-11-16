@@ -42,12 +42,11 @@
   var tabbar = '<nav class="tabbar" aria-label="Sections">' + SHEETS.map(function (s) {
     return '<a href="' + s[2] + '" data-sheet' + (s[0] === page ? ' aria-current="page"' : '') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[s[0]] + '</svg><span>' + s[1] + '</span></a>';
   }).join('') + '</nav>';
-  var footer = '<footer class="titleblock"><div class="wrap">' +
-    '<div class="tb-row"><div><span class="tb-k">Drawn by</span>' + esc(S.name || 'Vikas Singh') + '</div>' +
-    '<div><span class="tb-k">Sheet</span>' + String(idx + 1).padStart(2, '0') + ' of 05 · ' + SHEETS[idx][1] + '</div>' +
-    '<div><span class="tb-k">Revision</span>Rev ' + rev + ' · ' + fmt(updated) + '</div>' +
-    '<div><span class="tb-k">Contact</span><a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a> · <a href="' + esc(S.linkedin) + '" rel="noopener">LinkedIn</a></div></div>' +
-    '<p class="tb-note">' + esc(S.publicWorkNote || '') + '</p></div></footer>';
+  // One quiet line: who drew it, the revision, and how to get in touch. #about is where brief.html forwards.
+  var footer = '<footer class="titleblock" id="about"><div class="wrap">' +
+    (page === 'home' ? '<p class="tb-brief">' + esc(S.briefLine) + '</p>' : '') +
+    '<p class="tb-line"><span>Drawn by ' + esc(S.name || 'Vikas Singh') + '</span><span>Sheet ' + String(idx + 1).padStart(2, '0') + ' of 05 · Rev ' + rev + ' · ' + fmt(updated) + '</span>' +
+    '<span><a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a> · <a href="' + esc(S.linkedin) + '" rel="noopener">LinkedIn</a></span></p></div></footer>';
 
   /* ---------- pieces ---------- */
   function sheetHead(no, title, lede, drawing) {
@@ -68,11 +67,12 @@
   function projCard(p, full) {
     var pr = progressOf(p), pct = Math.round(pr * 100);
     var stepTxt = p.st ? p.st.done + ' of ' + p.st.total + ' steps done' : p.kind;
-    var h = '<article class="card proj is-' + p.status + '" id="' + esc(p.id) + '" data-status="' + p.status + '">' +
+    var h = '<article class="card proj is-' + p.status + (full ? '' : ' compact') + '" id="' + esc(p.id) + '" data-status="' + p.status + '">' +
       '<div class="proj-art">' + Sketch.svg(p.drawing, '0 0 160 110', 'mini', '') + '</div>' +
       '<div class="proj-body"><span class="status s-' + p.status + '">' + LABEL[p.status] + '</span><h3>' + (p.link ? '<a href="' + esc(p.link) + '">' + esc(p.title) + '</a>' : esc(p.title)) + '</h3>' +
-      '<p>' + md(p.text) + '</p>' +
-      '<div class="hatch" role="img" aria-label="' + pct + '% done"><span style="width:' + pct + '%"></span></div><div class="meta"><span>' + esc(stepTxt) + '</span><span>' + (p.status === 'live' ? 'Inked' : pct + '%') + '</span></div>';
+      '<p>' + md(p.text) + '</p>';
+    if (!full) return h + '</div></article>';
+    if (p.status !== 'live') h += '<div class="hatch" role="img" aria-label="' + pct + '% done"><span style="width:' + pct + '%"></span></div><div class="meta"><span>' + esc(stepTxt) + '</span><span>' + pct + '%</span></div>';
     if (full && p.steps && p.steps.length) h += '<ol class="steps">' + p.steps.map(function (s) { return '<li class="st-' + esc(s.state) + '"><span>' + esc(s.when) + '</span>' + esc(s.name) + '</li>'; }).join('') + '</ol>';
     if (full && p.exp) {
       var x = p.exp;
@@ -94,8 +94,9 @@
   function belief(h) {
     var ret = h.status === 'retired', c = ret ? h.retired.to : h.confidence, hist = h.history || [], was = ret ? h.retired.from : hist.length ? hist[0].confidence : c;
     return '<article class="belief' + (ret ? ' retired' : '') + '" id="' + esc(h.id) + '"><div class="b-text"><div class="eyebrow">' + esc(h.id) + ' · ' + (ret ? 'retired ' + fmt(h.retired.date) : 'since ' + fmt(h.opened)) + '</div>' +
-      '<h3>' + esc(h.statement) + '</h3>' + (ret ? '<p>' + md(h.retired.what) + '</p>' : '<p>' + md(h.why) + '</p>' + (h.changeMind ? '<p class="cm"><b>What would change my mind:</b> ' + md(h.changeMind) + '</p>' : '')) +
-      ((h.revisions || []).length ? '<p class="cm"><b>Reworded:</b> <s>' + esc(h.revisions[0].before) + '</s></p>' : '') + '</div>' +
+      '<h3>' + esc(h.statement) + '</h3>' + (ret ? '<p>' + md(h.retired.what) + '</p>' :
+        '<details><summary>Why I think so</summary><p>' + md(h.why) + '</p>' + (h.changeMind ? '<h4>What would change my mind</h4><p>' + md(h.changeMind) + '</p>' : '') +
+        ((h.revisions || []).length ? '<h4>First worded as</h4><p><s>' + esc(h.revisions[0].before) + '</s></p>' : '') + '</details>') + '</div>' +
       '<div class="b-dial">' + dial(h) + '<div class="b-num"><b>' + c + '%</b> sure' + (was !== c ? '<span>was ' + was + '%</span>' : '') + '</div></div></article>';
   }
   function cover(b, lazy) {
@@ -113,59 +114,59 @@
   if (page === 'home') {
     var cur = reading[0], fst = featured ? steps(featured) : null;
     main = '<section class="hero"><div class="hero-text"><span class="pill"><b></b>Day ' + day + ' of a year of building · updated ' + short(updated) + '</span>' +
-      '<h1>I sketch ideas, then <em>build them</em>.</h1><p class="lede">' + esc((S.coverLines || []).join(' ')) + ' This site is the drawing board: what I am learning, making and thinking, and where I am heading.</p>' +
+      '<h1>I sketch ideas, then <em>build them</em>.</h1><p class="lede">' + esc((S.coverLines || []).join(' ')) + '</p>' +
       '<div class="cta"><a class="btn dark" href="/work.html" data-sheet>See the work</a><a class="btn" href="/now.html" data-sheet>What I am learning</a></div></div>' +
       '<div class="hero-art">' + Sketch.svg('home', '0 0 360 280', 'hero', 'A line drawing of a workbench with a lamp and a half-drawn part') + '</div></section>' +
-      block('Right now', ['/now.html', 'All of Now'], '<div class="grid3">' +
+      block('Right now', ['/now.html', 'Now'], '<div class="grid3">' +
         '<a class="card" href="/now.html" data-sheet><div class="label">Learning</div><h3>' + esc(((T.currently || [])[0] || {}).text) + '</h3></a>' +
         (featured ? '<a class="card" href="/work.html#' + esc(featured.id) + '" data-sheet><div class="label">Building</div><h3>' + esc(featured.title) + '</h3><div class="hatch"><span style="width:' + (fst.total ? Math.round(fst.done / fst.total * 100) : 0) + '%"></span></div><div class="meta"><span>' + (expStatus(featured) === 'idea' ? 'On the drawing board' : 'Building') + '</span><span>' + fst.done + ' of ' + fst.total + ' steps</span></div></a>' : '') +
         (cur ? '<a class="card book-card" href="/reading.html" data-sheet><img src="/' + esc(cur.cover) + '" alt="" width="58" height="87"><div><div class="label">Reading</div><h3>' + esc(cur.title) + '</h3><p>' + esc(cur.author) + '</p></div></a>' : '') + '</div>') +
       block('The journey so far', null, '<ol class="journey">' + W.journey.map(function (j) { return '<li class="stop st-' + j.state + '"><span class="when">' + esc(j.when) + '</span><h3>' + esc(j.title) + '</h3><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ol>') +
-      block('What I have made', ['/work.html', 'All work'], '<div class="grid3">' + allProjects.filter(function (p) { return p.status === 'live'; }).slice(0, 3).map(function (p) { return projCard(p, false); }).join('') + '</div>') +
-      block('What I think', ['/thinking.html', 'All thinking'], '<div class="grid2">' +
-        (N[0] ? '<a class="card" href="/thinking.html#' + esc(N[0].id) + '" data-sheet><div class="label">Latest note · ' + fmt(N[0].date) + '</div><h3 class="serif">' + esc(N[0].title) + '</h3><p>' + md((N[0].paragraphs || [''])[0].slice(0, 170)) + '…</p></a>' : '') +
-        (featBelief ? '<a class="card belief-card" href="/thinking.html#' + esc(featBelief.id) + '" data-sheet><div class="label">A belief I am testing</div><h3 class="serif">' + esc(featBelief.statement) + '</h3><div class="bc-dial">' + dial(featBelief) + '<span><b>' + featBelief.confidence + '%</b> sure</span></div></a>' : '') + '</div>') +
-      block('What is next', null, '<div class="grid3">' + W.next.map(function (n) { return '<div class="card plan"><div class="label">' + esc(n.when) + '</div><h3>' + esc(n.text) + '</h3></div>'; }).join('') + '</div>' +
-        (L.length ? '<p class="aside">' + L.length + ' sealed letters to my future self open between ' + L.map(function (l) { return l.opens.slice(0, 4); }).sort()[0] + ' and ' + L.map(function (l) { return l.opens.slice(0, 4); }).sort().pop() + '.</p>' : ''), 'next') +
-      block('About', null, '<div class="about"><div><p class="big">' + esc(S.briefLine) + '</p>' + (S.thirtySeconds || []).map(function (p) { return '<p>' + md(p) + '</p>'; }).join('') + '</div>' +
-        '<div class="card contact"><div class="label">Get in touch</div><a href="mailto:' + esc(S.email) + '">' + esc(S.email) + '</a><a href="' + esc(S.linkedin) + '" rel="noopener">LinkedIn</a>' + (S.cvFile ? '<a href="' + esc(S.cvFile) + '">CV</a>' : '') + '</div></div>', 'about');
+      block('What I have made', ['/work.html', 'Work'], '<div class="grid3">' + allProjects.filter(function (p) { return p.status === 'live'; }).slice(0, 3).map(function (p) { return projCard(p, false); }).join('') + '</div>') +
+      block('What is next', null, '<div class="grid3">' + W.next.map(function (n) { return '<div class="card plan"><div class="label">' + esc(n.when) + '</div><h3>' + esc(n.text) + '</h3></div>'; }).join('') + '</div>', 'next');
   } else if (page === 'now') {
     var around = ((T.sketch || {}).around || []), n = around.length || 1;
     var route = '<svg class="sk route" viewBox="0 0 640 150" role="img" aria-label="Learning route: ' + esc(around.map(function (a) { return a.label + (a.state === 'now' ? ' (now)' : ''); }).join(', ')) + '">' +
       '<path class="thin" d="M30 90 C 120 30, 200 140, 320 80 S 520 40, 610 90"/>' +
       around.map(function (a, i) { var x = 30 + i * (580 / Math.max(1, n - 1)), y = 90 - Math.sin(i / Math.max(1, n - 1) * Math.PI * 2) * 22;
         return '<circle class="' + (a.state === 'now' ? 'soft-acc' : a.state === 'done' ? '' : 'dash') + '" cx="' + x.toFixed(0) + '" cy="' + y.toFixed(0) + '" r="' + (a.state === 'now' ? 9 : 6) + '"/><text class="note' + (a.state === 'now' ? ' strong' : '') + '" x="' + x.toFixed(0) + '" y="' + (y + 30).toFixed(0) + '" text-anchor="middle">' + esc(a.label) + '</text>'; }).join('') + '</svg>';
-    main = sheetHead('02', 'Now', esc(T.intro) + ' <span class="muted">Updated ' + fmt(T.date) + '.</span>', 'now') +
-      '<div class="grid2">' + (T.currently || []).map(function (c) { return '<div class="card"><div class="label">' + esc(c.label) + '</div><h3>' + esc(c.text) + '</h3></div>'; }).join('') +
+    var keep = (T.currently || []).filter(function (c) { return /learn|build/i.test(c.label); });
+    main = sheetHead('02', 'Now', 'What has my attention this month. <span class="muted">Updated ' + fmt(T.date) + '.</span>', 'now') +
+      '<div class="grid3">' + keep.map(function (c) { return '<div class="card"><div class="label">' + esc(c.label) + '</div><h3>' + esc(c.text) + '</h3></div>'; }).join('') +
       (T.question ? '<div class="card q"><div class="label">The question on my desk</div><h3 class="serif">' + esc(T.question) + '</h3></div>' : '') + '</div>' +
-      block('The learning route', null, route + '<p class="aside">' + esc((T.sketch || {}).caption) + '</p>') +
-      ((T.sinceLastMonth || []).length ? block('What changed', null, '<ul class="changes">' + T.sinceLastMonth.map(function (c) { return '<li>' + (c.struck ? '<s>' + esc(c.struck) + '</s>' : '') + '<span>' + esc(c.note) + '</span></li>'; }).join('') + '</ul>') : '') +
-      block('Log', null, '<ul class="log">' + (T.log || []).map(function (l) { return '<li><span class="d">' + fmt(l.date) + '</span><span>' + md(l.text) + '</span></li>'; }).join('') + '</ul>');
+      block('The learning route', null, route + '<p class="aside">' + esc((T.sketch || {}).caption) + '</p>');
   } else if (page === 'work') {
-    var cnt = function (s) { return allProjects.filter(function (p) { return p.status === s; }).length; };
+    var big = allProjects.filter(function (p) { return p.status !== 'idea' || (p.exp && p.exp.featured); });
+    var ideas = allProjects.filter(function (p) { return big.indexOf(p) < 0; });
     main = sheetHead('03', 'Work', esc(W.intro), 'work') +
-      '<div class="stats"><div><b>' + cnt('live') + '</b><span>live</span></div><div><b>' + cnt('building') + '</b><span>building</span></div><div><b>' + cnt('idea') + '</b><span>on the drawing board</span></div><div><b>' + day + '</b><span>days into the build year</span></div></div>' +
-      '<div class="legend"><span><i class="lg-idea"></i>Dashed: an idea</span><span><i class="lg-build"></i>Shaded: being built</span><span><i class="lg-live"></i>Inked green: live</span></div>' +
-      '<div class="chips" role="group" aria-label="Filter"><button aria-pressed="true" data-f="all">All</button><button aria-pressed="false" data-f="live">Live</button><button aria-pressed="false" data-f="building">Building</button><button aria-pressed="false" data-f="idea">On the drawing board</button></div>' +
-      '<div class="projects">' + allProjects.map(function (p) { return projCard(p, true); }).join('') + '</div>';
+      '<div class="projects">' + big.map(function (p) { return projCard(p, true); }).join('') + '</div>' +
+      (ideas.length ? block('Also on the drawing board', null, '<ul class="ideas">' + ideas.map(function (p) {
+        var x = p.exp || {};
+        return '<li id="' + esc(p.id) + '"><span class="idea-art">' + Sketch.svg(p.drawing, '0 0 160 110', 'mini idea', '') + '</span><div><h3>' + esc(p.title) + '</h3><p>' + md(x.question || p.text) + '</p>' +
+          '<details><summary>The plan</summary>' + [['Hypothesis', x.hypothesis], ['Method', x.method], ['Next step', x.next]].filter(function (r) { return r[1]; }).map(function (r) { return '<h4>' + r[0] + '</h4><p>' + md(r[1]) + '</p>'; }).join('') + '</details></div></li>';
+      }).join('') + '</ul>') : '');
   } else if (page === 'thinking') {
-    main = sheetHead('04', 'Thinking', 'Short notes, and beliefs I am testing out loud. When I change my mind, the old view stays visible, struck through rather than erased.', 'thinking') +
-      '<div class="chips jump"><a href="#notes">Notes</a><a href="#beliefs">Beliefs</a>' + (E.length ? '<a href="#corrections">Corrections</a>' : '') + '</div>' +
-      block('Notes', null, N.map(function (n) { return '<article class="note" id="' + esc(n.id) + '"><div class="n-meta">' + fmt(n.date) + '<br>' + esc(n.topic) + '</div><div class="n-body"><h3>' + esc(n.title) + '</h3>' +
-        (n.paragraphs || []).map(function (p, i) { return i === 0 ? '<p>' + md(p) + '</p>' : ''; }).join('') +
-        ((n.paragraphs || []).length > 1 ? '<details><summary>Read the rest</summary>' + n.paragraphs.slice(1).map(function (p) { return '<p>' + md(p) + '</p>'; }).join('') + '</details>' : '') + '</div></article>'; }).join(''), 'notes') +
+    var firstSentence = function (p) { var m = String(p).match(/^.*?[.?!](\s|$)/); return m ? m[0].trim() : p; };
+    main = sheetHead('04', 'Thinking', 'Notes, and beliefs I am testing out loud. When I change my mind, the old view stays visible.', 'thinking') +
+      block('Notes', null, N.map(function (n) {
+        var ps = n.paragraphs || [], lead = firstSentence(ps[0] || ''), rest = String(ps[0] || '').slice(lead.length).trim();
+        return '<article class="note" id="' + esc(n.id) + '"><div class="n-meta">' + fmt(n.date) + '</div><div class="n-body"><h3>' + esc(n.title) + '</h3><p>' + md(lead) + '</p>' +
+          '<details><summary>Read the note</summary>' + (rest ? '<p>' + md(rest) + '</p>' : '') + ps.slice(1).map(function (p) { return '<p>' + md(p) + '</p>'; }).join('') + '</details></div></article>';
+      }).join(''), 'notes') +
       block('Beliefs I am testing', null, H.filter(function (h) { return h.status !== 'retired'; }).concat(H.filter(function (h) { return h.status === 'retired'; })).map(belief).join(''), 'beliefs') +
-      (E.length ? block('Corrections', null, '<ul class="log">' + E.map(function (e) { return '<li><span class="d">' + fmt(e.date) + '<br>' + esc(e.where) + '</span><span>' + md(e.text) + '</span></li>'; }).join('') + '</ul>', 'corrections') : '');
+      (E.length ? '<details class="corrections" id="corrections"><summary>Corrections (' + E.length + ')</summary><ul class="log">' + E.map(function (e) { return '<li><span class="d">' + fmt(e.date) + '</span><span>' + md(e.text) + '</span></li>'; }).join('') + '</ul></details>' : '');
   } else if (page === 'reading') {
     var yr = String(new Date().getFullYear()), thisYear = read.filter(function (b) { return (b.read || '').slice(0, 4) === yr; }).length;
-    var used = {}; read.forEach(function (b) { ((SH.books || {})[b.id] || []).forEach(function (g) { used[g] = (used[g] || 0) + 1; }); });
-    var genres = (SH.genres || []).filter(function (g) { return used[g.key] >= 3; });
-    main = sheetHead('05', 'Reading', esc(R.intro || 'Books that shaped how I think, synced from Goodreads.'), 'reading') +
-      '<div class="stats"><div><b>' + read.length + '</b><span>books read</span></div><div><b>' + thisYear + '</b><span>this year</span></div><div><b>' + G.filter(function (b) { return b.shelf === 'to-read'; }).length + '</b><span>on the list</span></div><div><b>' + reading.length + '</b><span>reading now</span></div></div>' +
+    var GROUPS = [['fantasy', 'Fantasy', ['fantasy', 'paranormal', 'myth']], ['fiction', 'Fiction', ['scifi', 'horror', 'thriller', 'literary', 'classics', 'comingofage', 'romance']],
+      ['science', 'Science & tech', ['science', 'tech']], ['money', 'Business & money', ['money']], ['history', 'History', ['history', 'war', 'lives']], ['ideas', 'Ideas', ['mind', 'philosophy', 'craft']]];
+    var groupOf = function (b) { var g = (SH.books || {})[b.id] || []; return GROUPS.filter(function (G2) { return g.some(function (k) { return G2[2].indexOf(k) >= 0; }); }).map(function (G2) { return G2[0]; }).join(' '); };
+    var profile = (NB.goodreads || {}).profile || 'https://www.goodreads.com/';
+    main = sheetHead('05', 'Reading', 'Books that shaped how I think. Fantasy sits next to physics on purpose.', 'reading') +
+      '<div class="stats two"><div><b>' + read.length + '</b><span>books read</span></div><div><b>' + thisYear + '</b><span>this year</span></div></div>' +
       (reading.length ? block('Reading now', null, '<div class="covers now">' + reading.map(function (b) { return cover(b, false); }).join('') + '</div>') : '') +
-      block('The shelf', null, '<div class="chips" role="group" aria-label="Filter by shelf"><button aria-pressed="true" data-g="all">All</button>' + genres.map(function (g) { return '<button aria-pressed="false" data-g="' + esc(g.key) + '">' + esc(g.short || g.label) + '</button>'; }).join('') + '</div>' +
-        '<div class="covers shelf">' + read.map(function (b, i) { return cover(b, i > 11); }).join('') + '</div><button class="btn more" type="button">Show all ' + read.length + ' books</button>') +
-      ((R.log || []).length ? block('Courses and other things', null, '<ul class="log">' + R.log.map(function (r) { return '<li><span class="d">' + esc(r.date || '') + '<br>' + esc(r.type) + '</span><span>' + esc(r.title || r.link) + (r.by ? ' <span class="muted">· ' + esc(r.by) + '</span>' : '') + '</span></li>'; }).join('') + '</ul>') : '');
+      block('Recently read', null, '<div class="chips" role="group" aria-label="Filter by shelf"><button aria-pressed="true" data-g="all">All</button>' + GROUPS.map(function (g) { return '<button aria-pressed="false" data-g="' + g[0] + '">' + esc(g[1]) + '</button>'; }).join('') + '</div>' +
+        '<div class="covers shelf">' + read.map(function (b, i) { return cover(b, i > 5).replace('class="book"', 'class="book" data-group="' + groupOf(b) + '"' + (i >= 12 ? ' hidden' : '')); }).join('') + '</div>' +
+        '<a class="btn more" href="' + esc(profile) + '" rel="noopener">See all ' + read.length + ' on Goodreads →</a>');
   }
 
   document.getElementById('app').innerHTML = header + '<main id="main" class="wrap">' + main + '</main>' + footer + tabbar;
@@ -215,20 +216,17 @@
     if (Math.abs(dx) > 90 && Math.abs(dy) < 40) { var j = idx + (dx < 0 ? 1 : -1); if (j >= 0 && j < SHEETS.length) leave(SHEETS[j][2]); }
   }, { passive: true });
 
-  // Filters.
-  [].forEach.call(document.querySelectorAll('.chips button'), function (b) {
+  // Shelf filter: show the 12 most recent books in the chosen group.
+  [].forEach.call(document.querySelectorAll('.chips button[data-g]'), function (b) {
     b.addEventListener('click', function () {
-      var grp = b.parentNode; [].forEach.call(grp.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-      if (b.dataset.f) [].forEach.call(document.querySelectorAll('.proj'), function (p) { p.hidden = b.dataset.f !== 'all' && p.dataset.status !== b.dataset.f; });
-      if (b.dataset.g) {
-        var shelf = document.querySelector('.covers.shelf'); shelf.classList.add('open');
-        [].forEach.call(shelf.querySelectorAll('.book'), function (k) { k.hidden = b.dataset.g !== 'all' && (' ' + k.dataset.genres + ' ').indexOf(' ' + b.dataset.g + ' ') < 0; });
-        var m = document.querySelector('.btn.more'); if (m) m.hidden = true;
-      }
+      [].forEach.call(b.parentNode.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      var shown = 0;
+      [].forEach.call(document.querySelectorAll('.covers.shelf .book'), function (k) {
+        var ok = b.dataset.g === 'all' || (' ' + k.dataset.group + ' ').indexOf(' ' + b.dataset.g + ' ') >= 0;
+        k.hidden = !(ok && shown < 12); if (ok && shown < 12) { shown++; var im = k.querySelector('img'); if (im) im.loading = 'eager'; }
+      });
     });
   });
-  var more = document.querySelector('.btn.more');
-  if (more) more.addEventListener('click', function () { document.querySelector('.covers.shelf').classList.add('open'); more.hidden = true; });
 
   // Pencil ring around cards on hover.
   [].forEach.call(document.querySelectorAll('a.card, .proj'), function (c) {
