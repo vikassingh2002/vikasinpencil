@@ -1,7 +1,7 @@
 // Book Club: caches only the app's own files so it opens quickly and offline.
 // Database, sign-in and book-lookup requests always go to the network.
-const CACHE = "bookclub-static-v5";
-const FILES = ["/bookclub/", "/bookclub/style.css?v=5", "/bookclub/app.js?v=5", "/bookclub/manifest.webmanifest",
+const CACHE = "bookclub-static-v6";
+const FILES = ["/bookclub/", "/bookclub/style.css?v=6", "/bookclub/app.js?v=5", "/bookclub/manifest.webmanifest",
   "/bookclub/icon.svg", "/bookclub/icon-192.png", "/assets/js/desk-config.js?v=bookclub1"];
 const shell = new Set(FILES.map(p => new URL(p, self.location.origin).pathname));
 self.addEventListener("install", e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));

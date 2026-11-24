@@ -85,7 +85,7 @@ h1 { font-family: var(--serif); font-weight: 500; letter-spacing: -0.015em; }
 }
 .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; margin-right: auto; }
 .brand b { font-weight: 700; }
-.brand-mark { width: 24px; height: 24px; fill: var(--accent); flex: none; }
+.brand-mark { width: 30px; height: 30px; flex: none; display: block; }
 .tabs { display: none; gap: 2px; }
 .tabs a, .bottom a { position: relative; text-decoration: none; color: var(--ink-3); display: flex; align-items: center; gap: 7px; }
 .tabs a { padding: 7px 12px; border-radius: 999px; font-weight: 500; font-size: 14px; }
